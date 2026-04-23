@@ -9,6 +9,18 @@ This document is generated from the same three committed bundle JSON samples as 
 - **In-repo threat model & OWASP mapping (phase0):** [THREAT_MODEL_TAXONOMY.md](https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md)
 - **OWASP LLM Top 10 (official):** [Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 
+## Config signals vs `trust_remote_code` (default CI facts)
+
+These rows are **scanner defaults** (what flips `aggregate_exit_code` in CI today vs what is informational). They are not legal advice and not proof of compromise.
+
+| Config rule / topic | Blocks default CI today? | Compared to `trust_remote_code` | Leadership takeaway |
+| --------------------- | ------------------------- | ------------------------------ | ------------------- |
+| `trust_remote_code_enabled` | **YES** | Baseline worst-case static loader signal in default CI. | Stop / waive with controls; treat like shipping a remote dependency that can execute. |
+| `auto_map_custom_classes` | **YES** | High static concern; different mechanism, still blocking by default. | Require provenance for mapped classes; no silent waivers. |
+| `config_json_invalid` | **YES** | Operational / integrity break; not “Hub RCE” semantics. | Fix JSON before debating loader philosophy. |
+| `use_fast_tokenizer_truthy` | **NO (today)** | Much lower incident class than trust_remote_code in typical stacks. | Engineering + audit follow-up; not an automatic emergency bridge. |
+| `use_auth_token_present` | **NO (today)** | Secrets/compliance angle, not the same as remote code at load. | Rotate / remove secrets; involve security if scopes are broad. |
+
 ### How to use the score (1–5)
 
 | Score | Meaning for leadership |

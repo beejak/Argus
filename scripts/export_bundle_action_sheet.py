@@ -39,6 +39,15 @@ OWASP_SHORT: dict[str, str] = {
     "LLM10": "Unbounded consumption",
 }
 
+# Must stay aligned with `hf_bundle_scanner.dispatch.scan_bundle` config_risk escalation.
+_DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS: frozenset[str] = frozenset(
+    {
+        "trust_remote_code_enabled",
+        "auto_map_custom_classes",
+        "config_json_invalid",
+    }
+)
+
 
 @dataclass(frozen=True)
 class Demo:
@@ -322,7 +331,215 @@ def _decision_english(code: str) -> str:
 def _taxonomy_bundle(**kwargs: Any) -> dict[str, str]:
     d = _taxonomy_fields(**kwargs)
     d["recommended_decision_explained"] = _decision_english(d["recommended_decision"])
+    d.update(_leadership_decision_support(**kwargs))
     return d
+
+
+def _leadership_decision_support(**kwargs: Any) -> dict[str, str]:
+    """Facts + expert-style guidance so leadership can compare signals (not 'policy TBD')."""
+    row_kind = str(kwargs.get("row_kind") or "")
+    rid = str(kwargs.get("rule_id") or "").strip()
+    relpath = str(kwargs.get("relpath") or "")
+    suf = _suffix(relpath)
+
+    if row_kind == "EXEC_SUMMARY":
+        return {
+            "default_ci_blocks_release": "N/A (bundle rollup)",
+            "compared_to_worst_case_loader_risk": (
+                "Worst-case **static** loader signal in this repo’s **default** CI gate is "
+                "`trust_remote_code` truthy (remote code class at load). Use the legend + per-row "
+                "`default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**."
+            ),
+            "decision_support_expert": (
+                "Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle "
+                "aggregate in default CI today. **NO** rows can still matter for audits and "
+                "engineering backlog, but they are not the same incident class as remote code."
+            ),
+        }
+
+    if row_kind == "CONFIG":
+        blocks = "YES" if rid in _DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS else "NO"
+        if rid == "trust_remote_code_enabled":
+            return {
+                "default_ci_blocks_release": blocks,
+                "compared_to_worst_case_loader_risk": (
+                    "This **is** the reference severe loader posture for this scanner’s default gate: "
+                    "it can enable **Hub-supplied Python** during load in typical stacks."
+                ),
+                "decision_support_expert": (
+                    "Treat as a **security + legal** decision, not an ML hyperparameter tweak: "
+                    "require explicit waiver with compensating controls, revision pinning, and "
+                    "deny-by-default in production unless you run inside a tightly bounded sandbox."
+                ),
+            }
+        if rid == "use_fast_tokenizer_truthy":
+            return {
+                "default_ci_blocks_release": blocks,
+                "compared_to_worst_case_loader_risk": (
+                    "**Much lower** than `trust_remote_code`: it does **not** assert that arbitrary "
+                    "Hub Python will run. It flags a **legacy / fast tokenizer path** that can make "
+                    "audits and reproducibility harder and can hide subtle behavior differences — "
+                    "not an automatic RCE story."
+                ),
+                "decision_support_expert": (
+                    "Leadership can usually route this to **engineering hygiene** (tokenizer provenance, "
+                    "tests, pinning) rather than an emergency incident bridge. Still worth tracking if "
+                    "your org cares about strict reproducibility or regulated explainability."
+                ),
+            }
+        if rid == "use_auth_token_present":
+            return {
+                "default_ci_blocks_release": blocks,
+                "compared_to_worst_case_loader_risk": (
+                    "Different class than `trust_remote_code`: primary risk is **credential exposure** "
+                    "in artifacts/config repos and downstream secret sprawl — serious for compliance, "
+                    "but not the same as “execute Hub code at load.”"
+                ),
+                "decision_support_expert": (
+                    "Treat as **secret-management**: rotate anything hinted, block merges that embed "
+                    "tokens, move to secret stores / OIDC. Escalate severity if the token is live for "
+                    "production scopes."
+                ),
+            }
+        if rid == "auto_map_custom_classes":
+            return {
+                "default_ci_blocks_release": blocks,
+                "compared_to_worst_case_loader_risk": (
+                    "Below or equal to `trust_remote_code` depending on your threat model: it is "
+                    "**custom class mapping** risk (unexpected deserialization / code paths), not "
+                    "automatically “Hub runs Python,” but still a **high static** concern."
+                ),
+                "decision_support_expert": (
+                    "Default CI treats this as **blocking** alongside `trust_remote_code`. Require "
+                    "named owners for each mapped class, provenance review, and a deliberate waiver if "
+                    "you keep `auto_map`."
+                ),
+            }
+        if rid == "config_json_invalid":
+            return {
+                "default_ci_blocks_release": blocks,
+                "compared_to_worst_case_loader_risk": (
+                    "Not comparable to `trust_remote_code` as “malicious intent” — it means the "
+                    "config **cannot be parsed**, which is often operational breakage and can hide "
+                    "misconfigurations."
+                ),
+                "decision_support_expert": (
+                    "Treat as **release hygiene**: fix JSON first; do not debate remote-code nuance "
+                    "until the file parses. Blocking default CI is intentional so bad configs do not "
+                    "silently pass."
+                ),
+            }
+        return {
+            "default_ci_blocks_release": blocks,
+            "compared_to_worst_case_loader_risk": (
+                f"Rule `{rid or 'unknown'}`: compare message text to `trust_remote_code` — if it "
+                "does not imply executable Hub code at load, it is usually **lower urgency** than "
+                "that worst-case baseline."
+            ),
+            "decision_support_expert": (
+                "If `default_ci_blocks_release` is NO, treat as **triage**: assign an ML + security "
+                "owner, decide whether your org wants this signal to become blocking later (phase 3 "
+                "work), and record the rationale in the release ticket."
+            ),
+        }
+
+    if row_kind == "FINDING" and rid == "policy.gate_violation":
+        return {
+            "default_ci_blocks_release": "YES (this artifact fails policy)",
+            "compared_to_worst_case_loader_risk": (
+                "This is **governance / integrity** risk (disallowed formats), not the same "
+                "statement as `trust_remote_code` unless your policy explicitly encodes that rule."
+            ),
+            "decision_support_expert": (
+                "Leadership decision is **waive with recorded risk acceptance** vs **remediate** "
+                "(convert weights / drop files). Pair with procurement and audit stakeholders if "
+                "you claim “safetensors-only” externally."
+            ),
+        }
+
+    if row_kind == "FINDING":
+        return {
+            "default_ci_blocks_release": "YES (artifact scan failed)",
+            "compared_to_worst_case_loader_risk": (
+                "Driver/policy finding — compare the embedded `rule_id` to `trust_remote_code` "
+                "only if the failure mode is actually loader execution; many findings are unrelated."
+            ),
+            "decision_support_expert": (
+                "Route to the owning engineering team with the embedded severity; use security "
+                "review templates for waivers."
+            ),
+        }
+
+    if row_kind == "WEIGHT_FILE":
+        if suf == ".bin":
+            return {
+                "default_ci_blocks_release": "NO (passed static gate in this demo)",
+                "compared_to_worst_case_loader_risk": (
+                    "Not a config flag. Residual concern is **pickle deserialization class** if "
+                    "weights are ever swapped — different from `trust_remote_code`, but still "
+                    "material in strict threat models."
+                ),
+                "decision_support_expert": (
+                    "If leadership only skims one thing on `.bin`: ask whether your org allows "
+                    "pickle-era weights in prod **at all**; if not, plan conversion to safetensors "
+                    "even when static policy is permissive."
+                ),
+            }
+        return {
+            "default_ci_blocks_release": "NO (passed static gate in this demo)",
+            "compared_to_worst_case_loader_risk": (
+                "Not comparable to `trust_remote_code` directly — this row is about **artifact "
+                "format choice** and supply-chain integrity for that format."
+            ),
+            "decision_support_expert": (
+                "Keep revision pinning and mirror policy on the radar; escalate only if your "
+                "runtime stack has known issues for this format class."
+            ),
+        }
+
+    return {
+        "default_ci_blocks_release": "UNKNOWN",
+        "compared_to_worst_case_loader_risk": "See scanner_signal and taxonomy_note.",
+        "decision_support_expert": "Triage with security + ML owners using THREAT_MODEL_TAXONOMY.md.",
+    }
+
+
+def _decision_legend_rows() -> list[dict[str, str]]:
+    """Static reference rows for HTML/Markdown legends (kept in sync with configlint + dispatch)."""
+    return [
+        {
+            "rule_or_topic": "trust_remote_code_enabled",
+            "default_ci_blocks_release": "YES",
+            "vs_trust_remote_code": "Baseline worst-case static loader signal in default CI.",
+            "leadership_takeaway": (
+                "Stop / waive with controls; treat like shipping a remote dependency that can execute."
+            ),
+        },
+        {
+            "rule_or_topic": "auto_map_custom_classes",
+            "default_ci_blocks_release": "YES",
+            "vs_trust_remote_code": "High static concern; different mechanism, still blocking by default.",
+            "leadership_takeaway": "Require provenance for mapped classes; no silent waivers.",
+        },
+        {
+            "rule_or_topic": "config_json_invalid",
+            "default_ci_blocks_release": "YES",
+            "vs_trust_remote_code": "Operational / integrity break; not “Hub RCE” semantics.",
+            "leadership_takeaway": "Fix JSON before debating loader philosophy.",
+        },
+        {
+            "rule_or_topic": "use_fast_tokenizer_truthy",
+            "default_ci_blocks_release": "NO (today)",
+            "vs_trust_remote_code": "Much lower incident class than trust_remote_code in typical stacks.",
+            "leadership_takeaway": "Engineering + audit follow-up; not an automatic emergency bridge.",
+        },
+        {
+            "rule_or_topic": "use_auth_token_present",
+            "default_ci_blocks_release": "NO (today)",
+            "vs_trust_remote_code": "Secrets/compliance angle, not the same as remote code at load.",
+            "leadership_takeaway": "Rotate / remove secrets; involve security if scopes are broad.",
+        },
+    ]
 
 
 def _blast_for_exec_summary(demo: Demo, data: dict[str, Any]) -> dict[str, str]:
@@ -649,6 +866,9 @@ FIELDNAMES = [
     "owasp_touchpoints",
     "risk_taxonomy_category",
     "taxonomy_note",
+    "default_ci_blocks_release",
+    "compared_to_worst_case_loader_risk",
+    "decision_support_expert",
 ]
 
 
@@ -756,7 +976,25 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> Non
         f"    <a href=\"{html.escape(THREAT_MODEL_DOC_URL)}\">Threat model &amp; taxonomy (phase0)</a> · ",
         f"    <a href=\"{html.escape(OWASP_LLM_TOP10_URL)}\">OWASP LLM Top 10 (official project)</a>",
         "  </p>",
+        "  <p class=\"lead\">",
+        "    <strong>Decision support:</strong> not every configlint row is the same incident class. ",
+        "    The table below states whether each signal <strong>blocks default CI</strong> today (mirrors ",
+        "    <code>hf_bundle_scanner.dispatch.scan_bundle</code>) and how it compares to ",
+        "    <code>trust_remote_code</code> as the reference “worst static loader” story.",
+        "  </p>",
     ]
+    lines.extend(
+        _html_table_lines(
+            "Config signals vs trust_remote_code (default CI facts)",
+            [
+                "rule_or_topic",
+                "default_ci_blocks_release",
+                "vs_trust_remote_code",
+                "leadership_takeaway",
+            ],
+            _decision_legend_rows(),
+        )
+    )
 
     exec_rows = [r for r in rows if r.get("row_kind") == "EXEC_SUMMARY"]
     dash_cols = [
@@ -792,6 +1030,9 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> Non
         "exec_one_liner",
         "taxonomy_note",
         "threat_model_doc",
+        "default_ci_blocks_release",
+        "compared_to_worst_case_loader_risk",
+        "decision_support_expert",
     ]
 
     by_demo: dict[str, list[dict[str, str]]] = {}
@@ -852,18 +1093,36 @@ def write_blast_radius_md(path: Path, demos: list[Demo], rows: list[dict[str, st
         f"- **In-repo threat model & OWASP mapping (phase0):** [THREAT_MODEL_TAXONOMY.md]({THREAT_MODEL_DOC_URL})",
         f"- **OWASP LLM Top 10 (official):** [Top 10 for LLM Applications]({OWASP_LLM_TOP10_URL})",
         "",
-        "### How to use the score (1–5)",
+        "## Config signals vs `trust_remote_code` (default CI facts)",
         "",
-        "| Score | Meaning for leadership |",
-        "| ----- | ------------------------ |",
-        "| 1–2 | Static gate is green or only residual supply-chain hygiene. |",
-        "| 3 | Needs explicit owner; not automatically blocking. |",
-        "| 4 | Hold for governance / policy mismatch until waived or remediated. |",
-        "| 5 | Stop-the-line on static evidence as modeled here (e.g. remote-code posture). |",
+        "These rows are **scanner defaults** (what flips `aggregate_exit_code` in CI today vs what is "
+        "informational). They are not legal advice and not proof of compromise.",
         "",
-        "---",
-        "",
+        "| Config rule / topic | Blocks default CI today? | Compared to `trust_remote_code` | Leadership takeaway |",
+        "| --------------------- | ------------------------- | ------------------------------ | ------------------- |",
     ]
+    for row in _decision_legend_rows():
+        lines.append(
+            f"| `{row['rule_or_topic']}` | **{row['default_ci_blocks_release']}** | "
+            f"{row['vs_trust_remote_code'].replace('|', '\\|')} | "
+            f"{row['leadership_takeaway'].replace('|', '\\|')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### How to use the score (1–5)",
+            "",
+            "| Score | Meaning for leadership |",
+            "| ----- | ------------------------ |",
+            "| 1–2 | Static gate is green or only residual supply-chain hygiene. |",
+            "| 3 | Needs explicit owner; not automatically blocking. |",
+            "| 4 | Hold for governance / policy mismatch until waived or remediated. |",
+            "| 5 | Stop-the-line on static evidence as modeled here (e.g. remote-code posture). |",
+            "",
+            "---",
+            "",
+        ],
+    )
 
     exec_by_id = {r["demo_id"]: r for r in rows if r.get("row_kind") == "EXEC_SUMMARY"}
     lines.extend(

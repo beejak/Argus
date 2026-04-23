@@ -37,6 +37,11 @@ If `raw.githack.com` is slow or blocked, use (1) or print the Markdown brief [`B
 - **`owasp_llm_primary` / `owasp_llm_secondary` / `owasp_touchpoints`**: mapping to **OWASP Top 10 for LLM Applications (2025 framing)** as summarized in-repo.
 - **`risk_taxonomy_category`**: phase0 `RiskCategory` bucket (`config`, `provenance`, `artifact`, `supply_chain`, …).
 - **`taxonomy_version`**, **`threat_model_doc`**, **`owasp_project_url`**: pointers to [`docs/THREAT_MODEL_TAXONOMY.md`](../../THREAT_MODEL_TAXONOMY.md) and the official OWASP project.
+- **`default_ci_blocks_release`**: **YES / NO / N_A** — whether this signal **flips the bundle aggregate exit code in default CI today** (mirrors `hf_bundle_scanner.dispatch.scan_bundle` for configlint; separate logic for failed artifact rows).
+- **`compared_to_worst_case_loader_risk`**: plain-language comparison to **`trust_remote_code`** as the reference “worst static loader” story (e.g. `use_fast_tokenizer_truthy` vs `trust_remote_code_enabled`).
+- **`decision_support_expert`**: concise **what leadership should do next** for that row (not legal advice).
+
+The **HTML** and **`BLAST_RADIUS_LEADERSHIP.md`** files also include a **fixed legend table** summarizing common `rule_id`s (including the `use_fast_tokenizer` vs `trust_remote_code` contrast).
 
 Dynamic/runtime risks (e.g. **LLM01** prompt injection) are **out of scope** for these static sample exports; see roadmap for later phases.
 

@@ -351,7 +351,7 @@ scan-bundle scan \
 
 **Per-file gate** (single artifact): `admit-model scan --artifact … --policy … --report … --drivers "" --timeout 600 --fail-on MEDIUM` — policy JSON shape: [`model-admission/README.md`](model-admission/README.md).
 
-**Configlint rules** that can bump **`aggregate_exit_code`** to **`1`** when the file lane is otherwise clean: `trust_remote_code_enabled`, `auto_map_custom_classes`, `config_json_invalid` (see [`hf_bundle_scanner/hf_bundle_scanner/dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py)). Other configlint signals (e.g. `use_fast_tokenizer_truthy`) appear in **`config_findings`** but do not currently force that escalation.
+**Configlint rules** that can bump **`aggregate_exit_code`** to **`1`** when the file lane is otherwise clean: `trust_remote_code_enabled`, `auto_map_custom_classes`, `config_json_invalid` (see [`hf_bundle_scanner/hf_bundle_scanner/dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py)). Other configlint signals (e.g. `use_fast_tokenizer_truthy`) appear in **`config_findings`** but do not currently force that escalation — the **actionable** exports spell out that contrast for leadership ([`docs/sample_reports/actionable/`](docs/sample_reports/actionable/), columns **`default_ci_blocks_release`** + narrative fields).
 
 ---
 

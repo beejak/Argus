@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-22 — actionable exports: decision support vs trust_remote_code + default CI facts
+
+- **Changes:** `export_bundle_action_sheet.py` adds `default_ci_blocks_release`, comparison + expert columns; HTML/MD legend table; `actionable/README.md` + root README pointer.
+- **Commands:** `make sample-action-sheets`, `make agent-verify`.
+
 ### 2026-04-22 — README roadmap + CLI/scripts tables; roadmap phase 2/3 handoff
 
 - **Changes:** root `README.md` (where we are, doc hub rows, Makefile targets, CLI/env/scripts, outputs); `docs/PRODUCTION_SCANNER_ROADMAP.md` phase 2 bullets + phase 3 next.

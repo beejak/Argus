@@ -48,6 +48,55 @@
     <a href="https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md">Threat model &amp; taxonomy (phase0)</a> · 
     <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP LLM Top 10 (official project)</a>
   </p>
+  <p class="lead">
+    <strong>Decision support:</strong> not every configlint row is the same incident class. 
+    The table below states whether each signal <strong>blocks default CI</strong> today (mirrors 
+    <code>hf_bundle_scanner.dispatch.scan_bundle</code>) and how it compares to 
+    <code>trust_remote_code</code> as the reference “worst static loader” story.
+  </p>
+  <h2>Config signals vs trust_remote_code (default CI facts)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>rule_or_topic</th>
+        <th>default_ci_blocks_release</th>
+        <th>vs_trust_remote_code</th>
+        <th>leadership_takeaway</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>trust_remote_code_enabled</td>
+        <td>YES</td>
+        <td>Baseline worst-case static loader signal in default CI.</td>
+        <td>Stop / waive with controls; treat like shipping a remote dependency that can execute.</td>
+      </tr>
+      <tr>
+        <td>auto_map_custom_classes</td>
+        <td>YES</td>
+        <td>High static concern; different mechanism, still blocking by default.</td>
+        <td>Require provenance for mapped classes; no silent waivers.</td>
+      </tr>
+      <tr>
+        <td>config_json_invalid</td>
+        <td>YES</td>
+        <td>Operational / integrity break; not “Hub RCE” semantics.</td>
+        <td>Fix JSON before debating loader philosophy.</td>
+      </tr>
+      <tr>
+        <td>use_fast_tokenizer_truthy</td>
+        <td>NO (today)</td>
+        <td>Much lower incident class than trust_remote_code in typical stacks.</td>
+        <td>Engineering + audit follow-up; not an automatic emergency bridge.</td>
+      </tr>
+      <tr>
+        <td>use_auth_token_present</td>
+        <td>NO (today)</td>
+        <td>Secrets/compliance angle, not the same as remote code at load.</td>
+        <td>Rotate / remove secrets; involve security if scopes are broad.</td>
+      </tr>
+    </tbody>
+  </table>
   <h2>Executive dashboard (decision-first)</h2>
   <table>
     <thead>
@@ -166,6 +215,9 @@
             <th>exec_one_liner</th>
             <th>taxonomy_note</th>
             <th>threat_model_doc</th>
+            <th>default_ci_blocks_release</th>
+            <th>compared_to_worst_case_loader_risk</th>
+            <th>decision_support_expert</th>
           </tr>
         </thead>
         <tbody>
@@ -189,6 +241,9 @@
             <td>Static gate SHIP_OK_ON_STATIC_GATE for this snapshot — leadership should still budget runtime AI risk and supply-chain controls outside this JSON.</td>
             <td>Static gate only. OWASP LLM01/05/06/09 not evaluated by this bundle scan.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>N/A (bundle rollup)</td>
+            <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
+            <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -210,6 +265,9 @@
             <td>No static blocker — confirm revision pinning and mirror policy.</td>
             <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>NO (passed static gate in this demo)</td>
+            <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
+            <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -231,6 +289,9 @@
             <td>No static finding — leadership should still ask whether **.bin** is acceptable in **your** prod threat model.</td>
             <td>Pickle-era `.bin` weight surface — not a verdict of malicious content.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>NO (passed static gate in this demo)</td>
+            <td>Not a config flag. Residual concern is **pickle deserialization class** if weights are ever swapped — different from `trust_remote_code`, but still material in strict threat models.</td>
+            <td>If leadership only skims one thing on `.bin`: ask whether your org allows pickle-era weights in prod **at all**; if not, plan conversion to safetensors even when static policy is permissive.</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -252,6 +313,9 @@
             <td>No static blocker — confirm revision pinning and mirror policy.</td>
             <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>NO (passed static gate in this demo)</td>
+            <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
+            <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
           </tr>
         </tbody>
       </table>
@@ -278,6 +342,9 @@
             <th>exec_one_liner</th>
             <th>taxonomy_note</th>
             <th>threat_model_doc</th>
+            <th>default_ci_blocks_release</th>
+            <th>compared_to_worst_case_loader_risk</th>
+            <th>decision_support_expert</th>
           </tr>
         </thead>
         <tbody>
@@ -301,6 +368,9 @@
             <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — treat as **undeclared RCE-class supply chain** on load until explicitly waived with hardened controls and owner sign-off.</td>
             <td>`trust_remote_code` maps to supply-chain / integrity (LLM03) and untrusted execution paths adjacent to poisoning (LLM04) in phase0 framing.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>N/A (bundle rollup)</td>
+            <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
+            <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
           </tr>
           <tr>
             <td>CONFIG</td>
@@ -322,6 +392,9 @@
             <td>`trust_remote_code` truthy — **stop-the-line** for prod until removed or formally accepted with compensating controls.</td>
             <td>Configlint rule trust_remote_code_enabled (see taxonomy doc).</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>YES</td>
+            <td>This **is** the reference severe loader posture for this scanner’s default gate: it can enable **Hub-supplied Python** during load in typical stacks.</td>
+            <td>Treat as a **security + legal** decision, not an ML hyperparameter tweak: require explicit waiver with compensating controls, revision pinning, and deny-by-default in production unless you run inside a tightly bounded sandbox.</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -343,6 +416,9 @@
             <td>No static blocker — confirm revision pinning and mirror policy.</td>
             <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>NO (passed static gate in this demo)</td>
+            <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
+            <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -364,6 +440,9 @@
             <td>No static finding — leadership should still ask whether **.bin** is acceptable in **your** prod threat model.</td>
             <td>Pickle-era `.bin` weight surface — not a verdict of malicious content.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>NO (passed static gate in this demo)</td>
+            <td>Not a config flag. Residual concern is **pickle deserialization class** if weights are ever swapped — different from `trust_remote_code`, but still material in strict threat models.</td>
+            <td>If leadership only skims one thing on `.bin`: ask whether your org allows pickle-era weights in prod **at all**; if not, plan conversion to safetensors even when static policy is permissive.</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -385,6 +464,9 @@
             <td>No static blocker — confirm revision pinning and mirror policy.</td>
             <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>NO (passed static gate in this demo)</td>
+            <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
+            <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
           </tr>
         </tbody>
       </table>
@@ -411,6 +493,9 @@
             <th>exec_one_liner</th>
             <th>taxonomy_note</th>
             <th>threat_model_doc</th>
+            <th>default_ci_blocks_release</th>
+            <th>compared_to_worst_case_loader_risk</th>
+            <th>decision_support_expert</th>
           </tr>
         </thead>
         <tbody>
@@ -434,6 +519,9 @@
             <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — leadership question is: **waive with recorded risk acceptance** or **convert/remove blocked artifacts** before prod.</td>
             <td>Policy gate enforces provenance / format posture (RiskCategory.provenance); remediate artifacts or record executive waiver.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>N/A (bundle rollup)</td>
+            <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
+            <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -455,6 +543,9 @@
             <td>Blocked artifact `onnx/model.onnx` — waive only with **named executive risk acceptance**.</td>
             <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>YES (this artifact fails policy)</td>
+            <td>This is **governance / integrity** risk (disallowed formats), not the same statement as `trust_remote_code` unless your policy explicitly encodes that rule.</td>
+            <td>Leadership decision is **waive with recorded risk acceptance** vs **remediate** (convert weights / drop files). Pair with procurement and audit stakeholders if you claim “safetensors-only” externally.</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -476,6 +567,9 @@
             <td>Blocked artifact `pytorch_model.bin` — waive only with **named executive risk acceptance**.</td>
             <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>YES (this artifact fails policy)</td>
+            <td>This is **governance / integrity** risk (disallowed formats), not the same statement as `trust_remote_code` unless your policy explicitly encodes that rule.</td>
+            <td>Leadership decision is **waive with recorded risk acceptance** vs **remediate** (convert weights / drop files). Pair with procurement and audit stakeholders if you claim “safetensors-only” externally.</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -497,6 +591,9 @@
             <td>Blocked artifact `tf_model.h5` — waive only with **named executive risk acceptance**.</td>
             <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+            <td>YES (this artifact fails policy)</td>
+            <td>This is **governance / integrity** risk (disallowed formats), not the same statement as `trust_remote_code` unless your policy explicitly encodes that rule.</td>
+            <td>Leadership decision is **waive with recorded risk acceptance** vs **remediate** (convert weights / drop files). Pair with procurement and audit stakeholders if you claim “safetensors-only” externally.</td>
           </tr>
         </tbody>
       </table>
