@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-22 — README: human-readable test summary, strict-policy Hub sample, redact helper
+
+- **Changes:** README “What green looks like” table; Live Hub third JSON (safetensors-only policy); `scripts/redact_ephemeral_report.py`; `hf_bundle_scanner/tests/fixtures/policy.safetensors-only.json`; `docs/sample_reports/README.md`.
+- **Commands:** `make agent-verify`.
+
 ### 2026-04-23 — committed live Hub bundle sample reports + README interpretation
 
 - **Changes:** `docs/sample_reports/*.json` + `docs/sample_reports/README.md`; README section explaining fields + baseline vs demo-risk; `scripts/ephemeral_hub_scan.py` resolves policy paths against repo root (works with scan `cwd`).

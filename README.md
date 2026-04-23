@@ -160,12 +160,39 @@ Advanced flags are passed through **`EPHEMERAL_FLAGS`** (see **`make help`**). *
 
 ## Live Hub sample reports (real download)
 
-These are **committed outputs** from a **live** Hugging Face snapshot download (`hf-internal-testing/tiny-random-BertModel`), scanned with the repo’s **permissive** policy fixture, then the working tree was deleted. Snapshot paths are **redacted** to `/tmp/<ephemeral-hub-demo>` for readability. Index + context: [`docs/sample_reports/README.md`](docs/sample_reports/README.md).
+These are **committed outputs** from a **live** Hugging Face snapshot download (**`hf-internal-testing/tiny-random-BertModel`**), then the working tree was deleted. Among common `hf-internal-testing/tiny-random-*` snapshots, this repo is **one of the smallest** full multi-format fixtures we measured (~**1.3 MB** over the wire vs ~**2.1 MB** for `tiny-random-GPT2Model`), which keeps demos fast.
+
+**About “small but vulnerable”:** this repository does **not** ship or recommend downloading known-malicious weights. In practice, “risky” Hub content usually means **(a)** policy-relevant formats (for example **pickle-capable** `pytorch_model.bin`), **(b)** **config** flags like `trust_remote_code`, or **(c)** your org’s **stricter policy** rejecting formats you do not want in production. The samples below illustrate **(b)** with a JSON-only demo file and **(c)** with a **safetensors-only** policy on the same benign test snapshot.
+
+Snapshot paths are **redacted** to `/tmp/<ephemeral-hub-demo>` for readability. Index + context: [`docs/sample_reports/README.md`](docs/sample_reports/README.md).
 
 | Artifact | One-line meaning |
 | -------- | ---------------- |
 | [`docs/sample_reports/live_hub_tiny_bert_bundle_report.json`](docs/sample_reports/live_hub_tiny_bert_bundle_report.json) | **Baseline:** three weight-like artifacts (`.onnx`, `.bin`, `.h5`) scanned; **no** configlint hits; **`aggregate_exit_code`: `0`**. |
 | [`docs/sample_reports/live_hub_tiny_bert_bundle_report_with_demo_risk.json`](docs/sample_reports/live_hub_tiny_bert_bundle_report_with_demo_risk.json) | **Same snapshot + demo JSON risk:** a synthetic `tokenizer_config.json` enables **`trust_remote_code_enabled`** → aggregate bumped to **`1`** even if per-file scans are clean. |
+| [`docs/sample_reports/live_hub_tiny_bert_bundle_report_strict_safetensors_policy.json`](docs/sample_reports/live_hub_tiny_bert_bundle_report_strict_safetensors_policy.json) | **Same snapshot + strict policy:** only **`.safetensors`** allowed ([`policy.safetensors-only.json`](hf_bundle_scanner/tests/fixtures/policy.safetensors-only.json)); `.onnx`, `.bin`, `.h5` each get a **policy** finding → **`aggregate_exit_code`: `1`**. |
+
+### Trimmed excerpt (strict policy sample)
+
+This is what a **policy-gated** failure looks like in the bundle JSON (one of three similar rows); the full file is linked above.
+
+```json
+{
+  "relpath": "pytorch_model.bin",
+  "exit_code": 1,
+  "report": {
+    "findings": [
+      {
+        "driver": "policy",
+        "severity": "high",
+        "title": "Policy violation",
+        "detail": "extension '.bin' not in allowed_extensions",
+        "rule_id": "policy.gate_violation"
+      }
+    ]
+  }
+}
+```
 
 ### How to read the JSON (top-level)
 
@@ -198,6 +225,20 @@ These are **committed outputs** from a **live** Hugging Face snapshot download (
 | **Agent verify** | `make agent-verify` | Runs **`scripts/run_tests_for_agent.py`**: model-admission **all** tests + hf_bundle_scanner **excluding** `integration`. |
 
 Canonical index: [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md).
+
+### What “green” looks like (human-readable)
+
+`make agent-verify` runs **two** pytest invocations and writes **`.agent/pytest-last.log`** plus **`.agent/pytest-last.exit`** (`0` = both suites passed). A typical green log ends like this:
+
+| Step | Result | Meaning |
+| ---- | ------ | ------- |
+| **model-admission** | **42 passed**, **2 skipped** | Skips are integration-style driver checks that need optional external tools; they are not failures. |
+| **hf_bundle_scanner** | **36 passed**, **2 deselected** | Deselected = tests marked **`integration`** excluded on purpose for speed and determinism. |
+| **Overall** | **`overall_exit=0`** | Both subprocess exit codes were `0`. |
+
+The [![LLM Scanner CI](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml/badge.svg?branch=main)](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml?query=branch%3Amain) badge reflects the same harness in GitHub Actions (open the workflow run to download the uploaded log if you need it).
+
+> **Plain language:** If someone mentions an “optional third sample” or “pasting an excerpt into the README,” they are talking about **documentation choices**, not a product fork. A **stricter policy** sample means “same harmless Hub test weights, but your policy rejects `.bin` / `.onnx` / `.h5`.” A **trimmed excerpt** means “show a short JSON fragment inline so readers see shape without opening a large file.” Neither option changes how the scanner runs.
 
 ---
 

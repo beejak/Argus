@@ -1,0 +1,6 @@
+{
+  "max_bytes": 1073741824,
+  "allowed_extensions": [".safetensors"],
+  "forbidden_extensions": null,
+  "sha256_allowlist": null
+}
