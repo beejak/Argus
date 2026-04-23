@@ -10,13 +10,13 @@ description: HF snapshot manifest, bundle discovery, model-admission dispatch, c
 | Area | Path | Owns |
 |------|------|------|
 | Per-file gate | `model-admission/model_admission/` | Policy, ModelScan/ModelAudit drivers, `admit-model` |
-| Bundle orchestration | `hf_bundle_scanner/hf_bundle_scanner/` | `snapshot`, `discovery`, `dispatch`, `configlint`, `report`, `cli`, optional `mcp_server`, `http_job` |
+| Bundle orchestration | `hf_bundle_scanner/hf_bundle_scanner/` | `snapshot`, `discovery`, `dispatch`, `configlint`, `report`, `provenance`, `cli`, optional `mcp_server`, `http_job` |
 | Harness | `/root/LLM Scanner/Makefile` | `install`, `test`, `scan-fixture`, `docker`, `docker-bundle` |
 
 ## Contracts
 
 - **Manifest JSON** (`scan-bundle manifest`): `{ root, file_count, files: [{ relpath, size_bytes, sha256 }] }`.
-- **Bundle report** (`scan-bundle scan`): `{ schema: hf_bundle_scanner.bundle_report.v1, aggregate_exit_code, file_scans[], config_findings[], manifest? }`.
+- **Bundle report** (`scan-bundle scan`): `{ schema: hf_bundle_scanner.bundle_report.v2, taxonomy_version, aggregate_exit_code, file_scans[], config_findings[], manifest?, provenance }` (`provenance` includes phase‑1 Hub hints, mirror allowlist, SBOM URI, manifest digest summary — see `provenance.py`).
 - **Exit codes** (aggregate): `4` usage from child, `2` driver errors, `1` policy/findings/config risk, `0` pass.
 
 ## Commands
