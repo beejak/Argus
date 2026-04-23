@@ -41,3 +41,5 @@ def test_scan_endpoint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     assert r.status_code == 200
     body = r.json()
     assert body["aggregate_exit_code"] == 0
+    assert body["schema"] == "hf_bundle_scanner.bundle_report.v2"
+    assert body["provenance"]["provenance_version"] == "phase1"

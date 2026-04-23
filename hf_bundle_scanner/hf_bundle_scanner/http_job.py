@@ -23,6 +23,13 @@ class ScanBody(BaseModel):
     timeout: int = Field(default=600, ge=1, le=86_400)
     fail_on: str = Field(default="MEDIUM")
     include_manifest: bool = Field(default=True)
+    hub_repo_id: str | None = Field(default=None, description="Optional HF repo id for bundle provenance")
+    hub_revision: str | None = Field(default=None, description="Optional HF revision for bundle provenance")
+    mirror_allowlist: str | None = Field(
+        default=None,
+        description="Comma-separated mirror hostnames (merged with HF_BUNDLE_MIRROR_ALLOWLIST)",
+    )
+    sbom_uri: str | None = Field(default=None, description="SBOM URI/path (overrides HF_BUNDLE_SBOM_URI)")
 
 
 def create_app():
@@ -42,6 +49,11 @@ def create_app():
             raise HTTPException(status_code=400, detail="snapshot_root must be a directory")
         if not policy.is_file():
             raise HTTPException(status_code=400, detail="policy_path must be a file")
+        mirrors = (
+            [x.strip() for x in scan_in.mirror_allowlist.split(",") if x.strip()]
+            if scan_in.mirror_allowlist
+            else None
+        )
         bundle = scan_bundle(
             root,
             policy,
@@ -49,6 +61,10 @@ def create_app():
             timeout=scan_in.timeout,
             fail_on=scan_in.fail_on,
             include_manifest=scan_in.include_manifest,
+            hub_repo_id=scan_in.hub_repo_id,
+            hub_revision=scan_in.hub_revision,
+            mirror_allowlist=mirrors,
+            sbom_uri=scan_in.sbom_uri,
         )
         return bundle.to_dict()
 

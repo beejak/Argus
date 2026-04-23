@@ -54,6 +54,12 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commits:** initial monorepo import + `docs: Argus publish guide; expand .gitignore`.
 - **Next:** `git push -u origin main` from WSL with GitHub auth (see `docs/PUBLISH_ARGUS.md`).
 
+### 2026-04-23 — README refresh + phase1 bundle provenance
+
+- **Phase:** `phase1-bundle-provenance` (initial slice).
+- **Changes:** `hf_bundle_scanner.bundle_report.v2` + `provenance` block (`provenance.py`, CLI / HTTP / MCP), docs (roadmap, threat model, Hermes), beautified root `README.md`.
+- **Commands:** `make agent-verify` (or `pytest` under `hf_bundle_scanner` with `.venv`).
+
 ### 2026-04-23 — add-catalog (phase0) + taxonomy CI guard
 
 - **Phase:** test catalog / phase0 alignment.

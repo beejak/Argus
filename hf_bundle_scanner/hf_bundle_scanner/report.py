@@ -28,6 +28,9 @@ class FileScanRecord:
         return d
 
 
+BUNDLE_REPORT_SCHEMA = "hf_bundle_scanner.bundle_report.v2"
+
+
 @dataclass
 class BundleReport:
     root: str
@@ -37,10 +40,11 @@ class BundleReport:
     config_findings: list[dict[str, str]]
     file_scans: list[FileScanRecord]
     aggregate_exit_code: int
+    provenance: dict[str, Any]
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "schema": "hf_bundle_scanner.bundle_report.v1",
+            "schema": BUNDLE_REPORT_SCHEMA,
             "taxonomy_version": "phase0",
             "root": self.root,
             "policy_path": self.policy_path,
@@ -49,6 +53,7 @@ class BundleReport:
             "config_findings": self.config_findings,
             "file_scans": [f.to_dict() for f in self.file_scans],
             "aggregate_exit_code": self.aggregate_exit_code,
+            "provenance": self.provenance,
         }
 
     def write_json(self, path: Path) -> None:

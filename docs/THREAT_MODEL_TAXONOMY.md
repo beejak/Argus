@@ -56,4 +56,4 @@ Map free-text planning ids to categories via `category_for_register_id()` and `R
 
 ## Bundle JSON
 
-[`hf_bundle_scanner` bundle reports](../hf_bundle_scanner/hf_bundle_scanner/report.py) include **`taxonomy_version": "phase0"`** alongside `schema: hf_bundle_scanner.bundle_report.v1` so consumers can gate on taxonomy-aware fields as drivers populate `rule_id` / `category`.
+[`hf_bundle_scanner` bundle reports](../hf_bundle_scanner/hf_bundle_scanner/report.py) use **`schema: hf_bundle_scanner.bundle_report.v2`**, include **`taxonomy_version": "phase0"`**, and add **`provenance`** (phase 1: Hub revision hints, mirror allowlist, SBOM pointer, manifest digest summary — see [`provenance.py`](../hf_bundle_scanner/hf_bundle_scanner/provenance.py)) so consumers can gate on taxonomy-aware fields **and** supply-chain context as drivers populate `rule_id` / `category`.

@@ -31,7 +31,7 @@ hf-bundle-mcp
 
 Tools:
 
-- `scan_path(root, policy, drivers="")` — full bundle JSON + aggregate exit semantics inside JSON (process exit is separate).
+- `scan_path(root, policy, drivers="", hub_repo="", hub_revision="", mirror_allowlist="", sbom_uri="")` — full bundle JSON (**`hf_bundle_scanner.bundle_report.v2`**) + `provenance` + aggregate exit semantics inside JSON (process exit is separate). Empty optional strings are ignored.
 - `build_manifest_json(root)` — recursive SHA-256 manifest.
 
 Point Hermes MCP client at this stdio server per [Hermes MCP docs](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp).
@@ -44,6 +44,6 @@ HF_BUNDLE_HTTP_HOST=127.0.0.1 HF_BUNDLE_HTTP_PORT=8765 hf-bundle-http
 ```
 
 - `GET /healthz`
-- `POST /v1/scan` with JSON body `{ "snapshot_root": "/abs/path", "policy_path": "/abs/path", "drivers": "", "timeout": 600, "fail_on": "MEDIUM", "include_manifest": true }` (extra keys ignored).
+- `POST /v1/scan` with JSON body `{ "snapshot_root": "/abs/path", "policy_path": "/abs/path", "drivers": "", "timeout": 600, "fail_on": "MEDIUM", "include_manifest": true, "hub_repo_id": null, "hub_revision": null, "mirror_allowlist": null, "sbom_uri": null }` (optional provenance fields; extra keys ignored).
 
 Bind to localhost unless you add auth and TLS.

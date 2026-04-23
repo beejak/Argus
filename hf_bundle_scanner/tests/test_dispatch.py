@@ -52,11 +52,25 @@ def test_scan_bundle_with_weight(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     _write_minimal_safetensors(tmp_path / "m.safetensors")
     (tmp_path / "config.json").write_text('{"model_type": "llama"}', encoding="utf-8")
     pol = _policy(tmp_path)
-    bundle = scan_bundle(tmp_path, pol, drivers="", timeout=60)
+    bundle = scan_bundle(
+        tmp_path,
+        pol,
+        drivers="",
+        timeout=60,
+        hub_repo_id="demo/repo",
+        hub_revision="abc123",
+        sbom_uri="https://example.invalid/sbom.json",
+    )
     assert len(bundle.file_scans) == 1
     assert bundle.file_scans[0].relpath.endswith("m.safetensors")
     assert bundle.manifest is not None
     assert bundle.manifest["file_count"] >= 2
+    d = bundle.to_dict()
+    assert d["schema"] == "hf_bundle_scanner.bundle_report.v2"
+    assert d["provenance"]["provenance_version"] == "phase1"
+    assert d["provenance"]["hub"] == {"repo_id": "demo/repo", "revision": "abc123"}
+    assert d["provenance"]["sbom"] == {"uri": "https://example.invalid/sbom.json"}
+    assert "manifest_summary" in d["provenance"]
 
 
 def test_scan_bundle_trust_remote_raises_exit(

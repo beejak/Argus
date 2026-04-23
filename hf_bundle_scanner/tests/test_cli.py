@@ -69,4 +69,5 @@ def test_cli_scan_subcommand(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
     )
     assert proc.returncode == 0, proc.stderr + proc.stdout
     data = json.loads(out.read_text(encoding="utf-8"))
-    assert data["schema"] == "hf_bundle_scanner.bundle_report.v1"
+    assert data["schema"] == "hf_bundle_scanner.bundle_report.v2"
+    assert data["provenance"]["provenance_version"] == "phase1"

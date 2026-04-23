@@ -17,8 +17,15 @@ Use the Makefile in the parent `LLM Scanner/` directory (`make test`, `make scan
 scan-bundle manifest --root /path/to/snapshot --out /tmp/manifest.json
 scan-bundle download --repo org/name --revision main --dest /tmp/snap
 scan-bundle scan --root /path/to/snapshot --policy policy.json --out /tmp/bundle.json --drivers ""
+# Optional provenance (bundle JSON schema v2, top-level `provenance`):
+scan-bundle scan --root "$D" --policy policy.json --out /tmp/bundle.json --drivers "" \
+  --hub-repo org/name --hub-revision main \
+  --mirror-allowlist huggingface.co,cdn-lfs.huggingface.co \
+  --sbom-uri file:///tmp/sbom.json
 python -m hf_bundle_scanner manifest --root /path --out /tmp/m.json
 ```
+
+Environment mirrors / SBOM merge with CLI flags: **`HF_BUNDLE_MIRROR_ALLOWLIST`** (comma-separated hosts), **`HF_BUNDLE_SBOM_URI`**.
 
 See [docs/hermes-mcp.md](docs/hermes-mcp.md) for MCP and optional HTTP.
 

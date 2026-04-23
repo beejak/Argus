@@ -29,6 +29,11 @@ def _cmd_scan(args: argparse.Namespace) -> int:
     root = Path(args.root).resolve()
     policy = Path(args.policy).resolve()
     out = Path(args.out).resolve()
+    mirrors = (
+        [x.strip() for x in args.mirror_allowlist.split(",") if x.strip()]
+        if args.mirror_allowlist
+        else None
+    )
     bundle = scan_bundle(
         root,
         policy,
@@ -36,6 +41,10 @@ def _cmd_scan(args: argparse.Namespace) -> int:
         timeout=args.timeout,
         fail_on=args.fail_on,
         include_manifest=not args.no_manifest,
+        hub_repo_id=args.hub_repo or None,
+        hub_revision=args.hub_revision or None,
+        mirror_allowlist=mirrors,
+        sbom_uri=args.sbom_uri or None,
     )
     bundle.write_json(out)
     if args.print_summary:
@@ -95,6 +104,26 @@ def build_parser() -> argparse.ArgumentParser:
         "--print-summary",
         action="store_true",
         help="Print a small JSON summary to stdout",
+    )
+    ps.add_argument(
+        "--hub-repo",
+        default=None,
+        help="Optional Hugging Face repo id for provenance (e.g. org/name)",
+    )
+    ps.add_argument(
+        "--hub-revision",
+        default=None,
+        help="Optional Hub revision (branch, tag, or commit) for provenance",
+    )
+    ps.add_argument(
+        "--mirror-allowlist",
+        default=None,
+        help="Comma-separated mirror hostnames (merged with HF_BUNDLE_MIRROR_ALLOWLIST)",
+    )
+    ps.add_argument(
+        "--sbom-uri",
+        default=None,
+        help="SBOM location (URI or path); overrides HF_BUNDLE_SBOM_URI if set",
     )
     ps.set_defaults(func=_cmd_scan)
 

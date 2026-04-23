@@ -14,6 +14,7 @@ from typing import Any
 
 from hf_bundle_scanner.configlint import lint_tree
 from hf_bundle_scanner.discovery import DiscoveryConfig, discover_config_files, discover_scan_artifacts
+from hf_bundle_scanner.provenance import build_bundle_provenance
 from hf_bundle_scanner.report import BundleReport, FileScanRecord, compute_aggregate_exit, merge_aggregate_exit
 from hf_bundle_scanner.snapshot import build_manifest
 
@@ -98,6 +99,10 @@ def scan_bundle(
     fail_on: str = "MEDIUM",
     include_manifest: bool = True,
     discovery: DiscoveryConfig | None = None,
+    hub_repo_id: str | None = None,
+    hub_revision: str | None = None,
+    mirror_allowlist: list[str] | None = None,
+    sbom_uri: str | None = None,
 ) -> BundleReport:
     """Discover artifacts, lint configs, run admit-model per file, aggregate."""
     root = root.resolve()
@@ -155,6 +160,14 @@ def scan_bundle(
     agg = compute_aggregate_exit(codes)
     agg = merge_aggregate_exit(agg, config_risk)
 
+    provenance = build_bundle_provenance(
+        manifest=manifest,
+        hub_repo_id=hub_repo_id,
+        hub_revision=hub_revision,
+        mirror_allowlist=mirror_allowlist,
+        sbom_uri=sbom_uri,
+    )
+
     return BundleReport(
         root=str(root),
         policy_path=str(policy),
@@ -163,4 +176,5 @@ def scan_bundle(
         config_findings=cfg_findings,
         file_scans=records,
         aggregate_exit_code=agg,
+        provenance=provenance,
     )

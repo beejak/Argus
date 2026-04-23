@@ -10,8 +10,15 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 
 - **Code:** [`model_admission/taxonomy.py`](../model-admission/model_admission/taxonomy.py) — `RiskCategory`, OWASP rows, risk-register map, `make_rule_id` / `slugify`.
 - **Findings:** [`Finding`](../model-admission/model_admission/report.py) optional `rule_id`, `category`; policy violations emit `policy.gate_violation` + `provenance`.
-- **Bundle JSON:** `taxonomy_version: "phase0"` on bundle reports ([`hf_bundle_scanner/report.py`](../hf_bundle_scanner/hf_bundle_scanner/report.py)).
+- **Bundle JSON:** `taxonomy_version: "phase0"` on bundle reports ([`hf_bundle_scanner/report.py`](../hf_bundle_scanner/hf_bundle_scanner/report.py)); schema is **`hf_bundle_scanner.bundle_report.v2`** once phase 1 landed (see below).
 - **Docs:** [THREAT_MODEL_TAXONOMY.md](THREAT_MODEL_TAXONOMY.md), [LESSONS_LEARNED.md](LESSONS_LEARNED.md).
+
+### Phase 1 status (`phase1-bundle-provenance`, implemented in repo)
+
+- **Schema:** bundle reports use **`schema: hf_bundle_scanner.bundle_report.v2`** with a top-level **`provenance`** object ([`hf_bundle_scanner/provenance.py`](../hf_bundle_scanner/hf_bundle_scanner/provenance.py), [`hf_bundle_scanner/report.py`](../hf_bundle_scanner/hf_bundle_scanner/report.py)).
+- **Fields:** `provenance_version: "phase1"`; optional **`hub`** (`repo_id`, `revision`); **`mirror_allowlist`** (env `HF_BUNDLE_MIRROR_ALLOWLIST` and/or CLI / HTTP / MCP); **`sbom`** `{ "uri": … }` (env `HF_BUNDLE_SBOM_URI` or flags); **`manifest_summary`** (`sha256` of canonical manifest JSON + `file_count`) when a manifest is included.
+- **Surfaces:** `scan-bundle scan …` ([`cli.py`](../hf_bundle_scanner/hf_bundle_scanner/cli.py)), `POST /v1/scan` ([`http_job.py`](../hf_bundle_scanner/hf_bundle_scanner/http_job.py)), MCP `scan_path` ([`mcp_server.py`](../hf_bundle_scanner/hf_bundle_scanner/mcp_server.py)).
+- **Next (later phases):** enforce mirror policy against actual download URLs, attach real SBOM artifacts from CI, and widen bundle provenance with SBOM hashes once `phase6-supplychain-extras` matures.
 
 ## Ten capability pillars (summary)
 
