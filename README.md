@@ -171,8 +171,9 @@ Snapshot paths are **redacted** to `/tmp/<ephemeral-hub-demo>` for readability. 
 If the JSON feels opaque, open the **human briefing pack** first:
 
 - **[`docs/sample_reports/actionable/README.md`](docs/sample_reports/actionable/README.md)** — how to read the columns.
-- **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`).
-- **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser.
+- **[`docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md`](docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md)** — **leadership blast-radius brief**: prod impact + who is affected + roll-up of **every** identified signal per demo.
+- **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`) including **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**.
+- **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser (leadership section first).
 
 **PDF (no extra tooling):** open `SCAN_BRIEFING.html` → **Print** → **Save as PDF**.
 
@@ -298,7 +299,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Harness: Makefile, session log, graphify | [docs/LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) |
 | Append-only session memory | [docs/sessions/SESSION_LOG.md](docs/sessions/SESSION_LOG.md) |
 | Live Hub sample bundle JSON | [docs/sample_reports/](docs/sample_reports/) |
-| Human briefing (CSV + HTML → PDF) | [docs/sample_reports/actionable/](docs/sample_reports/actionable/) |
+| Human briefing + blast radius (CSV / HTML / MD) | [docs/sample_reports/actionable/](docs/sample_reports/actionable/) |
 | Cursor long-horizon skill | [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md) |
 
 ---

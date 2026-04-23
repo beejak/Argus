@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-22 — leadership blast-radius (prod impact) in CSV/HTML/MD
+
+- **Changes:** `export_bundle_action_sheet.py` adds risk/prod/blast/exec columns + `BLAST_RADIUS_LEADERSHIP.md`; HTML leadership table; README pointers.
+- **Commands:** `make sample-action-sheets`, `make agent-verify`.
+
 ### 2026-04-22 — actionable sample exports (CSV + HTML briefing)
 
 - **Changes:** `docs/sample_reports/actionable/*`, `scripts/export_bundle_action_sheet.py`, `make sample-action-sheets`, README pointers.
