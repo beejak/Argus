@@ -23,8 +23,10 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 ### Phase 2 status (`phase2-static-drivers`, starter slice in repo)
 
 - **Ephemeral Hub demo:** [`scripts/ephemeral_hub_scan.py`](../scripts/ephemeral_hub_scan.py) + **`make ephemeral-hub-scan`** — download a **small** public Hub snapshot, run **`scan-bundle scan`**, write bundle JSON, **delete** the working tree (opt-in / manual; network).
-- **Configlint expansion:** additional tokenizer / loader hints (e.g. `use_fast_tokenizer_truthy`) before broader driver adapters.
-- **Next:** optional **ModelScan / ModelAudit** extras, optional commercial static adapters behind explicit policy (see phase table below).
+- **Committed sample reports:** [`docs/sample_reports/`](../docs/sample_reports/) (raw bundle JSON) + **[`docs/sample_reports/actionable/`](../docs/sample_reports/actionable/)** — CSV / HTML / leadership Markdown with **traffic-light**, **1–5 score**, **OWASP LLM touchpoints**, and links to [`THREAT_MODEL_TAXONOMY.md`](THREAT_MODEL_TAXONOMY.md); regenerate via **`make sample-action-sheets`** ([`scripts/export_bundle_action_sheet.py`](../scripts/export_bundle_action_sheet.py)).
+- **Configlint expansion:** tokenizer / loader hints including **`use_fast_tokenizer_truthy`**, **`use_auth_token_present`**, **`trust_remote_code`**, **`auto_map`**, invalid JSON — see [`hf_bundle_scanner/configlint.py`](../hf_bundle_scanner/hf_bundle_scanner/configlint.py). Only a **subset** currently escalates **`aggregate_exit_code`** via [`dispatch.py`](../hf_bundle_scanner/hf_bundle_scanner/dispatch.py) (`trust_remote_code_enabled`, `auto_map_custom_classes`, `config_json_invalid`).
+- **Next (still phase 2 lane):** optional **ModelScan / ModelAudit** wiring in policy + CI; optional commercial static adapters behind explicit policy.
+- **Next phase (phase 3):** **`phase3-configlint-oss`** — widen OSS loader / tokenizer patterns, tighten which configlint **`rule_id`** values are **release-blocking** vs informational, and document severities per org policy pack.
 
 ## Ten capability pillars (summary)
 

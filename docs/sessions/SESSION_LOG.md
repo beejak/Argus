@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-22 — README roadmap + CLI/scripts tables; roadmap phase 2/3 handoff
+
+- **Changes:** root `README.md` (where we are, doc hub rows, Makefile targets, CLI/env/scripts, outputs); `docs/PRODUCTION_SCANNER_ROADMAP.md` phase 2 bullets + phase 3 next.
+- **Commands:** `make agent-verify`. **Git:** `origin/main` already synced before commit.
+
 ### 2026-04-22 — leadership exports: OWASP mapping, 1–5 score, traffic light, tighter HTML
 
 - **Changes:** `export_bundle_action_sheet.py` adds taxonomy columns + executive-first HTML (`<details>` for long tables); `BLAST_RADIUS_LEADERSHIP.md` dashboard; README column help.

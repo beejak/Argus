@@ -287,6 +287,16 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 
 ---
 
+## Where we are (roadmap)
+
+| Phase | Status (high level) | What to read next |
+| ----- | -------------------- | ----------------- |
+| **0–1** | **Shipped** — taxonomy, bundle **`hf_bundle_scanner.bundle_report.v2`**, **`provenance`** | [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md), [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) |
+| **2** | **In progress** — Lane A static demos, **configlint** tokens, **human/actionable** sample exports | This README (Hub + reports below), [`hf_bundle_scanner/hf_bundle_scanner/configlint.py`](hf_bundle_scanner/hf_bundle_scanner/configlint.py) |
+| **3+** | **Planned** — wider OSS loader patterns, orchestrator scope, opt-in dynamic probes | [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md#phases-non-overlapping-todos) |
+
+---
+
 ## Documentation hub
 
 | Topic | Where |
@@ -298,6 +308,9 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Hermes / MCP boundaries | [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md) |
 | Harness: Makefile, session log, graphify | [docs/LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) |
 | Append-only session memory | [docs/sessions/SESSION_LOG.md](docs/sessions/SESSION_LOG.md) |
+| Publish / mirror notes | [docs/PUBLISH_ARGUS.md](docs/PUBLISH_ARGUS.md) |
+| Lessons learned (paths, git, CI) | [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) |
+| Agent pytest artifacts (local) | [`.agent/README.md`](.agent/README.md) |
 | Live Hub sample bundle JSON | [docs/sample_reports/](docs/sample_reports/) |
 | Human briefing + blast radius (CSV / HTML / MD) | [docs/sample_reports/actionable/](docs/sample_reports/actionable/) |
 | Cursor long-horizon skill | [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md) |
@@ -314,8 +327,66 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | `make scan-fixture` | Minimal bundle scan smoke |
 | `make git-doctor` | Diagnose `git commit` / trailer config issues |
 | `make commit-msg MSG='…'` | Commit via `git commit -F` (safer quoting) |
+| `make ephemeral-hub-scan` | `OUT=/tmp/report.json` — live Hub download → scan → delete tree ([`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py); optional `INJECT=1`) |
+| `make sample-action-sheets` | Regenerate [`docs/sample_reports/actionable/`](docs/sample_reports/actionable/) (CSV, HTML, leadership MD) from committed sample JSON |
 
 You can also run `make` from **`hf_bundle_scanner/`**; that Makefile forwards to the root.
+
+---
+
+## CLI syntax (minimal)
+
+Full flags for **`scan-bundle`** / **`download`** / **`manifest`** live in [`hf_bundle_scanner/README.md`](hf_bundle_scanner/README.md). Common **`scan-bundle scan`** shape from repo root:
+
+```bash
+cd "/root/LLM Scanner"
+export HF_BUNDLE_PYTHON="$(pwd)/.venv/bin/python"
+scan-bundle scan \
+  --root /path/to/snapshot \
+  --policy /path/to/policy.json \
+  --out /tmp/bundle-report.json \
+  --drivers "" \
+  --print-summary
+```
+
+**Per-file gate** (single artifact): `admit-model scan --artifact … --policy … --report … --drivers "" --timeout 600 --fail-on MEDIUM` — policy JSON shape: [`model-admission/README.md`](model-admission/README.md).
+
+**Configlint rules** that can bump **`aggregate_exit_code`** to **`1`** when the file lane is otherwise clean: `trust_remote_code_enabled`, `auto_map_custom_classes`, `config_json_invalid` (see [`hf_bundle_scanner/hf_bundle_scanner/dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py)). Other configlint signals (e.g. `use_fast_tokenizer_truthy`) appear in **`config_findings`** but do not currently force that escalation.
+
+---
+
+## Environment variables (bundle / admit)
+
+| Variable | Purpose |
+| -------- | ------- |
+| **`HF_BUNDLE_PYTHON`** | Interpreter used to spawn **`admit-model`** / **`python -m model_admission`** (set when paths contain spaces). |
+| **`HF_BUNDLE_ADMIT_CMD`** | Optional override for admit argv (advanced; quoting pitfalls — see [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)). |
+| **`HF_BUNDLE_MIRROR_ALLOWLIST`** | Comma-separated mirror hosts merged into **`provenance`**. |
+| **`HF_BUNDLE_SBOM_URI`** | SBOM pointer merged into **`provenance`**. |
+| **`LLM_SCANNER_TEST_CATALOG`** | Absolute path to [`llm_security_test_cases/catalog.json`](llm_security_test_cases/catalog.json) for pytest harnesses ([`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py)). |
+
+---
+
+## Root helper scripts (syntax)
+
+| Script | Purpose | Example |
+| ------ | ------- | ------- |
+| [`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py) | Hub **`snapshot_download`** → **`scan-bundle`** → delete temp tree | `HF_BUNDLE_PYTHON="$(pwd)/.venv/bin/python" python3 scripts/ephemeral_hub_scan.py --out /tmp/r.json` · optional `--inject-demo-tokenizer-risk` · `--policy` path |
+| [`scripts/export_bundle_action_sheet.py`](scripts/export_bundle_action_sheet.py) | Bundle JSON → **CSV + HTML +** `BLAST_RADIUS_LEADERSHIP.md` (OWASP + board call) | `python3 scripts/export_bundle_action_sheet.py` · optional `--csv-out` / `--html-out` / `--md-out` |
+| [`scripts/redact_ephemeral_report.py`](scripts/redact_ephemeral_report.py) | Strip ephemeral `/tmp/hf-ephemeral-*` paths before committing a sample | `python3 scripts/redact_ephemeral_report.py /tmp/in.json docs/sample_reports/out.json` |
+| [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py) | **`make agent-verify`** backend; writes **`.agent/pytest-last.log`** | `make agent-verify` |
+| [`scripts/git_commit_via_file.py`](scripts/git_commit_via_file.py) | Commit when `git commit -m` / trailers misbehave | `python3 scripts/git_commit_via_file.py 'subject line'` |
+| [`scripts/git_doctor.py`](scripts/git_doctor.py) | Diagnose trailer / identity issues | `make git-doctor` |
+
+---
+
+## Outputs & reports (what to attach where)
+
+| Output | Produced by | Attach to |
+| ------ | ----------- | --------- |
+| **`.agent/pytest-last.log`** | `make agent-verify` | CI debugging, agent session |
+| **`docs/sample_reports/*.json`** | `scripts/ephemeral_hub_scan.py` (then redact paths) | Engineering evidence of bundle schema |
+| **`docs/sample_reports/actionable/*`** | `make sample-action-sheets` | **Leadership / risk**: CSV, printable HTML, `BLAST_RADIUS_LEADERSHIP.md` ([index](docs/sample_reports/actionable/README.md)) |
 
 ---
 
