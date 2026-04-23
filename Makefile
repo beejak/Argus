@@ -3,7 +3,7 @@
 VENVDIR ?= .venv
 PY := $(abspath $(VENVDIR))/bin/python
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg
 
 help:
 	@echo "LLM Scanner harness"
@@ -15,6 +15,8 @@ help:
 	@echo "  make graphify-update  - refresh graphify-out/ if graphify is installed"
 	@echo "  make memory-open      - path to docs/sessions/SESSION_LOG.md"
 	@echo "  make agent-verify     - run both pytest suites; write .agent/pytest-last.log"
+	@echo "  make git-doctor       - print trailer-related git config + env hints"
+	@echo "  make commit-msg       - git commit via -F (usage: make commit-msg MSG='subject')"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
 install:
@@ -70,3 +72,10 @@ memory-open:
 
 agent-verify:
 	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_tests_for_agent.py"
+
+git-doctor:
+	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/git_doctor.py"
+
+commit-msg:
+	@test -n "$(MSG)" || (echo 'Usage: make commit-msg MSG="commit subject"' >&2 && exit 1)
+	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/git_commit_via_file.py" "$(MSG)"

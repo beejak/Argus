@@ -46,7 +46,7 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 ## 2026-04-22 — Agent cannot see pytest stdout
 
 - **Mistake:** Assuming `run_terminal_cmd` always returns streamed pytest output to the agent; in some Cursor setups stdout is empty while exit code is `0`.
-- **Fix:** Add **`make agent-verify`** → [`scripts/run-tests-for-agent.sh`](../scripts/run-tests-for-agent.sh) writes **`.agent/pytest-last.log`** + **`.agent/pytest-last.exit`** under the repo; the agent **reads those files** from the workspace after the command returns.
+- **Fix:** Add **`make agent-verify`** → [`scripts/run_tests_for_agent.py`](../scripts/run_tests_for_agent.py) writes **`.agent/pytest-last.log`** + **`.agent/pytest-last.exit`** under the repo; the agent **reads those files** from the workspace after the command returns.
 
 ## 2026-04-22 — CRLF in `*.sh` breaks Git Bash / `set -u`
 
@@ -57,6 +57,12 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 
 - **Observation:** `wsl -e bash -lc '... > /root/LLM Scanner/.agent/...'` from the agent terminal did not create files visible to the Read tool on `\\wsl.localhost\...` in this environment (while `Write` to the same UNC path works).
 - **Fix:** Prefer **Cursor Remote – WSL** (agent shell runs inside Linux) **or** rely on **GitHub Actions** (`.github/workflows/llm-scanner.yml`) for deterministic verification without depending on the agent’s local terminal bridge.
+
+## 2026-04-23 — `git commit` and `option trailer requires a value`
+
+- **Symptom:** `git commit -m '…'` returns **129** with **`error: option trailer requires a value`** even though you never passed **`--trailer`**.
+- **Likely causes:** (1) **Shell / nested host quoting** dropped the `-m` value so a later token was parsed as **`--trailer`** with no value. (2) A broken **`trailer.*`** entry or **`alias.commit=… --trailer …`** in some Git config (`git config --list --show-origin | grep -i trailer`). (3) Rare **environment pollution**; compare against a minimal env (`env -i HOME="$HOME" XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}" PATH="/usr/bin:/bin:$PATH" git …`).
+- **Fix:** Prefer **`git commit -F msg.txt`**, **`python3 scripts/git_commit_via_file.py 'subject line'`**, or **`make commit-msg MSG='subject line'`**. Inspect config with **`python3 scripts/git_doctor.py`** or **`make git-doctor`**.
 
 ## Template (copy below)
 
