@@ -128,13 +128,19 @@ def _format_reference_list(
     *,
     max_items: int | None = None,
     sep: str = " | ",
+    dedupe_urls: bool = True,
 ) -> str:
     parts: list[str] = []
+    seen_urls: set[str] = set()
     for ref in refs or []:
         if not isinstance(ref, dict):
             continue
         title = str(ref.get("title") or "").strip()
         url = str(ref.get("url") or "").strip()
+        if dedupe_urls and url and url in seen_urls:
+            continue
+        if url:
+            seen_urls.add(url)
         if title and url:
             parts.append(f"{title} — {url}")
         elif url:
