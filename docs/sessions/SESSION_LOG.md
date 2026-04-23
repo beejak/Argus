@@ -48,4 +48,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** `scripts/run_tests_for_agent.py` is canonical; `make agent-verify` uses `$(PY)` + that script; bash wrapper delegates to Python; `.gitattributes` forces LF for `*.sh` etc.; CI runs the same script + uploads `.agent/pytest-last.log`.
 - **Verified:** `.agent/pytest-last.log` readable in workspace after WSL run — **37 passed, 2 skipped** (model-admission) + **20 passed, 2 deselected** (hf_bundle), `pytest-last.exit=0`.
 
+### 2026-04-23 — Git remote → Argus
+
+- **Remote:** `origin` → `https://github.com/beejak/Argus.git` ([Argus](https://github.com/beejak/Argus)).
+- **Commits:** initial monorepo import + `docs: Argus publish guide; expand .gitignore`.
+- **Next:** `git push -u origin main` from WSL with GitHub auth (see `docs/PUBLISH_ARGUS.md`).
+
 ---
