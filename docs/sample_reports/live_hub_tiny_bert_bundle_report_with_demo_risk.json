@@ -1,0 +1,175 @@
+{
+  "schema": "hf_bundle_scanner.bundle_report.v2",
+  "taxonomy_version": "phase0",
+  "root": "/tmp/<ephemeral-hub-demo>",
+  "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
+  "drivers": "",
+  "manifest": {
+    "root": "/tmp/<ephemeral-hub-demo>",
+    "file_count": 20,
+    "files": [
+      {
+        "relpath": ".cache/huggingface/.gitignore",
+        "size_bytes": 1,
+        "sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1"
+      },
+      {
+        "relpath": ".cache/huggingface/CACHEDIR.TAG",
+        "size_bytes": 191,
+        "sha256": "f6572428f6d5e1575e73a1502895a8731f10757dfbb634909c6e154b849af91d"
+      },
+      {
+        "relpath": ".cache/huggingface/download/.gitattributes.metadata",
+        "size_bytes": 101,
+        "sha256": "924fe69ef1b6b562b8025a0257206c51ffd95b8ba5ab9942831e88e63c26eccb"
+      },
+      {
+        "relpath": ".cache/huggingface/download/config.json.metadata",
+        "size_bytes": 99,
+        "sha256": "7dacb122f1c1b2064c6601d69e68fbcb8f4cf8861ab92859566cba55f8b62cbd"
+      },
+      {
+        "relpath": ".cache/huggingface/download/onnx/model.onnx.metadata",
+        "size_bytes": 125,
+        "sha256": "2ad599043a379f66bb134cdf9ef3b07e37745e9dc3bacf6110d2ff5fd009f7c0"
+      },
+      {
+        "relpath": ".cache/huggingface/download/pytorch_model.bin.metadata",
+        "size_bytes": 125,
+        "sha256": "1816a7c09cd2a649d240a957a39ea0ceab55b93f1a0edf068316c7fabc95de37"
+      },
+      {
+        "relpath": ".cache/huggingface/download/special_tokens_map.json.metadata",
+        "size_bytes": 101,
+        "sha256": "43506f7ddf4399cd50d0359e11a71635f466a7b4d845efb210fd9722724fb71b"
+      },
+      {
+        "relpath": ".cache/huggingface/download/tf_model.h5.metadata",
+        "size_bytes": 125,
+        "sha256": "97efcc8a81e07a8d1643120b9d9fc51943cbe578df6f0011f4f5ff186845e980"
+      },
+      {
+        "relpath": ".cache/huggingface/download/tokenizer.json.metadata",
+        "size_bytes": 97,
+        "sha256": "7ddb7def6f21e4879ace49b8d3a4bf00a436c6cb0fbc972de348f7266495206a"
+      },
+      {
+        "relpath": ".cache/huggingface/download/tokenizer_config.json.metadata",
+        "size_bytes": 101,
+        "sha256": "666e57349e1e36162df91330a020aee0f5cff4c2cf4f1967466290cd17686c89"
+      },
+      {
+        "relpath": ".cache/huggingface/download/vocab.txt.metadata",
+        "size_bytes": 101,
+        "sha256": "c3e2be24c8ccf1a1c7cc2b6a8d445f070c96ce47ee874c9bcd69216c390ef2e3"
+      },
+      {
+        "relpath": ".gitattributes",
+        "size_bytes": 1477,
+        "sha256": "db7c0371f46f0840b8f25794c1e3321c9b5820a8cb6ba9694a46fc64b8fae5a6"
+      },
+      {
+        "relpath": "config.json",
+        "size_bytes": 631,
+        "sha256": "8feeb7fe8bdbc49754e178ae88da4a3f065c53a282a0398e2e384e230872faef"
+      },
+      {
+        "relpath": "onnx/model.onnx",
+        "size_bytes": 449599,
+        "sha256": "ebc3af0117e7fcc734a5c8b951d8b711dda1e21baaa3052daeddfbc15401bc77"
+      },
+      {
+        "relpath": "pytorch_model.bin",
+        "size_bytes": 383481,
+        "sha256": "545d8feae7cdaa752dfcecd8d480928b31a0f7a0b494877c9ab5ddf504906703"
+      },
+      {
+        "relpath": "special_tokens_map.json",
+        "size_bytes": 125,
+        "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3"
+      },
+      {
+        "relpath": "tf_model.h5",
+        "size_bytes": 472416,
+        "sha256": "8961e0116b64f7aa000cdee56f226922e47168126dfc846a85b935b259311edf"
+      },
+      {
+        "relpath": "tokenizer.json",
+        "size_bytes": 23061,
+        "sha256": "912299631520e23e3df042e4a892221dcd5500d21f9bb89e692ef55be381a64b"
+      },
+      {
+        "relpath": "tokenizer_config.json",
+        "size_bytes": 117,
+        "sha256": "6c949077644ebb564ba699e1964edff11a50406cbba690cf0b775e2c3bd021bb"
+      },
+      {
+        "relpath": "vocab.txt",
+        "size_bytes": 4679,
+        "sha256": "80e5f55906f9c9dc3d762d5e66f3705916a5422f0b976175ba3eebf3614f87d8"
+      }
+    ]
+  },
+  "config_findings": [
+    {
+      "path": "/tmp/<ephemeral-hub-demo>/tokenizer_config.json",
+      "rule_id": "trust_remote_code_enabled",
+      "message": "trust_remote_code is truthy ('True'); loading with trust_remote_code can execute Hub Python"
+    }
+  ],
+  "file_scans": [
+    {
+      "relpath": "onnx/model.onnx",
+      "exit_code": 0,
+      "report_path": null,
+      "error": null,
+      "report": {
+        "artifact_path": "/tmp/<ephemeral-hub-demo>/onnx/model.onnx",
+        "artifact_sha256": "ebc3af0117e7fcc734a5c8b951d8b711dda1e21baaa3052daeddfbc15401bc77",
+        "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
+        "drivers_run": [],
+        "driver_errors": [],
+        "findings": []
+      }
+    },
+    {
+      "relpath": "pytorch_model.bin",
+      "exit_code": 0,
+      "report_path": null,
+      "error": null,
+      "report": {
+        "artifact_path": "/tmp/<ephemeral-hub-demo>/pytorch_model.bin",
+        "artifact_sha256": "545d8feae7cdaa752dfcecd8d480928b31a0f7a0b494877c9ab5ddf504906703",
+        "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
+        "drivers_run": [],
+        "driver_errors": [],
+        "findings": []
+      }
+    },
+    {
+      "relpath": "tf_model.h5",
+      "exit_code": 0,
+      "report_path": null,
+      "error": null,
+      "report": {
+        "artifact_path": "/tmp/<ephemeral-hub-demo>/tf_model.h5",
+        "artifact_sha256": "8961e0116b64f7aa000cdee56f226922e47168126dfc846a85b935b259311edf",
+        "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
+        "drivers_run": [],
+        "driver_errors": [],
+        "findings": []
+      }
+    }
+  ],
+  "aggregate_exit_code": 1,
+  "provenance": {
+    "provenance_version": "phase1",
+    "hub": {
+      "repo_id": "hf-internal-testing/tiny-random-BertModel"
+    },
+    "manifest_summary": {
+      "sha256": "27b746fa9981f7481e10d2f4f9bc64908ea161ef63a519507ca5098f8e01f1b8",
+      "file_count": 20
+    }
+  }
+}

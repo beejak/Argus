@@ -46,10 +46,11 @@ def main(argv: list[str] | None = None) -> int:
 
     policy = Path(args.policy)
     if not policy.is_file():
-        policy = (root / args.policy).resolve()
+        policy = root / args.policy
     if not policy.is_file():
         print(f"ERROR: policy not found: {args.policy}", file=sys.stderr)
         return 2
+    policy = policy.resolve()
 
     out = Path(args.out).resolve()
     py = os.environ.get("HF_BUNDLE_PYTHON") or sys.executable
@@ -115,7 +116,8 @@ def main(argv: list[str] | None = None) -> int:
             cmd.extend(["--hub-revision", str(args.revision)])
 
         env = {**os.environ, "HF_BUNDLE_PYTHON": str(py)}
-        r = subprocess.run(cmd, cwd=str(root), env=env, capture_output=True, text=True)
+        # Run with package cwd so `python -m hf_bundle_scanner` resolves the editable install reliably.
+        r = subprocess.run(cmd, cwd=str(root / "hf_bundle_scanner"), env=env, capture_output=True, text=True)
         if r.stdout:
             print(r.stdout, end="" if r.stdout.endswith("\n") else "\n")
         if r.stderr:

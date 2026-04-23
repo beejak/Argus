@@ -158,6 +158,36 @@ Advanced flags are passed through **`EPHEMERAL_FLAGS`** (see **`make help`**). *
 
 ---
 
+## Live Hub sample reports (real download)
+
+These are **committed outputs** from a **live** Hugging Face snapshot download (`hf-internal-testing/tiny-random-BertModel`), scanned with the repo’s **permissive** policy fixture, then the working tree was deleted. Snapshot paths are **redacted** to `/tmp/<ephemeral-hub-demo>` for readability. Index + context: [`docs/sample_reports/README.md`](docs/sample_reports/README.md).
+
+| Artifact | One-line meaning |
+| -------- | ---------------- |
+| [`docs/sample_reports/live_hub_tiny_bert_bundle_report.json`](docs/sample_reports/live_hub_tiny_bert_bundle_report.json) | **Baseline:** three weight-like artifacts (`.onnx`, `.bin`, `.h5`) scanned; **no** configlint hits; **`aggregate_exit_code`: `0`**. |
+| [`docs/sample_reports/live_hub_tiny_bert_bundle_report_with_demo_risk.json`](docs/sample_reports/live_hub_tiny_bert_bundle_report_with_demo_risk.json) | **Same snapshot + demo JSON risk:** a synthetic `tokenizer_config.json` enables **`trust_remote_code_enabled`** → aggregate bumped to **`1`** even if per-file scans are clean. |
+
+### How to read the JSON (top-level)
+
+| Field | What it tells you |
+| ----- | ----------------- |
+| **`schema`** | Report format version (`hf_bundle_scanner.bundle_report.v2`). |
+| **`taxonomy_version`** | Phase‑0 risk language revision (`phase0`) for `rule_id` / categories. |
+| **`root`** | Snapshot root that was scanned (redacted here). |
+| **`policy_path`** | The admission policy JSON used for every `admit-model` invocation. |
+| **`drivers`** | Comma-separated static driver list forwarded to `admit-model` (empty here = policy gate only). |
+| **`manifest`** | Recursive file hashes for integrity / drift (includes Hub cache files under `.cache/` in this sample). |
+| **`config_findings`** | **configlint** hits on JSON configs (`tokenizer_config.json`, etc.) — empty in the baseline file; populated in the demo-risk file. |
+| **`file_scans[]`** | One row per discovered artifact: `relpath`, `exit_code`, embedded **`report`** (admit-model JSON) or `error` text. |
+| **`aggregate_exit_code`** | Single “ship / no-ship style” rollup for CI gates (`0` clean, `1` policy/config/findings floor, `2` tooling, `4` usage). |
+| **`provenance`** | Phase‑1 metadata: Hub repo/revision echo, mirror/SBOM env hints if set, **`manifest_summary`** digest. |
+
+### Why the “demo risk” file exits `1`
+
+`merge_aggregate_exit` intentionally escalates **0 → 1** when configlint sees high-risk loader posture (`trust_remote_code_enabled`, `auto_map_custom_classes`, or invalid JSON). That is **not** proof of exploitation — it is a **policy signal** that your integration is asking for a sharper review before production.
+
+---
+
 ## Tests in this repository
 
 | Suite | Path | What it covers |
@@ -214,6 +244,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Hermes / MCP boundaries | [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md) |
 | Harness: Makefile, session log, graphify | [docs/LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) |
 | Append-only session memory | [docs/sessions/SESSION_LOG.md](docs/sessions/SESSION_LOG.md) |
+| Live Hub sample bundle JSON | [docs/sample_reports/](docs/sample_reports/) |
 | Cursor long-horizon skill | [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md) |
 
 ---

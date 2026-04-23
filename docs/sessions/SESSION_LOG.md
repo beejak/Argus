@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-23 — committed live Hub bundle sample reports + README interpretation
+
+- **Changes:** `docs/sample_reports/*.json` + `docs/sample_reports/README.md`; README section explaining fields + baseline vs demo-risk; `scripts/ephemeral_hub_scan.py` resolves policy paths against repo root (works with scan `cwd`).
+- **Commands:** `scripts/ephemeral_hub_scan.py`, `make agent-verify`.
+
 ### 2026-04-23 — dedupe GitHub Actions (Docker-only hf-bundle workflow)
 
 - **Changes:** `.github/workflows/hf-bundle-scanner.yml` no longer runs a second pytest matrix; **`llm-scanner.yml`** remains the canonical test workflow. **`hf-bundle-scanner`** workflow keeps **Docker build + CLI smoke** only.
