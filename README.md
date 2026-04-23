@@ -154,7 +154,7 @@ Advanced flags are passed through **`EPHEMERAL_FLAGS`** (see **`make help`**). *
 | **Pytest harness log** | Full stdout/stderr from **both** packages’ pytest runs + exit summary. | **`make agent-verify`** → **`.agent/pytest-last.log`** and **`.agent/pytest-last.exit`** ([`.agent/README.md`](.agent/README.md)). |
 | **GitHub Actions** | Same harness as local agent-verify; uploads the log artifact. | [`.github/workflows/llm-scanner.yml`](.github/workflows/llm-scanner.yml) — open the latest run for your branch. |
 
-**Exit semantics (bundle aggregate):** worst child wins by priority — code **`4`** (usage), then **`2`** (driver/tooling), then **`1`** (policy / findings / certain configlint escalations), else **`0`** (`compute_aggregate_exit` in [`report.py`](hf_bundle_scanner/hf_bundle_scanner/report.py)). Config risk from **`trust_remote_code`**, **`auto_map`** custom classes, or **invalid `config.json`** can raise the aggregate to **`1`** when the file lane was clean. See [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md).
+**Exit semantics (bundle aggregate):** worst child wins by priority — code **`4`** (usage), then **`2`** (driver/tooling), then **`1`** (policy / findings / certain configlint escalations), else **`0`** (`compute_aggregate_exit` in [`report.py`](hf_bundle_scanner/hf_bundle_scanner/report.py)). Config risk from **`CONFIG_RISK_RULE_IDS`** in [`dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py) (mirrored in [`docs/policy/configlint_rule_defaults.json`](docs/policy/configlint_rule_defaults.json)) can raise the aggregate to **`1`** when the file lane was clean. See [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md).
 
 ---
 
@@ -172,12 +172,12 @@ If the JSON feels opaque, open the **human briefing pack** first:
 
 - **[`docs/sample_reports/actionable/README.md`](docs/sample_reports/actionable/README.md)** — how to read the columns.
 - **[`docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md`](docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md)** — **leadership brief**: executive **dashboard** (signal + 1–5 score + **OWASP LLM** touchpoints + board decision), then blast-radius narrative and issue roll-up.
-- **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`) including **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**.
+- **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`) including **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**, plus **decision-support** columns (**`reference_citations`**, **`owasp_genai_catalog_hint`**, **`decision_catalog_version`**) sourced from [`docs/reporting/decision_support_rule_catalog.json`](docs/reporting/decision_support_rule_catalog.json).
 - **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser (leadership section first). **GitHub’s repo file view shows HTML as source only** — open locally or use the rendered preview link in [`actionable/README.md`](docs/sample_reports/actionable/README.md).
 
 **PDF (no extra tooling):** open `SCAN_BRIEFING.html` in a real browser → **Print** → **Save as PDF**.
 
-Regenerate after changing sample JSON: `python3 scripts/export_bundle_action_sheet.py` (also `make sample-action-sheets`).
+Regenerate after changing sample JSON: `python3 scripts/export_bundle_action_sheet.py` (also `make sample-action-sheets`; optional `--repo-root` if not run from the repo root).
 
 | Artifact | One-line meaning |
 | -------- | ---------------- |
@@ -224,7 +224,7 @@ This is what a **policy-gated** failure looks like in the bundle JSON (one of th
 
 ### Why the “demo risk” file exits `1`
 
-`merge_aggregate_exit` intentionally escalates **0 → 1** when configlint sees high-risk loader posture (`trust_remote_code_enabled`, `auto_map_custom_classes`, or invalid JSON). That is **not** proof of exploitation — it is a **policy signal** that your integration is asking for a sharper review before production.
+`merge_aggregate_exit` intentionally escalates **0 → 1** when configlint emits a **`rule_id`** in **`CONFIG_RISK_RULE_IDS`** (see [`dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py)). That is **not** proof of exploitation — it is a **policy signal** that your integration is asking for a sharper review before production.
 
 ---
 
@@ -292,8 +292,8 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Phase | Status (high level) | What to read next |
 | ----- | -------------------- | ----------------- |
 | **0–1** | **Shipped** — taxonomy, bundle **`hf_bundle_scanner.bundle_report.v2`**, **`provenance`** | [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md), [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) |
-| **2** | **In progress** — Lane A static demos, **configlint** tokens, **human/actionable** sample exports | This README (Hub + reports below), [`hf_bundle_scanner/hf_bundle_scanner/configlint.py`](hf_bundle_scanner/hf_bundle_scanner/configlint.py) |
-| **3+** | **Planned** — wider OSS loader patterns, orchestrator scope, opt-in dynamic probes | [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md#phases-non-overlapping-todos) |
+| **2** | **In progress** — Lane A static demos (**ModelScan** / **ModelAudit** via `--drivers`; `make drivers-help`), **configlint** tokens, **human/actionable** sample exports | This README (Hub + reports below), [`hf_bundle_scanner/README.md`](hf_bundle_scanner/README.md), [`hf_bundle_scanner/hf_bundle_scanner/configlint.py`](hf_bundle_scanner/hf_bundle_scanner/configlint.py) |
+| **3+** | **In progress (OSS slice)** — org **configlint** policy template ([`docs/policy/`](docs/policy/)); wider loader heuristics + orchestrator scope + opt-in dynamic probes on the roadmap | [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md#phases-non-overlapping-todos) |
 
 ---
 
@@ -313,6 +313,8 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Agent pytest artifacts (local) | [`.agent/README.md`](.agent/README.md) |
 | Live Hub sample bundle JSON | [docs/sample_reports/](docs/sample_reports/) |
 | Human briefing + blast radius (CSV / HTML / MD) | [docs/sample_reports/actionable/](docs/sample_reports/actionable/) |
+| Decision-support rule catalog (exports + citations) | [docs/reporting/](docs/reporting/) |
+| Org **configlint** escalation template (fork for CI/policy) | [docs/policy/](docs/policy/) |
 | Cursor long-horizon skill | [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md) |
 
 ---
@@ -329,6 +331,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | `make commit-msg MSG='…'` | Commit via `git commit -F` (safer quoting) |
 | `make ephemeral-hub-scan` | `OUT=/tmp/report.json` — live Hub download → scan → delete tree ([`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py); optional `INJECT=1`) |
 | `make sample-action-sheets` | Regenerate [`docs/sample_reports/actionable/`](docs/sample_reports/actionable/) (CSV, HTML, leadership MD) from committed sample JSON |
+| `make drivers-help` | Print **`model-admission`** scan driver names (`modelscan`, `modelaudit`) and **`MODELSCAN_BIN` / `MODELAUDIT_BIN`** hints (after `make install`) |
 
 You can also run `make` from **`hf_bundle_scanner/`**; that Makefile forwards to the root.
 
@@ -351,7 +354,7 @@ scan-bundle scan \
 
 **Per-file gate** (single artifact): `admit-model scan --artifact … --policy … --report … --drivers "" --timeout 600 --fail-on MEDIUM` — policy JSON shape: [`model-admission/README.md`](model-admission/README.md).
 
-**Configlint rules** that can bump **`aggregate_exit_code`** to **`1`** when the file lane is otherwise clean: `trust_remote_code_enabled`, `auto_map_custom_classes`, `config_json_invalid` (see [`hf_bundle_scanner/hf_bundle_scanner/dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py)). Other configlint signals (e.g. `use_fast_tokenizer_truthy`) appear in **`config_findings`** but do not currently force that escalation — the **actionable** exports spell out that contrast for leadership ([`docs/sample_reports/actionable/`](docs/sample_reports/actionable/), columns **`default_ci_blocks_release`** + narrative fields).
+**Configlint rules** that can bump **`aggregate_exit_code`** to **`1`** when the file lane is otherwise clean: **`CONFIG_RISK_RULE_IDS`** in [`dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py) (also in [`docs/policy/configlint_rule_defaults.json`](docs/policy/configlint_rule_defaults.json)). Other configlint signals (e.g. `use_fast_tokenizer_truthy`, `use_safetensors_disabled`) appear in **`config_findings`** but do not currently force that escalation — the **actionable** exports spell out that contrast for leadership ([`docs/sample_reports/actionable/`](docs/sample_reports/actionable/), columns **`default_ci_blocks_release`** + narrative fields + **`reference_citations`**).
 
 ---
 
@@ -364,6 +367,7 @@ scan-bundle scan \
 | **`HF_BUNDLE_MIRROR_ALLOWLIST`** | Comma-separated mirror hosts merged into **`provenance`**. |
 | **`HF_BUNDLE_SBOM_URI`** | SBOM pointer merged into **`provenance`**. |
 | **`LLM_SCANNER_TEST_CATALOG`** | Absolute path to [`llm_security_test_cases/catalog.json`](llm_security_test_cases/catalog.json) for pytest harnesses ([`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py)). |
+| **`MODELSCAN_BIN`**, **`MODELAUDIT_BIN`** | Override **`modelscan`** / **`modelaudit`** executables when using **`--drivers`** on **`admit-model`** or **`scan-bundle scan`** (see [`model-admission/README.md`](model-admission/README.md)). |
 
 ---
 
@@ -372,7 +376,7 @@ scan-bundle scan \
 | Script | Purpose | Example |
 | ------ | ------- | ------- |
 | [`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py) | Hub **`snapshot_download`** → **`scan-bundle`** → delete temp tree | `HF_BUNDLE_PYTHON="$(pwd)/.venv/bin/python" python3 scripts/ephemeral_hub_scan.py --out /tmp/r.json` · optional `--inject-demo-tokenizer-risk` · `--policy` path |
-| [`scripts/export_bundle_action_sheet.py`](scripts/export_bundle_action_sheet.py) | Bundle JSON → **CSV + HTML +** `BLAST_RADIUS_LEADERSHIP.md` (OWASP + board call) | `python3 scripts/export_bundle_action_sheet.py` · optional `--csv-out` / `--html-out` / `--md-out` |
+| [`scripts/export_bundle_action_sheet.py`](scripts/export_bundle_action_sheet.py) | Bundle JSON → **CSV + HTML +** `BLAST_RADIUS_LEADERSHIP.md` (OWASP + board call + catalog citations) | `python3 scripts/export_bundle_action_sheet.py` · optional `--repo-root` / `--csv-out` / `--html-out` / `--md-out` |
 | [`scripts/redact_ephemeral_report.py`](scripts/redact_ephemeral_report.py) | Strip ephemeral `/tmp/hf-ephemeral-*` paths before committing a sample | `python3 scripts/redact_ephemeral_report.py /tmp/in.json docs/sample_reports/out.json` |
 | [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py) | **`make agent-verify`** backend; writes **`.agent/pytest-last.log`** | `make agent-verify` |
 | [`scripts/git_commit_via_file.py`](scripts/git_commit_via_file.py) | Commit when `git commit -m` / trailers misbehave | `python3 scripts/git_commit_via_file.py 'subject line'` |

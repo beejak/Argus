@@ -146,4 +146,8 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** `CONFIG_RISK_RULE_IDS` + `RULE_IDS_EMITTED`; `docs/policy/configlint_rule_defaults.json` + `docs/policy/README.md`; `test_configlint_policy_template.py`; exporter tries `CONFIG_RISK_RULE_IDS` import; `make drivers-help`; `hf_bundle_scanner/README.md` bundle drivers section; `test_dispatch.py` driver exit 2 path; ModelAudit JSON parse unit tests; roadmap + reporting README cross-links.
 - **Commands:** `make agent-verify`, `make drivers-help` (after `make install`).
 
+### 2026-04-24 — root README sync (reports + policy + drivers)
+
+- **Changes:** Root `README.md` — reporting / CLI / doc hub / Makefile table aligned with **`CONFIG_RISK_RULE_IDS`**, **`docs/policy/`**, **`docs/reporting/`**, new actionable CSV columns, **`make drivers-help`**, **`MODELSCAN_BIN` / `MODELAUDIT_BIN`**, export **`--repo-root`** note.
+
 ---
