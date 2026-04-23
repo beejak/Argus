@@ -1,0 +1,148 @@
+{
+  "catalog_version": "2026-04-23",
+  "maintainer_note": "Keep synchronized with hf_bundle_scanner/hf_bundle_scanner/configlint.py (emitted rule_id values) and hf_bundle_scanner/hf_bundle_scanner/dispatch.py (which configlint rule_ids set config_risk / aggregate exit). Add new rows when configlint grows; cite primary standards (OWASP GenAI / NIST / vendor docs).",
+  "global_references": [
+    {
+      "title": "OWASP GenAI — LLM Top 10 (latest list)",
+      "url": "https://genai.owasp.org/llm-top-10/"
+    },
+    {
+      "title": "OWASP Top 10 for LLM Applications (project hub)",
+      "url": "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+    },
+    {
+      "title": "LLM Scanner — Threat model & taxonomy (phase0, in-repo)",
+      "url": "https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md"
+    },
+    {
+      "title": "NIST AI Risk Management Framework (AI RMF)",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+    },
+    {
+      "title": "Hugging Face Hub — Security overview",
+      "url": "https://huggingface.co/docs/hub/security"
+    },
+    {
+      "title": "Hugging Face Hub — Pickle scanning (unsafe serialization class)",
+      "url": "https://huggingface.co/docs/hub/security-pickle"
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "trust_remote_code_enabled",
+      "emitted_by": "configlint",
+      "blocks_default_ci": true,
+      "owasp_llm_codes_hint": ["LLM05", "LLM07"],
+      "owasp_note": "OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.",
+      "vs_trust_remote_code": "This IS the reference worst-case static loader signal in default CI: it can enable execution of Hub-supplied Python during load in typical stacks.",
+      "legend_takeaway": "Stop / waive with named controls; do not treat as a hyperparameter tweak.",
+      "expert_guidance": "Treat as security + legal + procurement: require explicit waiver, revision pinning, sandboxed CI materialization, and deny-by-default in prod unless tightly bounded. Pair with secrets rotation if any Hub token scopes are broad.",
+      "references": [
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
+        },
+        {
+          "title": "Hugging Face Hub — Security",
+          "url": "https://huggingface.co/docs/hub/security"
+        }
+      ]
+    },
+    {
+      "rule_id": "auto_map_custom_classes",
+      "emitted_by": "configlint",
+      "blocks_default_ci": true,
+      "owasp_llm_codes_hint": ["LLM05"],
+      "owasp_note": "Custom class mapping is a supply-chain / unexpected-code-path story adjacent to insecure integration patterns.",
+      "vs_trust_remote_code": "Different mechanism than trust_remote_code, but still a high static concern: unexpected class wiring can execute surprising code paths.",
+      "legend_takeaway": "Blocking in default CI; require provenance for each mapped class.",
+      "expert_guidance": "Assign named owners per class mapping, require code review + SBOM linkage, and document waivers. Do not merge silently.",
+      "references": [
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
+        },
+        {
+          "title": "THREAT_MODEL_TAXONOMY.md (phase0)",
+          "url": "https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md"
+        }
+      ]
+    },
+    {
+      "rule_id": "config_json_invalid",
+      "emitted_by": "configlint",
+      "blocks_default_ci": true,
+      "owasp_llm_codes_hint": [],
+      "owasp_note": "Primarily integrity / operational reliability; fix before interpreting other loader flags.",
+      "vs_trust_remote_code": "Not a remote-code narrative by itself — the file does not parse, which can hide misconfigurations and break reproducibility.",
+      "legend_takeaway": "Fix JSON first; blocking default CI is intentional.",
+      "expert_guidance": "Treat as release hygiene: repair JSON, re-run scan, then revisit loader posture. Prevents false negatives on downstream checks.",
+      "references": [
+        {
+          "title": "NIST AI RMF — governance & measurement (context)",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ]
+    },
+    {
+      "rule_id": "use_fast_tokenizer_truthy",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM05"],
+      "owasp_note": "Hygiene / reproducibility / integration complexity — not equivalent to remote code execution by itself.",
+      "vs_trust_remote_code": "Much lower incident class than trust_remote_code in typical stacks: does not assert arbitrary Hub Python will run; flags legacy fast-tokenizer paths that complicate audits.",
+      "legend_takeaway": "Engineering + audit follow-up; not an automatic emergency bridge.",
+      "expert_guidance": "Route to ML platform owners: confirm tokenizer provenance, add regression tests, pin revisions. Escalate to security only if regulated explainability or strict reproducibility policies apply.",
+      "references": [
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
+        },
+        {
+          "title": "THREAT_MODEL_TAXONOMY.md (phase0)",
+          "url": "https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md"
+        }
+      ]
+    },
+    {
+      "rule_id": "use_auth_token_present",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM06"],
+      "owasp_note": "Sensitive information / secret handling — closer to disclosure and compliance than to loader RCE.",
+      "vs_trust_remote_code": "Different class: credential exposure and secret sprawl risk, not the same as execute Hub code at load.",
+      "legend_takeaway": "Secrets hygiene: rotate, remove from repos, use secret stores.",
+      "expert_guidance": "Treat as secret-management: rotate tokens, block merges that embed secrets, prefer OIDC/short-lived creds. Escalate if token scopes touch production data planes.",
+      "references": [
+        {
+          "title": "Hugging Face Hub — User access tokens",
+          "url": "https://huggingface.co/docs/hub/security-tokens"
+        },
+        {
+          "title": "Hugging Face Hub — Secrets scanning",
+          "url": "https://huggingface.co/docs/hub/security-secrets"
+        }
+      ]
+    },
+    {
+      "rule_id": "policy.gate_violation",
+      "emitted_by": "model-admission (bundle file_scans)",
+      "blocks_default_ci": true,
+      "owasp_llm_codes_hint": ["LLM05"],
+      "owasp_note": "Supply chain / integrity governance when policy encodes allowed formats and hashes.",
+      "vs_trust_remote_code": "Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence.",
+      "legend_takeaway": "Artifact/policy mismatch — waive with sign-off or remediate formats.",
+      "expert_guidance": "Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.",
+      "references": [
+        {
+          "title": "THREAT_MODEL_TAXONOMY.md (phase0)",
+          "url": "https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md"
+        },
+        {
+          "title": "NIST AI RMF",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ]
+    }
+  ]
+}

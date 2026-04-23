@@ -8,18 +8,21 @@ This document is generated from the same three committed bundle JSON samples as 
 
 - **In-repo threat model & OWASP mapping (phase0):** [THREAT_MODEL_TAXONOMY.md](https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md)
 - **OWASP LLM Top 10 (official):** [Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- **OWASP GenAI — LLM Top 10 (canonical list):** https://genai.owasp.org/llm-top-10/
+- **Decision catalog (machine-readable):** [decision_support_rule_catalog.json](../../reporting/decision_support_rule_catalog.json)
 
 ## Config signals vs `trust_remote_code` (default CI facts)
 
 These rows are **scanner defaults** (what flips `aggregate_exit_code` in CI today vs what is informational). They are not legal advice and not proof of compromise.
 
-| Config rule / topic | Blocks default CI today? | Compared to `trust_remote_code` | Leadership takeaway |
-| --------------------- | ------------------------- | ------------------------------ | ------------------- |
-| `trust_remote_code_enabled` | **YES** | Baseline worst-case static loader signal in default CI. | Stop / waive with controls; treat like shipping a remote dependency that can execute. |
-| `auto_map_custom_classes` | **YES** | High static concern; different mechanism, still blocking by default. | Require provenance for mapped classes; no silent waivers. |
-| `config_json_invalid` | **YES** | Operational / integrity break; not “Hub RCE” semantics. | Fix JSON before debating loader philosophy. |
-| `use_fast_tokenizer_truthy` | **NO (today)** | Much lower incident class than trust_remote_code in typical stacks. | Engineering + audit follow-up; not an automatic emergency bridge. |
-| `use_auth_token_present` | **NO (today)** | Secrets/compliance angle, not the same as remote code at load. | Rotate / remove secrets; involve security if scopes are broad. |
+| Config rule / topic | Blocks default CI today? | Compared to `trust_remote_code` | Leadership takeaway | Reference citations |
+| --------------------- | ------------------------- | ------------------------------ | ------------------- | ------------------- |
+| `trust_remote_code_enabled` | **YES** | This IS the reference worst-case static loader signal in default CI: it can enable execution of Hub-supplied Python during load in typical stacks. | Stop / waive with named controls; do not treat as a hyperparameter tweak. | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ \| Hugging Face Hub — Security — https://huggingface.co/docs/hub/security |
+| `auto_map_custom_classes` | **YES** | Different mechanism than trust_remote_code, but still a high static concern: unexpected class wiring can execute surprising code paths. | Blocking in default CI; require provenance for each mapped class. | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ \| THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md |
+| `config_json_invalid` | **YES** | Not a remote-code narrative by itself — the file does not parse, which can hide misconfigurations and break reproducibility. | Fix JSON first; blocking default CI is intentional. | NIST AI RMF — governance & measurement (context) — https://www.nist.gov/itl/ai-risk-management-framework |
+| `use_fast_tokenizer_truthy` | **NO (today)** | Much lower incident class than trust_remote_code in typical stacks: does not assert arbitrary Hub Python will run; flags legacy fast-tokenizer paths that complicate audits. | Engineering + audit follow-up; not an automatic emergency bridge. | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ \| THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md |
+| `use_auth_token_present` | **NO (today)** | Different class: credential exposure and secret sprawl risk, not the same as execute Hub code at load. | Secrets hygiene: rotate, remove from repos, use secret stores. | Hugging Face Hub — User access tokens — https://huggingface.co/docs/hub/security-tokens \| Hugging Face Hub — Secrets scanning — https://huggingface.co/docs/hub/security-secrets |
+| `policy.gate_violation` | **YES (policy gate)** | Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence. | Artifact/policy mismatch — waive with sign-off or remediate formats. | THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md \| NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework |
 
 ### How to use the score (1–5)
 

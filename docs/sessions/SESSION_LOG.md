@@ -128,4 +128,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** Root `README.md` expanded (what repo does / does not, philosophy, how to scan, reporting, tests, help, “keeping README honest”); `configlint` finding `use_fast_tokenizer_truthy`; `tests/test_configlint.py`.
 - **Commands:** `make agent-verify`.
 
+### 2026-04-23 — decision-support rule catalog + exporter wiring
+
+- **Phase:** reporting / human decision support.
+- **Changes:** `docs/reporting/decision_support_rule_catalog.json` (versioned `rule_id` rows with OWASP GenAI / NIST / HF citations), `docs/reporting/README.md`; `scripts/export_bundle_action_sheet.py` loads catalog for legend + `compared_to_worst_case_loader_risk` / `decision_support_expert` text; CSV columns `reference_citations`, `owasp_genai_catalog_hint`, `decision_catalog_version`; `configlint` module doc points to catalog; `docs/sample_reports/actionable/README.md` documents new columns; regenerated actionable CSV/HTML/MD.
+- **Commands:** `python3 scripts/export_bundle_action_sheet.py`, `make agent-verify`.
+
 ---

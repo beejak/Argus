@@ -46,13 +46,15 @@
   <p class="muted">
     <strong>References:</strong> 
     <a href="https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md">Threat model &amp; taxonomy (phase0)</a> · 
-    <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP LLM Top 10 (official project)</a>
+    <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP LLM Top 10 (official project)</a> · 
+    <a href="https://genai.owasp.org/llm-top-10/">OWASP GenAI — LLM Top 10 (canonical list)</a>
   </p>
   <p class="lead">
     <strong>Decision support:</strong> not every configlint row is the same incident class. 
     The table below states whether each signal <strong>blocks default CI</strong> today (mirrors 
     <code>hf_bundle_scanner.dispatch.scan_bundle</code>) and how it compares to 
-    <code>trust_remote_code</code> as the reference “worst static loader” story.
+    <code>trust_remote_code</code> as the reference “worst static loader” story. 
+    Citations come from <code>docs/reporting/decision_support_rule_catalog.json</code> when present.
   </p>
   <h2>Config signals vs trust_remote_code (default CI facts)</h2>
   <table>
@@ -62,38 +64,51 @@
         <th>default_ci_blocks_release</th>
         <th>vs_trust_remote_code</th>
         <th>leadership_takeaway</th>
+        <th>reference_citations</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>trust_remote_code_enabled</td>
         <td>YES</td>
-        <td>Baseline worst-case static loader signal in default CI.</td>
-        <td>Stop / waive with controls; treat like shipping a remote dependency that can execute.</td>
+        <td>This IS the reference worst-case static loader signal in default CI: it can enable execution of Hub-supplied Python during load in typical stacks.</td>
+        <td>Stop / waive with named controls; do not treat as a hyperparameter tweak.</td>
+        <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security</td>
       </tr>
       <tr>
         <td>auto_map_custom_classes</td>
         <td>YES</td>
-        <td>High static concern; different mechanism, still blocking by default.</td>
-        <td>Require provenance for mapped classes; no silent waivers.</td>
+        <td>Different mechanism than trust_remote_code, but still a high static concern: unexpected class wiring can execute surprising code paths.</td>
+        <td>Blocking in default CI; require provenance for each mapped class.</td>
+        <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
       </tr>
       <tr>
         <td>config_json_invalid</td>
         <td>YES</td>
-        <td>Operational / integrity break; not “Hub RCE” semantics.</td>
-        <td>Fix JSON before debating loader philosophy.</td>
+        <td>Not a remote-code narrative by itself — the file does not parse, which can hide misconfigurations and break reproducibility.</td>
+        <td>Fix JSON first; blocking default CI is intentional.</td>
+        <td>NIST AI RMF — governance &amp; measurement (context) — https://www.nist.gov/itl/ai-risk-management-framework</td>
       </tr>
       <tr>
         <td>use_fast_tokenizer_truthy</td>
         <td>NO (today)</td>
-        <td>Much lower incident class than trust_remote_code in typical stacks.</td>
+        <td>Much lower incident class than trust_remote_code in typical stacks: does not assert arbitrary Hub Python will run; flags legacy fast-tokenizer paths that complicate audits.</td>
         <td>Engineering + audit follow-up; not an automatic emergency bridge.</td>
+        <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
       </tr>
       <tr>
         <td>use_auth_token_present</td>
         <td>NO (today)</td>
-        <td>Secrets/compliance angle, not the same as remote code at load.</td>
-        <td>Rotate / remove secrets; involve security if scopes are broad.</td>
+        <td>Different class: credential exposure and secret sprawl risk, not the same as execute Hub code at load.</td>
+        <td>Secrets hygiene: rotate, remove from repos, use secret stores.</td>
+        <td>Hugging Face Hub — User access tokens — https://huggingface.co/docs/hub/security-tokens | Hugging Face Hub — Secrets scanning — https://huggingface.co/docs/hub/security-secrets</td>
+      </tr>
+      <tr>
+        <td>policy.gate_violation</td>
+        <td>YES (policy gate)</td>
+        <td>Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence.</td>
+        <td>Artifact/policy mismatch — waive with sign-off or remediate formats.</td>
+        <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
       </tr>
     </tbody>
   </table>
@@ -218,6 +233,9 @@
             <th>default_ci_blocks_release</th>
             <th>compared_to_worst_case_loader_risk</th>
             <th>decision_support_expert</th>
+            <th>reference_citations</th>
+            <th>owasp_genai_catalog_hint</th>
+            <th>decision_catalog_version</th>
           </tr>
         </thead>
         <tbody>
@@ -244,6 +262,9 @@
             <td>N/A (bundle rollup)</td>
             <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
             <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP GenAI — LLM Top 10 (latest list) — https://genai.owasp.org/llm-top-10/ | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Security overview — https://huggingface.co/docs/hub/security | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
+            <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -268,6 +289,9 @@
             <td>NO (passed static gate in this demo)</td>
             <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
+            <td></td>
+            <td></td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -292,6 +316,9 @@
             <td>NO (passed static gate in this demo)</td>
             <td>Not a config flag. Residual concern is **pickle deserialization class** if weights are ever swapped — different from `trust_remote_code`, but still material in strict threat models.</td>
             <td>If leadership only skims one thing on `.bin`: ask whether your org allows pickle-era weights in prod **at all**; if not, plan conversion to safetensors even when static policy is permissive.</td>
+            <td></td>
+            <td></td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -316,6 +343,9 @@
             <td>NO (passed static gate in this demo)</td>
             <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
+            <td></td>
+            <td></td>
+            <td>2026-04-23</td>
           </tr>
         </tbody>
       </table>
@@ -345,6 +375,9 @@
             <th>default_ci_blocks_release</th>
             <th>compared_to_worst_case_loader_risk</th>
             <th>decision_support_expert</th>
+            <th>reference_citations</th>
+            <th>owasp_genai_catalog_hint</th>
+            <th>decision_catalog_version</th>
           </tr>
         </thead>
         <tbody>
@@ -371,6 +404,9 @@
             <td>N/A (bundle rollup)</td>
             <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
             <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP GenAI — LLM Top 10 (latest list) — https://genai.owasp.org/llm-top-10/ | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Security overview — https://huggingface.co/docs/hub/security | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
+            <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>CONFIG</td>
@@ -393,8 +429,11 @@
             <td>Configlint rule trust_remote_code_enabled (see taxonomy doc).</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
             <td>YES</td>
-            <td>This **is** the reference severe loader posture for this scanner’s default gate: it can enable **Hub-supplied Python** during load in typical stacks.</td>
-            <td>Treat as a **security + legal** decision, not an ML hyperparameter tweak: require explicit waiver with compensating controls, revision pinning, and deny-by-default in production unless you run inside a tightly bounded sandbox.</td>
+            <td>This IS the reference worst-case static loader signal in default CI: it can enable execution of Hub-supplied Python during load in typical stacks.</td>
+            <td>Treat as security + legal + procurement: require explicit waiver, revision pinning, sandboxed CI materialization, and deny-by-default in prod unless tightly bounded. Pair with secrets rotation if any Hub token scopes are broad.</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security</td>
+            <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -419,6 +458,9 @@
             <td>NO (passed static gate in this demo)</td>
             <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
+            <td></td>
+            <td></td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -443,6 +485,9 @@
             <td>NO (passed static gate in this demo)</td>
             <td>Not a config flag. Residual concern is **pickle deserialization class** if weights are ever swapped — different from `trust_remote_code`, but still material in strict threat models.</td>
             <td>If leadership only skims one thing on `.bin`: ask whether your org allows pickle-era weights in prod **at all**; if not, plan conversion to safetensors even when static policy is permissive.</td>
+            <td></td>
+            <td></td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -467,6 +512,9 @@
             <td>NO (passed static gate in this demo)</td>
             <td>Not comparable to `trust_remote_code` directly — this row is about **artifact format choice** and supply-chain integrity for that format.</td>
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
+            <td></td>
+            <td></td>
+            <td>2026-04-23</td>
           </tr>
         </tbody>
       </table>
@@ -496,6 +544,9 @@
             <th>default_ci_blocks_release</th>
             <th>compared_to_worst_case_loader_risk</th>
             <th>decision_support_expert</th>
+            <th>reference_citations</th>
+            <th>owasp_genai_catalog_hint</th>
+            <th>decision_catalog_version</th>
           </tr>
         </thead>
         <tbody>
@@ -522,6 +573,9 @@
             <td>N/A (bundle rollup)</td>
             <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
             <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP GenAI — LLM Top 10 (latest list) — https://genai.owasp.org/llm-top-10/ | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Security overview — https://huggingface.co/docs/hub/security | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
+            <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -544,8 +598,11 @@
             <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
             <td>YES (this artifact fails policy)</td>
-            <td>This is **governance / integrity** risk (disallowed formats), not the same statement as `trust_remote_code` unless your policy explicitly encodes that rule.</td>
-            <td>Leadership decision is **waive with recorded risk acceptance** vs **remediate** (convert weights / drop files). Pair with procurement and audit stakeholders if you claim “safetensors-only” externally.</td>
+            <td>Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence.</td>
+            <td>Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.</td>
+            <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
+            <td>LLM05 — Supply chain / integrity governance when policy encodes allowed formats and hashes.</td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -568,8 +625,11 @@
             <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
             <td>YES (this artifact fails policy)</td>
-            <td>This is **governance / integrity** risk (disallowed formats), not the same statement as `trust_remote_code` unless your policy explicitly encodes that rule.</td>
-            <td>Leadership decision is **waive with recorded risk acceptance** vs **remediate** (convert weights / drop files). Pair with procurement and audit stakeholders if you claim “safetensors-only” externally.</td>
+            <td>Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence.</td>
+            <td>Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.</td>
+            <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
+            <td>LLM05 — Supply chain / integrity governance when policy encodes allowed formats and hashes.</td>
+            <td>2026-04-23</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -592,8 +652,11 @@
             <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
             <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
             <td>YES (this artifact fails policy)</td>
-            <td>This is **governance / integrity** risk (disallowed formats), not the same statement as `trust_remote_code` unless your policy explicitly encodes that rule.</td>
-            <td>Leadership decision is **waive with recorded risk acceptance** vs **remediate** (convert weights / drop files). Pair with procurement and audit stakeholders if you claim “safetensors-only” externally.</td>
+            <td>Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence.</td>
+            <td>Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.</td>
+            <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
+            <td>LLM05 — Supply chain / integrity governance when policy encodes allowed formats and hashes.</td>
+            <td>2026-04-23</td>
           </tr>
         </tbody>
       </table>

@@ -1,4 +1,9 @@
-"""Static checks on Hugging Face-style JSON configs (no execution)."""
+"""Static checks on Hugging Face-style JSON configs (no execution).
+
+Human-facing citations for emitted ``rule_id`` values live in
+``docs/reporting/decision_support_rule_catalog.json`` (used by
+``scripts/export_bundle_action_sheet.py``).
+"""
 
 from __future__ import annotations
 

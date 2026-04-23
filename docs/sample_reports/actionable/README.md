@@ -40,8 +40,11 @@ If `raw.githack.com` is slow or blocked, use (1) or print the Markdown brief [`B
 - **`default_ci_blocks_release`**: **YES / NO / N_A** — whether this signal **flips the bundle aggregate exit code in default CI today** (mirrors `hf_bundle_scanner.dispatch.scan_bundle` for configlint; separate logic for failed artifact rows).
 - **`compared_to_worst_case_loader_risk`**: plain-language comparison to **`trust_remote_code`** as the reference “worst static loader” story (e.g. `use_fast_tokenizer_truthy` vs `trust_remote_code_enabled`).
 - **`decision_support_expert`**: concise **what leadership should do next** for that row (not legal advice).
+- **`reference_citations`**: authoritative **title + URL** strings pulled from [`docs/reporting/decision_support_rule_catalog.json`](../../reporting/decision_support_rule_catalog.json) when the row’s `rule_id` is catalogued (exec summary rows also include the catalog’s global bibliography).
+- **`owasp_genai_catalog_hint`**: optional **OWASP GenAI / LLM Top 10** crosswalk notes from the same catalog (supplements `owasp_touchpoints`; numbering may differ from older slide decks — verify against [genai.owasp.org](https://genai.owasp.org/llm-top-10/)).
+- **`decision_catalog_version`**: catalog snapshot id (`catalog_version` field) for audit trails.
 
-The **HTML** and **`BLAST_RADIUS_LEADERSHIP.md`** files also include a **fixed legend table** summarizing common `rule_id`s (including the `use_fast_tokenizer` vs `trust_remote_code` contrast).
+The **HTML** and **`BLAST_RADIUS_LEADERSHIP.md`** files include a **legend table** built from that catalog when present (fallback text if the JSON is missing), including the `use_fast_tokenizer` vs `trust_remote_code` contrast plus **citations**.
 
 Dynamic/runtime risks (e.g. **LLM01** prompt injection) are **out of scope** for these static sample exports; see roadmap for later phases.
 
