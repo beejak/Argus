@@ -1,0 +1,5 @@
+# Pinned-ish worker image dependencies (bump intentionally after smoke tests).
+# Air-gap: copy wheels into image context and use pip install --no-index.
+
+modelscan>=0.7.0,<1.0.0
+modelaudit[all-ci]>=0.4.0,<1.0.0

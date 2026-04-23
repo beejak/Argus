@@ -1,0 +1,61 @@
+# Example Job: same container as CI; tune image + volume for your registry.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-admission-once
+spec:
+  ttlSecondsAfterFinished: 86400
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: 3600
+      containers:
+        - name: admit
+          image: ghcr.io/example/model-admission:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - scan
+            - --artifact
+            - /models/input.safetensors
+            - --policy
+            - /policy/policy.json
+            - --report
+            - /out/report.json
+            - --drivers
+            - modelscan,modelaudit
+            - --timeout
+            - "900"
+            - --fail-on
+            - MEDIUM
+          env:
+            - name: PROMPTFOO_DISABLE_TELEMETRY
+              value: "1"
+            - name: NO_ANALYTICS
+              value: "1"
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: policy
+              mountPath: /policy
+              readOnly: true
+            - name: out
+              mountPath: /out
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: models-pvc
+        - name: policy
+          configMap:
+            name: model-admission-policy
+        - name: out
+          emptyDir:
+            sizeLimit: 1Gi

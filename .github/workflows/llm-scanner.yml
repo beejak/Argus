@@ -1,0 +1,39 @@
+# Monorepo CI: model-admission + hf_bundle_scanner (runs on GitHub; no local WSL required).
+name: LLM Scanner
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install (monorepo)
+        run: |
+          python -m pip install -U pip
+          cd model-admission && pip install -e ".[dev]"
+          cd ../hf_bundle_scanner && pip install -e ".[dev,mcp,http]"
+
+      - name: Verify (single script; writes .agent artifacts)
+        run: python scripts/run_tests_for_agent.py
+
+      - name: Upload agent log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-last-py${{ matrix.python-version }}
+          path: .agent/pytest-last.log

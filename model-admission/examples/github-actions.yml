@@ -1,0 +1,41 @@
+# Example: scan a model artifact in CI using the worker image.
+# Build and push the image from model-admission/Dockerfile first, then pin by digest.
+name: model-admission-scan
+on:
+  pull_request:
+    paths:
+      - "models/**"
+      - "**/*.safetensors"
+      - "**/*.gguf"
+      - "**/*.pt"
+      - "**/*.bin"
+
+jobs:
+  admit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan model (replace IMAGE digest with yours)
+        env:
+          MODEL_DIGEST: "" # optional: pin expected sha256
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/work:ro" \
+            -e MODEL_ADMISSION_LEDGER=/tmp/ledger.jsonl \
+            ghcr.io/example/model-admission:latest \
+            scan \
+            --artifact "/work/models/your-model.safetensors" \
+            --policy "/work/model-admission/examples/policy.example.json" \
+            --report "/work/model-admission/scan-report.json" \
+            --ledger /tmp/ledger.jsonl \
+            --drivers modelscan,modelaudit \
+            --timeout 900 \
+            --fail-on MEDIUM
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-admission-report
+          path: model-admission/scan-report.json

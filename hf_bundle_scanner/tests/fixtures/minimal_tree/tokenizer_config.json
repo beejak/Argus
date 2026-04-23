@@ -1,0 +1,4 @@
+{
+  "tokenizer_class": "LlamaTokenizer",
+  "trust_remote_code": false
+}

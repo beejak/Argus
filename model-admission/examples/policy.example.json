@@ -1,0 +1,6 @@
+{
+  "max_bytes": 53687091200,
+  "allowed_extensions": null,
+  "forbidden_extensions": [".pkl", ".pickle", ".dill"],
+  "sha256_allowlist": null
+}

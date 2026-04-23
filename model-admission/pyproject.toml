@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model-admission"
+version = "0.1.0"
+description = "Driver-based model admission gate: stable CLI, pluggable ModelScan/ModelAudit, CI-friendly exit codes."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "build>=1.0"]
+
+[project.scripts]
+admit-model = "model_admission.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["model_admission*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: requires modelscan/modelaudit installed on PATH",
+]
