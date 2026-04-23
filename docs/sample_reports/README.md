@@ -1,5 +1,7 @@
 # Sample bundle reports (real Hub downloads)
 
+**Prefer a human briefing?** Start at **[`actionable/`](actionable/)** — committed **CSV** (Excel-friendly) and **HTML** (print → PDF) derived from the JSON below.
+
 These JSON files were produced by [`scripts/ephemeral_hub_scan.py`](../../scripts/ephemeral_hub_scan.py) against **`hf-internal-testing/tiny-random-BertModel`** (small public snapshot used by Hugging Face for tests).
 
 | File | What it demonstrates |

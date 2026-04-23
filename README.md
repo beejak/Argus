@@ -166,6 +166,18 @@ These are **committed outputs** from a **live** Hugging Face snapshot download (
 
 Snapshot paths are **redacted** to `/tmp/<ephemeral-hub-demo>` for readability. Index + context: [`docs/sample_reports/README.md`](docs/sample_reports/README.md).
 
+### Start here (actionable formats — not JSON)
+
+If the JSON feels opaque, open the **human briefing pack** first:
+
+- **[`docs/sample_reports/actionable/README.md`](docs/sample_reports/actionable/README.md)** — how to read the columns.
+- **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`).
+- **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser.
+
+**PDF (no extra tooling):** open `SCAN_BRIEFING.html` → **Print** → **Save as PDF**.
+
+Regenerate after changing sample JSON: `python3 scripts/export_bundle_action_sheet.py` (also `make sample-action-sheets`).
+
 | Artifact | One-line meaning |
 | -------- | ---------------- |
 | [`docs/sample_reports/live_hub_tiny_bert_bundle_report.json`](docs/sample_reports/live_hub_tiny_bert_bundle_report.json) | **Baseline:** three weight-like artifacts (`.onnx`, `.bin`, `.h5`) scanned; **no** configlint hits; **`aggregate_exit_code`: `0`**. |
@@ -286,6 +298,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Harness: Makefile, session log, graphify | [docs/LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) |
 | Append-only session memory | [docs/sessions/SESSION_LOG.md](docs/sessions/SESSION_LOG.md) |
 | Live Hub sample bundle JSON | [docs/sample_reports/](docs/sample_reports/) |
+| Human briefing (CSV + HTML → PDF) | [docs/sample_reports/actionable/](docs/sample_reports/actionable/) |
 | Cursor long-horizon skill | [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md) |
 
 ---

@@ -3,7 +3,7 @@
 VENVDIR ?= .venv
 PY := $(abspath $(VENVDIR))/bin/python
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets
 
 help:
 	@echo "LLM Scanner harness"
@@ -19,6 +19,7 @@ help:
 	@echo "  make commit-msg       - git commit via -F (usage: make commit-msg MSG='subject')"
 	@echo "  make slogan-dry-run   - print next README slogan (no file writes)"
 	@echo "  make ephemeral-hub-scan - Hub download → scan → delete (needs OUT=/path.json; optional INJECT=1)"
+	@echo "  make sample-action-sheets - regenerate docs/sample_reports/actionable/* from sample JSON"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
 install:
@@ -89,3 +90,6 @@ slogan-dry-run:
 ephemeral-hub-scan:
 	@test -n "$(OUT)" || (echo 'Usage: OUT=/tmp/bundle.json make ephemeral-hub-scan [INJECT=1] [EPHEMERAL_FLAGS="--repo ..."]' >&2 && exit 1)
 	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/ephemeral_hub_scan.py" --out "$(OUT)" $(if $(filter 1,$(INJECT)),--inject-demo-tokenizer-risk,) $(EPHEMERAL_FLAGS)
+
+sample-action-sheets:
+	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/export_bundle_action_sheet.py"
