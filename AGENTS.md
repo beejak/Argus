@@ -35,3 +35,5 @@ make scan-fixture
 ## Cursor rules
 
 Project skills live under [`.cursor/skills/`](.cursor/skills/). Do not write into `~/.cursor/skills-cursor/` (reserved).
+
+_No Tokens were harmed during making of this repo._

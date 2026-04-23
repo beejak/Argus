@@ -52,3 +52,5 @@ pip install -e ".[dev]"
 pytest -v
 docker build -t model-admission:local .
 ```
+
+_No Tokens were harmed during making of this repo._
