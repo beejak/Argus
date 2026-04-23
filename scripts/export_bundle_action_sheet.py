@@ -413,52 +413,99 @@ def write_csv(path: Path, rows: list[dict[str, str]]) -> None:
             w.writerow(r)
 
 
-def _html_table(title: str, cols: list[str], row_dicts: list[dict[str, str]]) -> str:
-    parts: list[str] = [f"<h2>{html.escape(title)}</h2>", "<table><thead><tr>"]
+# Public default for “rendered HTML” deep links (Argus mirror). Override via env for forks.
+_DEFAULT_HTML_RAW_BASE = (
+    "https://raw.githubusercontent.com/beejak/Argus/main/docs/sample_reports/actionable"
+)
+
+
+def _html_table_lines(title: str, cols: list[str], row_dicts: list[dict[str, str]]) -> list[str]:
+    """Pretty-printed table as separate lines (GitHub file view stays source-only; this helps humans)."""
+    t = html.escape(title)
+    lines: list[str] = [
+        f"  <h2>{t}</h2>",
+        "  <table>",
+        "    <thead>",
+        "      <tr>",
+    ]
     for c in cols:
-        parts.append(f"<th>{html.escape(c)}</th>")
-    parts.append("</tr></thead><tbody>")
+        lines.append(f"        <th>{html.escape(c)}</th>")
+    lines.extend(
+        [
+            "      </tr>",
+            "    </thead>",
+            "    <tbody>",
+        ]
+    )
     for r in row_dicts:
-        parts.append("<tr>")
+        lines.append("      <tr>")
         for c in cols:
-            parts.append(f"<td>{html.escape(r.get(c, ''))}</td>")
-        parts.append("</tr>")
-    parts.append("</tbody></table>")
-    return "".join(parts)
+            lines.append(f"        <td>{html.escape(r.get(c, ''))}</td>")
+        lines.append("      </tr>")
+    lines.extend(["    </tbody>", "  </table>"])
+    return lines
 
 
 def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    parts: list[str] = []
-    parts.append("<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'>")
-    parts.append(
-        "<title>Bundle scan — action sheet + blast radius</title>"
-        "<style>"
-        "body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:24px;color:#111;}"
-        "h1{font-size:1.35rem;} h2{font-size:1.1rem;margin-top:1.6rem;border-bottom:1px solid #ccc;}"
-        "table{border-collapse:collapse;width:100%;font-size:0.82rem;}"
-        "th,td{border:1px solid #ddd;padding:8px;vertical-align:top;}"
-        "th{background:#f4f4f4;text-align:left;}"
-        ".muted{color:#555;font-size:0.85rem;margin-top:8px;}"
-        ".lead{font-size:0.95rem;line-height:1.45;}"
-        "@media print{body{margin:12px;} a{color:#000;text-decoration:none;}}"
-        "</style></head><body>"
+    raw_url = f"{_DEFAULT_HTML_RAW_BASE}/{path.name}"
+    githack_url = raw_url.replace(
+        "https://raw.githubusercontent.com/",
+        "https://raw.githack.com/",
     )
-    parts.append("<h1>Bundle scan — human briefing + blast radius</h1>")
-    parts.append(
-        "<p class='muted'>Generated from committed sample bundle JSON. "
-        "For a PDF: use your browser <strong>Print → Save as PDF</strong> on this page.</p>"
-    )
-    parts.append(
-        "<p class='lead'><strong>For leadership:</strong> use the <em>Leadership blast radius</em> "
-        "table first (one row per demo). <strong>Blast radius</strong> means who and what could be "
-        "affected if this snapshot were deployed with today’s signals ignored — not a prediction "
-        "that this test model is malicious.</p>"
+    readme_url = (
+        "https://github.com/beejak/Argus/blob/main/docs/sample_reports/actionable/README.md"
     )
 
+    lines: list[str] = [
+        "<!DOCTYPE html>",
+        "<!--",
+        "  GitHub’s repository *file view* always shows HTML as source code (no execution).",
+        "  To see tables: open this file from a local checkout in a browser, or use the rendered",
+        "  preview URL documented next to SCAN_BRIEFING.html in docs/sample_reports/actionable/README.md.",
+        "-->",
+        '<html lang="en">',
+        "<head>",
+        '  <meta charset="utf-8">',
+        '  <meta name="viewport" content="width=device-width, initial-scale=1">',
+        "  <title>Bundle scan — action sheet + blast radius</title>",
+        "  <style>",
+        "    body { font-family: system-ui, Segoe UI, Roboto, sans-serif; margin: 24px; color: #111; }",
+        "    h1 { font-size: 1.35rem; }",
+        "    h2 { font-size: 1.1rem; margin-top: 1.6rem; border-bottom: 1px solid #ccc; }",
+        "    table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }",
+        "    th, td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }",
+        "    th { background: #f4f4f4; text-align: left; }",
+        "    .muted { color: #555; font-size: 0.85rem; margin-top: 8px; }",
+        "    .lead { font-size: 0.95rem; line-height: 1.45; }",
+        "    .callout { border: 1px solid #c9daf8; background: #eef5ff; padding: 12px 14px; border-radius: 6px; }",
+        "    code { font-size: 0.88em; }",
+        "    @media print { body { margin: 12px; } a { color: #000; text-decoration: none; } }",
+        "  </style>",
+        "</head>",
+        "<body>",
+        "  <h1>Bundle scan — human briefing + blast radius</h1>",
+        "  <p class=\"callout\">",
+        "    <strong>Seeing raw HTML on github.com?</strong> That is expected — GitHub does not render ",
+        "    HTML inside repos. Open this file from your machine (double-click after clone) or use a ",
+        "    preview host that serves <code>text/html</code> with the raw file, e.g. ",
+        f"    <a href=\"{html.escape(githack_url)}\">{html.escape(githack_url)}</a>. ",
+        "    More options: ",
+        f"    <a href=\"{html.escape(readme_url)}\">actionable/README.md</a>.",
+        "  </p>",
+        "  <p class=\"muted\">Generated from committed sample bundle JSON. ",
+        "  For a PDF: use your browser <strong>Print → Save as PDF</strong> on this page.</p>",
+        "  <p class=\"lead\">",
+        "    <strong>For leadership:</strong> use the <em>Leadership blast radius</em> ",
+        "    table first (one row per demo). <strong>Blast radius</strong> means who and what could be ",
+        "    affected if this snapshot were deployed with today’s signals ignored — not a prediction ",
+        "    that this test model is malicious.",
+        "  </p>",
+    ]
+
     exec_rows = [r for r in rows if r.get("row_kind") == "EXEC_SUMMARY"]
-    parts.append(
-        _html_table(
+    lines.extend(
+        _html_table_lines(
             "Leadership — blast radius by demo",
             [
                 "demo_id",
@@ -492,16 +539,16 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> Non
         by_demo.setdefault(r["demo_id"], []).append(r)
 
     for demo in demos:
-        parts.append(
-            _html_table(
+        lines.extend(
+            _html_table_lines(
                 f"Detail — {demo.title} ({demo.demo_id})",
                 detail_cols,
                 by_demo.get(demo.demo_id, []),
             )
         )
 
-    parts.append("</body></html>")
-    path.write_text("".join(parts), encoding="utf-8", newline="\n")
+    lines.extend(["</body>", "</html>"])
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def write_blast_radius_md(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> None:

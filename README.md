@@ -173,9 +173,9 @@ If the JSON feels opaque, open the **human briefing pack** first:
 - **[`docs/sample_reports/actionable/README.md`](docs/sample_reports/actionable/README.md)** — how to read the columns.
 - **[`docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md`](docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md)** — **leadership blast-radius brief**: prod impact + who is affected + roll-up of **every** identified signal per demo.
 - **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`) including **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**.
-- **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser (leadership section first).
+- **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser (leadership section first). **GitHub’s repo file view shows HTML as source only** — open locally or use the rendered preview link in [`actionable/README.md`](docs/sample_reports/actionable/README.md).
 
-**PDF (no extra tooling):** open `SCAN_BRIEFING.html` → **Print** → **Save as PDF**.
+**PDF (no extra tooling):** open `SCAN_BRIEFING.html` in a real browser → **Print** → **Save as PDF**.
 
 Regenerate after changing sample JSON: `python3 scripts/export_bundle_action_sheet.py` (also `make sample-action-sheets`).
 

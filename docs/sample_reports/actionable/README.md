@@ -8,6 +8,18 @@ The raw bundle reports are JSON (`hf_bundle_scanner.bundle_report.v2`). If you w
 | [`UNIFIED_ACTION_SHEET.csv`](UNIFIED_ACTION_SHEET.csv) | One spreadsheet: **three demos** + columns **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**. | Excel / Sheets: filter by `demo_id`, sort by `risk_rating`. |
 | [`SCAN_BRIEFING.html`](SCAN_BRIEFING.html) | Tables: **leadership blast-radius** section first, then full detail. | Screen readout; **Print → Save as PDF** for a fixed artifact. |
 
+## Why `SCAN_BRIEFING.html` looks “broken” on GitHub
+
+**GitHub’s file viewer never runs HTML** in the browser for repos (you always see tags). That is normal security behavior — the file is still valid.
+
+**Ways to see the real page (tables + styling):**
+
+1. **Local checkout:** open `docs/sample_reports/actionable/SCAN_BRIEFING.html` in Chrome/Edge/Firefox (double-click or drag into a tab).
+2. **Rendered preview (public `main`):** [raw.githack.com mirror of this HTML](https://raw.githack.com/beejak/Argus/main/docs/sample_reports/actionable/SCAN_BRIEFING.html) — serves `Content-Type: text/html` so the page renders.
+3. **Raw file then “Open with…”** does *not* apply on github.com; use (1) or (2).
+
+If `raw.githack.com` is slow or blocked, use (1) or print the Markdown brief [`BLAST_RADIUS_LEADERSHIP.md`](BLAST_RADIUS_LEADERSHIP.md) instead.
+
 ## How to read a row
 
 - **`demo_id` / `demo_title`**: which teaching scenario this row belongs to (same Hub test snapshot; different policy or injected config).

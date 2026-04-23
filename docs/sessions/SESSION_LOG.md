@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-22 — HTML briefing: pretty-print + GitHub “no render” note + raw.githack preview
+
+- **Changes:** `export_bundle_action_sheet.py` multiline HTML + in-page callout; `actionable/README.md` explains GitHub behavior + preview URL.
+- **Commands:** `make sample-action-sheets`.
+
 ### 2026-04-22 — leadership blast-radius (prod impact) in CSV/HTML/MD
 
 - **Changes:** `export_bundle_action_sheet.py` adds risk/prod/blast/exec columns + `BLAST_RADIUS_LEADERSHIP.md`; HTML leadership table; README pointers.
