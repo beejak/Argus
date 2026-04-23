@@ -1,5 +1,7 @@
 # LLM Scanner
 
+> *Because “we downloaded it from Hugging Face” is not a threat model — it’s a release note written in advance.*
+
 **Production-minded scanning for Hugging Face–style model bundles** — static admission, config risk, and a staged path toward dynamic probes and runtime guardrails. The public mirror of this monorepo is **[Argus on GitHub](https://github.com/beejak/Argus)** ([publish notes](docs/PUBLISH_ARGUS.md)).
 
 > **One working tree:** use a single checkout (for example `/root/LLM Scanner` on WSL). A duplicate under Windows `\\wsl$\\…` plus a UNC workspace invites drift and confusing pytest output.
