@@ -1,5 +1,5 @@
 {
-  "catalog_version": "2026-04-23",
+  "catalog_version": "2026-04-24",
   "maintainer_note": "Keep synchronized with hf_bundle_scanner/hf_bundle_scanner/configlint.py (emitted rule_id values) and hf_bundle_scanner/hf_bundle_scanner/dispatch.py (which configlint rule_ids set config_risk / aggregate exit). Add new rows when configlint grows; cite primary standards (OWASP GenAI / NIST / vendor docs).",
   "global_references": [
     {
@@ -121,6 +121,30 @@
         {
           "title": "Hugging Face Hub — Secrets scanning",
           "url": "https://huggingface.co/docs/hub/security-secrets"
+        }
+      ]
+    },
+    {
+      "rule_id": "use_safetensors_disabled",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM03"],
+      "owasp_note": "Supply-chain / artifact integrity: explicit opt-out of safetensors hints pickle-era weight paths may be acceptable.",
+      "vs_trust_remote_code": "Not remote code at load; it is a **weights format / deserialization posture** signal that pairs with `.bin` risk in threat models.",
+      "legend_takeaway": "Align with org policy (safetensors-first); track as backlog unless policy makes it blocking.",
+      "expert_guidance": "If your org is safetensors-only on paper, reconcile config with weights on disk. Otherwise treat as ML engineering: prefer safetensors, document exceptions, do not confuse with trust_remote_code.",
+      "references": [
+        {
+          "title": "Hugging Face — safetensors documentation",
+          "url": "https://huggingface.co/docs/safetensors/index"
+        },
+        {
+          "title": "Hugging Face Hub — Pickle scanning",
+          "url": "https://huggingface.co/docs/hub/security-pickle"
+        },
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
         }
       ]
     },

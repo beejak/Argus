@@ -114,6 +114,7 @@ def _validate_catalog_blocking(cat: dict[str, Any]) -> None:
         if not in_dispatch and rid in (
             "use_fast_tokenizer_truthy",
             "use_auth_token_present",
+            "use_safetensors_disabled",
         ):
             if flag:
                 print(
@@ -758,6 +759,13 @@ def _static_decision_legend_fallback() -> list[dict[str, str]]:
             "leadership_takeaway": "Rotate / remove secrets; involve security if scopes are broad.",
             "reference_citations": "",
         },
+        {
+            "rule_or_topic": "use_safetensors_disabled",
+            "default_ci_blocks_release": "NO (today)",
+            "vs_trust_remote_code": "Integrity / deserialization posture, not Hub RCE at tokenizer load.",
+            "leadership_takeaway": "Prefer safetensors + policy alignment; not a stop-the-line CI flag today.",
+            "reference_citations": "",
+        },
     ]
 
 
@@ -772,6 +780,7 @@ def _decision_legend_rows(repo_root: Path) -> list[dict[str, str]]:
         "config_json_invalid",
         "use_fast_tokenizer_truthy",
         "use_auth_token_present",
+        "use_safetensors_disabled",
         "policy.gate_violation",
     ]
     rows: list[dict[str, str]] = []

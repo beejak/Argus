@@ -104,6 +104,13 @@
         <td>Hugging Face Hub — User access tokens — https://huggingface.co/docs/hub/security-tokens | Hugging Face Hub — Secrets scanning — https://huggingface.co/docs/hub/security-secrets</td>
       </tr>
       <tr>
+        <td>use_safetensors_disabled</td>
+        <td>NO (today)</td>
+        <td>Not remote code at load; it is a **weights format / deserialization posture** signal that pairs with `.bin` risk in threat models.</td>
+        <td>Align with org policy (safetensors-first); track as backlog unless policy makes it blocking.</td>
+        <td>Hugging Face — safetensors documentation — https://huggingface.co/docs/safetensors/index | Hugging Face Hub — Pickle scanning — https://huggingface.co/docs/hub/security-pickle | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/</td>
+      </tr>
+      <tr>
         <td>policy.gate_violation</td>
         <td>YES (policy gate)</td>
         <td>Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence.</td>
@@ -262,9 +269,9 @@
             <td>N/A (bundle rollup)</td>
             <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
             <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
-            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP GenAI — LLM Top 10 (latest list) — https://genai.owasp.org/llm-top-10/ | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Security overview — https://huggingface.co/docs/hub/security | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
             <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -291,7 +298,7 @@
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
             <td></td>
             <td></td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -318,7 +325,7 @@
             <td>If leadership only skims one thing on `.bin`: ask whether your org allows pickle-era weights in prod **at all**; if not, plan conversion to safetensors even when static policy is permissive.</td>
             <td></td>
             <td></td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -345,7 +352,7 @@
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
             <td></td>
             <td></td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
         </tbody>
       </table>
@@ -404,9 +411,9 @@
             <td>N/A (bundle rollup)</td>
             <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
             <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
-            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP GenAI — LLM Top 10 (latest list) — https://genai.owasp.org/llm-top-10/ | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Security overview — https://huggingface.co/docs/hub/security | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
             <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>CONFIG</td>
@@ -433,7 +440,7 @@
             <td>Treat as security + legal + procurement: require explicit waiver, revision pinning, sandboxed CI materialization, and deny-by-default in prod unless tightly bounded. Pair with secrets rotation if any Hub token scopes are broad.</td>
             <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security</td>
             <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -460,7 +467,7 @@
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
             <td></td>
             <td></td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -487,7 +494,7 @@
             <td>If leadership only skims one thing on `.bin`: ask whether your org allows pickle-era weights in prod **at all**; if not, plan conversion to safetensors even when static policy is permissive.</td>
             <td></td>
             <td></td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>WEIGHT_FILE</td>
@@ -514,7 +521,7 @@
             <td>Keep revision pinning and mirror policy on the radar; escalate only if your runtime stack has known issues for this format class.</td>
             <td></td>
             <td></td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
         </tbody>
       </table>
@@ -573,9 +580,9 @@
             <td>N/A (bundle rollup)</td>
             <td>Worst-case **static** loader signal in this repo’s **default** CI gate is `trust_remote_code` truthy (remote code class at load). Use the legend + per-row `default_ci_blocks_release` to separate **stop-the-line** items from **hygiene**.</td>
             <td>Read **YES** rows on `default_ci_blocks_release` first — those flip the bundle aggregate in default CI today. **NO** rows can still matter for audits and engineering backlog, but they are not the same incident class as remote code.</td>
-            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP GenAI — LLM Top 10 (latest list) — https://genai.owasp.org/llm-top-10/ | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Security overview — https://huggingface.co/docs/hub/security | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
+            <td>OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security | OWASP Top 10 for LLM Applications (project hub) — https://owasp.org/www-project-top-10-for-large-language-model-applications/ | LLM Scanner — Threat model &amp; taxonomy (phase0, in-repo) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI Risk Management Framework (AI RMF) — https://www.nist.gov/itl/ai-risk-management-framework | Hugging Face Hub — Pickle scanning (unsafe serialization class) — https://huggingface.co/docs/hub/security-pickle</td>
             <td>LLM05, LLM07 — OWASP GenAI list numbering differs from older slide decks; map to Supply chain / Insecure plugin or extension / Excessive agency themes — see genai.owasp.org LLM Top 10 for the canonical wording.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -602,7 +609,7 @@
             <td>Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.</td>
             <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
             <td>LLM05 — Supply chain / integrity governance when policy encodes allowed formats and hashes.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -629,7 +636,7 @@
             <td>Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.</td>
             <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
             <td>LLM05 — Supply chain / integrity governance when policy encodes allowed formats and hashes.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
           <tr>
             <td>FINDING</td>
@@ -656,7 +663,7 @@
             <td>Leadership chooses waive-with-recorded-risk vs convert/drop artifacts. Pull in audit/procurement if external claims (e.g., safetensors-only) exist.</td>
             <td>THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md | NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework</td>
             <td>LLM05 — Supply chain / integrity governance when policy encodes allowed formats and hashes.</td>
-            <td>2026-04-23</td>
+            <td>2026-04-24</td>
           </tr>
         </tbody>
       </table>

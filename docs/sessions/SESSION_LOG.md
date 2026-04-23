@@ -134,4 +134,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** `docs/reporting/decision_support_rule_catalog.json` (versioned `rule_id` rows with OWASP GenAI / NIST / HF citations), `docs/reporting/README.md`; `scripts/export_bundle_action_sheet.py` loads catalog for legend + `compared_to_worst_case_loader_risk` / `decision_support_expert` text; CSV columns `reference_citations`, `owasp_genai_catalog_hint`, `decision_catalog_version`; `configlint` module doc points to catalog; `docs/sample_reports/actionable/README.md` documents new columns; regenerated actionable CSV/HTML/MD.
 - **Commands:** `python3 scripts/export_bundle_action_sheet.py`, `make agent-verify`.
 
+### 2026-04-24 — phase3 configlint: `use_safetensors_disabled`
+
+- **Phase:** `phase3-configlint-oss` (incremental).
+- **Changes:** `configlint` emits `use_safetensors_disabled` when `use_safetensors` is explicitly false in HF-style JSON; catalog row + legend order + exporter validation tuple; `tests/test_configlint.py`; roadmap note; `python3 scripts/export_bundle_action_sheet.py` to refresh actionable outputs.
+- **Commands:** `make agent-verify`, `python3 scripts/export_bundle_action_sheet.py`.
+
 ---

@@ -23,6 +23,29 @@ class ConfigFinding:
         return {"path": self.path, "rule_id": self.rule_id, "message": self.message}
 
 
+def _is_explicitly_false(v: Any) -> bool:
+    """JSON configs sometimes store booleans as strings; treat explicit false only."""
+    if v is False:
+        return True
+    if isinstance(v, str) and v.strip().lower() in ("false", "0", "no"):
+        return True
+    return False
+
+
+def _walk_use_safetensors_disabled(obj: Any, path: str, out: list[str]) -> None:
+    """Emit paths where ``use_safetensors`` is explicitly false (pickle-era weight paths more likely)."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            p = f"{path}.{k}" if path else k
+            if k.lower() == "use_safetensors" and _is_explicitly_false(v):
+                out.append(p)
+            else:
+                _walk_use_safetensors_disabled(v, p, out)
+    elif isinstance(obj, list):
+        for i, item in enumerate(obj):
+            _walk_use_safetensors_disabled(item, f"{path}[{i}]", out)
+
+
 def _walk_truthy_bools(obj: Any, path: str, out: list[tuple[str, str]]) -> None:
     if isinstance(obj, dict):
         for k, v in obj.items():
@@ -83,6 +106,18 @@ def lint_config_file(path: Path) -> list[ConfigFinding]:
                 rel,
                 "auto_map_custom_classes",
                 "auto_map references custom class names; verify code provenance before load",
+            )
+        )
+
+    safetensors_off: list[str] = []
+    _walk_use_safetensors_disabled(data, "", safetensors_off)
+    for key_path in safetensors_off:
+        findings.append(
+            ConfigFinding(
+                rel,
+                "use_safetensors_disabled",
+                f"{key_path} is false; loaders may prefer pickle-era weight paths—prefer safetensors "
+                "when your threat model cares about deserialization integrity",
             )
         )
 

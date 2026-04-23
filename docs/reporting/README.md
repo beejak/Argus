@@ -10,7 +10,7 @@ This folder holds **human-decision** material that is safe to version in git (no
 
 ## When to edit
 
-- **`configlint.py` emits a new `rule_id`** → add a catalog row and decide **`blocks_default_ci`** (must match [`hf_bundle_scanner/dispatch.py`](../../hf_bundle_scanner/hf_bundle_scanner/dispatch.py) unless you change dispatch in the same PR).
+- **`configlint.py` emits a new `rule_id`** → add a catalog row and decide **`blocks_default_ci`** (must match [`hf_bundle_scanner/dispatch.py`](../../hf_bundle_scanner/hf_bundle_scanner/dispatch.py) unless you change dispatch in the same PR). Current informational examples include `use_fast_tokenizer_truthy`, `use_auth_token_present`, `use_safetensors_disabled`.
 - **`dispatch.py` changes which rules escalate** → update `blocks_default_ci` + `maintainer_note` in the JSON.
 - **You want clearer leadership language** → edit `legend_takeaway` / `expert_guidance` / `vs_trust_remote_code` (keep claims honest: static signals, not exploit proof).
 

@@ -32,3 +32,17 @@ def test_use_fast_tokenizer_finding(tmp_path: Path) -> None:
     p.write_text(json.dumps({"use_fast_tokenizer": True}), encoding="utf-8")
     fs = lint_config_file(p)
     assert any(f.rule_id == "use_fast_tokenizer_truthy" for f in fs)
+
+
+def test_use_safetensors_disabled_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"model_type": "bert", "use_safetensors": False}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "use_safetensors_disabled" for f in fs)
+
+
+def test_use_safetensors_omitted_no_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"model_type": "bert"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert not any(f.rule_id == "use_safetensors_disabled" for f in fs)
