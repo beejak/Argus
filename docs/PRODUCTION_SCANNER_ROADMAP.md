@@ -20,6 +20,12 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Surfaces:** `scan-bundle scan …` ([`cli.py`](../hf_bundle_scanner/hf_bundle_scanner/cli.py)), `POST /v1/scan` ([`http_job.py`](../hf_bundle_scanner/hf_bundle_scanner/http_job.py)), MCP `scan_path` ([`mcp_server.py`](../hf_bundle_scanner/hf_bundle_scanner/mcp_server.py)).
 - **Next (later phases):** enforce mirror policy against actual download URLs, attach real SBOM artifacts from CI, and widen bundle provenance with SBOM hashes once `phase6-supplychain-extras` matures.
 
+### Phase 2 status (`phase2-static-drivers`, starter slice in repo)
+
+- **Ephemeral Hub demo:** [`scripts/ephemeral_hub_scan.py`](../scripts/ephemeral_hub_scan.py) + **`make ephemeral-hub-scan`** — download a **small** public Hub snapshot, run **`scan-bundle scan`**, write bundle JSON, **delete** the working tree (opt-in / manual; network).
+- **Configlint expansion:** additional tokenizer / loader hints (e.g. `use_fast_tokenizer_truthy`) before broader driver adapters.
+- **Next:** optional **ModelScan / ModelAudit** extras, optional commercial static adapters behind explicit policy (see phase table below).
+
 ## Ten capability pillars (summary)
 
 | # | Pillar |

@@ -1,0 +1,42 @@
+# Rotate README tagline from docs/slogans.json (scheduled + manual).
+name: Rotate README slogan
+
+on:
+  schedule:
+    # Twice weekly — Monday & Thursday 12:15 UTC (~every few days).
+    - cron: "15 12 * * 1,4"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rotate-readme-slogan
+  cancel-in-progress: true
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rotate slogan in README
+        run: python scripts/rotate_readme_slogan.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md .github/data/slogan_state.json
+          if git diff --staged --quiet; then
+            echo "No README slogan change; nothing to commit."
+          else
+            git commit -m "chore: rotate README slogan [skip ci]"
+            git push
+          fi

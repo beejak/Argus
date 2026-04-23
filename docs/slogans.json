@@ -1,0 +1,28 @@
+{
+  "slogans": [
+    "Because “we downloaded it from Hugging Face” is not a threat model — it’s a release note written in advance.",
+    "Static trust issues for models that ship anyway.",
+    "We lint your billion-parameter anxiety before it becomes a calendar invite.",
+    "Your snapshot didn’t ask for a lawyer — we brought the linter.",
+    "Policy beats vibes; exit codes beat slide decks.",
+    "If your config.json is brave enough to say trust_remote_code, we are brave enough to flag it.",
+    "OSS scanners first; commercial adapters only when you opt in and write it down.",
+    "The Hub gives you bytes; we give you receipts.",
+    "Air-gapped CI is a feature, not an insult.",
+    "We scan the folder before the blameless postmortem writes itself.",
+    "Weights are data. Config is intent. Intent gets audited.",
+    "Provenance is gossip that brought a checksum to a gunfight.",
+    "Your model is not haunted; your tokenizer settings are just chatty.",
+    "“Download this and run it” is not a maturity model.",
+    "We do not ship courage; we ship manifests.",
+    "The threat model fits in git; the risk acceptance fits in your process.",
+    "If it loads arbitrary Python, it is not a minor convenience flag.",
+    "We ask rude questions quietly, in JSON.",
+    "Hermes can orchestrate; we still enforce the floor.",
+    "SBOM pointers now, excuses never.",
+    "Two packages, one contract: admit models, aggregate outcomes.",
+    "Deterministic tests, probabilistic world — we pick the tests.",
+    "The mirror is public; your policy is yours.",
+    "Ships happen; surprises should not."
+  ]
+}

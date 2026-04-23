@@ -67,6 +67,12 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-23 — slogan pool + rotation workflow + ephemeral Hub scan
+
+- **Phase:** `phase2-static-drivers` starter + harness docs.
+- **Changes:** `docs/slogans.json`, `.github/data/slogan_state.json`, `docs/SLOGANS.md`, `scripts/rotate_readme_slogan.py`, `.github/workflows/rotate-slogan.yml`, `scripts/ephemeral_hub_scan.py`, `Makefile`, README (markers + Hub demo + phase2 blurb), roadmap Phase 2 section, `hf_bundle_scanner/tests/test_rotate_readme_slogan.py`.
+- **Commands:** `make slogan-dry-run`, `make agent-verify`, optional `OUT=/tmp/x.json make ephemeral-hub-scan` (network).
+
 ### 2026-04-23 — README scope/philosophy/reporting + configlint `use_fast_tokenizer`
 
 - **Phase:** docs + small `phase3-configlint-oss` slice.

@@ -1,6 +1,10 @@
 # LLM Scanner
 
+<!-- SLOGAN_START -->
 > *Because “we downloaded it from Hugging Face” is not a threat model — it’s a release note written in advance.*
+<!-- SLOGAN_END -->
+
+*Rotating taglines live in [`docs/slogans.json`](docs/slogans.json); a bot advances them on a schedule ([`docs/SLOGANS.md`](docs/SLOGANS.md), [`.github/workflows/rotate-slogan.yml`](.github/workflows/rotate-slogan.yml)).*
 
 **Production-minded scanning for Hugging Face–style model bundles** — static admission, config risk, and a staged path toward dynamic probes and runtime guardrails. The public mirror of this monorepo is **[Argus on GitHub](https://github.com/beejak/Argus)** ([publish notes](docs/PUBLISH_ARGUS.md)).
 
@@ -39,6 +43,19 @@
 4. **Agents orchestrate, they do not replace judgment** — Hermes / MCP should call **bounded** tools; humans (or your org) own severity floors and ship decisions. See [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md).
 5. **Phased honesty** — [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) names what exists today vs **phase 5–8** backlog (dynamic probes, runtime guards, observability).
 6. **Provenance as a first-class column** — Bundle JSON **v2** carries **`provenance`** (Hub hints, mirror allowlist, SBOM pointer, manifest digest summary) so downstream SIEMs and auditors can tie a report to **what** was scanned and **from where** ([`provenance.py`](hf_bundle_scanner/hf_bundle_scanner/provenance.py)).
+
+---
+
+## Phase 2 snapshot (`phase2-static-drivers`)
+
+**Theme:** widen **Lane A** static coverage (more drivers / adapters) while keeping default CI honest.
+
+**In this repo today (starter slice):**
+
+- **Ephemeral Hub demo** — [`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py) downloads a **small** public snapshot (default `hf-internal-testing/tiny-random-BertModel`), runs **`scan-bundle scan`**, writes your **`--out`** JSON, then **deletes** the tree. Optional **`--inject-demo-tokenizer-risk`** adds a **JSON-only** `tokenizer_config.json` flag so **configlint** fires on `trust_remote_code` for teaching — it is **not** a pickle exploit or a “trojan weight”.
+- **More configlint** — extra high-signal tokenizer / loader hints land here before heavier driver work (see roadmap).
+
+Full checklist: [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) (`phase2-static-drivers`).
 
 ---
 
@@ -95,6 +112,23 @@ Policy shape and driver strings are documented in [`model-admission/README.md`](
 ### C. HTTP / MCP
 
 See [hf_bundle_scanner/docs/hermes-mcp.md](hf_bundle_scanner/docs/hermes-mcp.md) for **`POST /v1/scan`** JSON and MCP **`scan_path`** parameters.
+
+### D. Ephemeral Hub scan (network, then delete)
+
+Use this when you want a **real download** and a **bundle JSON** on disk, but **no** long-lived snapshot directory. Requires **`make install`**, **`HF_BUNDLE_PYTHON`**, and outbound Hub access.
+
+```bash
+cd "/root/LLM Scanner"
+export HF_BUNDLE_PYTHON="$(pwd)/.venv/bin/python"
+
+# Tiny public test model → /tmp/ephemeral-bundle.json, tree removed afterward
+make ephemeral-hub-scan OUT=/tmp/ephemeral-bundle.json
+
+# Same, but force a configlint “trust_remote_code” hit for demos (JSON-only; not malware)
+make ephemeral-hub-scan OUT=/tmp/ephemeral-risk.json INJECT=1
+```
+
+Advanced flags are passed through **`EPHEMERAL_FLAGS`** (see **`make help`**). **Do not** use this path to fetch or execute known-offensive artifacts; for red-team payloads use an **org-approved** lab and separate policy.
 
 ---
 
