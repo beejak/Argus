@@ -1,5 +1,7 @@
 # LLM Scanner (WSL2 workspace)
 
+**Upstream GitHub:** [beejak/Argus](https://github.com/beejak/Argus) — first push instructions: [docs/PUBLISH_ARGUS.md](docs/PUBLISH_ARGUS.md).
+
 **Single working directory for this effort:** `/root/LLM Scanner`
 
 - **Per-file admission gate:** [`model-admission/`](model-admission/README.md) — `admit-model`, ModelScan/ModelAudit drivers, policy JSON.
