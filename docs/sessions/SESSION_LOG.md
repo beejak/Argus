@@ -67,4 +67,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-23 — README scope/philosophy/reporting + configlint `use_fast_tokenizer`
+
+- **Phase:** docs + small `phase3-configlint-oss` slice.
+- **Changes:** Root `README.md` expanded (what repo does / does not, philosophy, how to scan, reporting, tests, help, “keeping README honest”); `configlint` finding `use_fast_tokenizer_truthy`; `tests/test_configlint.py`.
+- **Commands:** `make agent-verify`.
+
 ---

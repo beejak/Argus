@@ -1,6 +1,6 @@
 # hf-bundle-scanner
 
-Modular HF-oriented bundle scanner: **manifest** (hashes), **discovery**, **dispatch** to [`model-admission`](../model-admission/README.md) per file, **configlint**, **aggregate report**.
+Modular HF-oriented bundle scanner: **manifest** (hashes), **discovery**, **dispatch** to [`model-admission`](../model-admission/README.md) per file, **configlint** (e.g. `trust_remote_code`, `auto_map`, `use_auth_token`, `use_fast_tokenizer`, invalid JSON), **aggregate report**.
 
 Install from repo root (WSL):
 

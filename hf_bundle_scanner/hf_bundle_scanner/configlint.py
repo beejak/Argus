@@ -62,6 +62,14 @@ def lint_config_file(path: Path) -> list[ConfigFinding]:
                     f"{key_path} is set; verify tokens are never embedded in public repos",
                 )
             )
+        elif "use_fast_tokenizer" in key_path.lower():
+            findings.append(
+                ConfigFinding(
+                    rel,
+                    "use_fast_tokenizer_truthy",
+                    f"{key_path} is truthy ({val!r}); legacy fast tokenizer paths can complicate audits—prefer explicit tokenizer provenance",
+                )
+            )
 
     auto_map = data.get("auto_map") if isinstance(data, dict) else None
     if isinstance(auto_map, dict) and auto_map:
