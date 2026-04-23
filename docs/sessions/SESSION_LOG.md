@@ -67,6 +67,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
 - **Next:** `phase1-bundle-provenance` (roadmap).
 
+### 2026-04-23 — README hero (minimal pop) + CI pip cache
+
+- **Changes:** Centered README hero (badges, HTML slogan block), note that GitHub ignores custom README fonts; `scripts/rotate_readme_slogan.py` emits centered `<p><i>…</i></p>`; `actions/cache` + `PYTHONUTF8` on CI install step.
+- **Commands:** `make agent-verify`.
+
 ### 2026-04-23 — slogan pool + rotation workflow + ephemeral Hub scan
 
 - **Phase:** `phase2-static-drivers` starter + harness docs.

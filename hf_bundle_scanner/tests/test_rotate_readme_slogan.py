@@ -21,13 +21,14 @@ def test_format_block_contains_markers() -> None:
     b = mod.format_block("Hello world")
     assert mod.MARKER_START in b
     assert mod.MARKER_END in b
-    assert "> *Hello world*" in b
+    assert 'align="center"' in b
+    assert "Hello world" in b
 
 
 def test_replace_slogan_region_updates_text() -> None:
     mod = _load_rotate_module()
     readme = "# Title\n" + mod.format_block("OLD") + "\ntrailer"
     out = mod.replace_slogan_region(readme, "NEW")
-    assert "> *NEW*" in out
+    assert "NEW" in out
     assert "OLD" not in out
     assert "trailer" in out

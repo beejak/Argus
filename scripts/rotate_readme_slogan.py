@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
 import sys
@@ -39,7 +40,9 @@ def _save_state(state: dict[str, int]) -> None:
 
 
 def format_block(slogan: str) -> str:
-    return f"{MARKER_START}\n> *{slogan}*\n{MARKER_END}"
+    """GitHub strips most inline CSS; centered HTML still renders cleanly."""
+    esc = html.escape(slogan, quote=False)
+    return f'{MARKER_START}\n<p align="center"><i>{esc}</i></p>\n{MARKER_END}'
 
 
 def replace_slogan_region(readme: str, slogan: str) -> str:

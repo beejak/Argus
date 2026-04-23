@@ -8,7 +8,7 @@ The blockquote directly under **`# LLM Scanner`** in the root [`README.md`](../R
 | ---- | ---- |
 | [`docs/slogans.json`](../docs/slogans.json) | Ordered pool of unique one-liners (edit here to add more — keep them distinct). |
 | [`.github/data/slogan_state.json`](../.github/data/slogan_state.json) | Machine index for the **next** slogan to apply on the next rotation run. |
-| [`scripts/rotate_readme_slogan.py`](../scripts/rotate_readme_slogan.py) | Updates the `<!-- SLOGAN_START -->` … `<!-- SLOGAN_END -->` region in `README.md` and advances the index. |
+| [`scripts/rotate_readme_slogan.py`](../scripts/rotate_readme_slogan.py) | Updates the `<!-- SLOGAN_START -->` … `<!-- SLOGAN_END -->` region in `README.md` (centered `<p><i>…</i></p>` HTML so it reads cleanly on GitHub) and advances the index. |
 
 ## Automation
 

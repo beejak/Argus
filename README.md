@@ -1,12 +1,25 @@
+<div align="center">
+
 # LLM Scanner
 
 <!-- SLOGAN_START -->
-> *Because “we downloaded it from Hugging Face” is not a threat model — it’s a release note written in advance.*
+<p align="center"><i>Because “we downloaded it from Hugging Face” is not a threat model — it’s a release note written in advance.</i></p>
 <!-- SLOGAN_END -->
 
-*Rotating taglines live in [`docs/slogans.json`](docs/slogans.json); a bot advances them on a schedule ([`docs/SLOGANS.md`](docs/SLOGANS.md), [`.github/workflows/rotate-slogan.yml`](.github/workflows/rotate-slogan.yml)).*
+<sub>Rotating tagline pool: <code>docs/slogans.json</code> · <a href="docs/SLOGANS.md">how it rotates</a> · <a href=".github/workflows/rotate-slogan.yml">workflow</a></sub>
 
-**Production-minded scanning for Hugging Face–style model bundles** — static admission, config risk, and a staged path toward dynamic probes and runtime guardrails. The public mirror of this monorepo is **[Argus on GitHub](https://github.com/beejak/Argus)** ([publish notes](docs/PUBLISH_ARGUS.md)).
+<br/>
+
+[![LLM Scanner CI](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml/badge.svg?branch=main)](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml?query=branch%3Amain)
+![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-101624?logo=python&logoColor=white)
+
+**Production-minded scanning** for Hugging Face–style model bundles — static admission, config risk, and a staged path toward dynamic probes and runtime guardrails.
+
+[**Argus** (GitHub mirror)](https://github.com/beejak/Argus) · [Publish notes](docs/PUBLISH_ARGUS.md)
+
+<sub><b>Fonts:</b> <code>github.com</code> ignores custom web fonts in READMEs. This layout uses <b>spacing, centering, and badges</b> instead. For a bespoke typeface, ship docs via <a href="https://pages.github.com/">GitHub Pages</a> (or any static site) with your own CSS.</sub>
+
+</div>
 
 > **One working tree:** use a single checkout (for example `/root/LLM Scanner` on WSL). A duplicate under Windows `\\wsl$\\…` plus a UNC workspace invites drift and confusing pytest output.
 
