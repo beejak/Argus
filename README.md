@@ -18,6 +18,7 @@ Do not maintain a second copy under Windows for this project; it causes drift.
 - [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md) — Hermes / MCP playbook.
 - [docs/LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) — session log, graphify, Makefile target list.
 - [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md) — phase 0 taxonomy and OWASP mapping.
+- [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md) — **index of LLM security test cases** (pytest + docs + planned dynamic packs).
 - [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) — planning/execution lessons (append over time).
 - [docs/sessions/SESSION_LOG.md](docs/sessions/SESSION_LOG.md) — append-only session memory (**no secrets**).
 - Cursor skill: [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md)

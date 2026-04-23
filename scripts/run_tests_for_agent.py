@@ -13,6 +13,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+def _test_catalog_env(root: Path) -> dict[str, str]:
+    """Resolve catalog path and export absolute ``LLM_SCANNER_TEST_CATALOG`` for child pytest."""
+    hf = root / "hf_bundle_scanner"
+    if hf.is_dir():
+        sys.path[:0] = [str(hf)]
+        try:
+            from hf_bundle_scanner.test_catalog import (  # type: ignore[import-untyped]
+                TEST_CATALOG_ENV_VAR,
+                resolve_test_catalog_path,
+            )
+
+            cat = resolve_test_catalog_path(repo_root=root, environ=os.environ)
+            return {TEST_CATALOG_ENV_VAR: str(cat.resolve())}
+        finally:
+            if sys.path and sys.path[0] == str(hf):
+                sys.path.pop(0)
+    return {}
+
+
 def _pick_python(root: Path) -> Path:
     """Prefer repo-local .venv; fall back to sys.executable (e.g. GitHub Actions)."""
     candidates = [
@@ -42,6 +61,11 @@ def main() -> int:
     log(f"ROOT={root}")
     log(f"PYTHON={py}")
 
+    catalog_env = _test_catalog_env(root)
+    if catalog_env:
+        k, v = next(iter(catalog_env.items()))
+        log(f"{k}={v}")
+
     if not py.is_file():
         log(f"ERROR: missing interpreter {py} — run: make install")
         exit_path.write_text("99", encoding="utf-8")
@@ -56,7 +80,7 @@ def main() -> int:
         cwd=str(root / "model-admission"),
         capture_output=True,
         text=True,
-        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        env={**os.environ, **catalog_env, "PYTHONUNBUFFERED": "1"},
     )
     log(r1.stdout or "")
     log(r1.stderr or "")
@@ -79,7 +103,7 @@ def main() -> int:
         cwd=str(root / "hf_bundle_scanner"),
         capture_output=True,
         text=True,
-        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+        env={**os.environ, **catalog_env, "PYTHONUNBUFFERED": "1"},
     )
     log(r2.stdout or "")
     log(r2.stderr or "")

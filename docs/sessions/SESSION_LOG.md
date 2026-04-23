@@ -54,4 +54,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commits:** initial monorepo import + `docs: Argus publish guide; expand .gitignore`.
 - **Next:** `git push -u origin main` from WSL with GitHub auth (see `docs/PUBLISH_ARGUS.md`).
 
+### 2026-04-23 — add-catalog (phase0) + taxonomy CI guard
+
+- **Phase:** test catalog / phase0 alignment.
+- **Changes:** `llm_security_test_cases/catalog.json` v0.2.0 (`taxonomy_version: phase0`, OWASP LLM01–LLM10 + `RISK_REGISTER` rows), stricter `catalog.schema.json`, `model-admission/tests/test_catalog_taxonomy_alignment.py`, `docs/TEST_CASES_LLM_SECURITY_SCANNER.md` + `PRODUCTION_SCANNER_ROADMAP.md` (add-catalog done).
+- **Commands:** `python scripts/run_tests_for_agent.py`; `pytest model-admission/tests/test_catalog_taxonomy_alignment.py`.
+- **Next:** `phase1-bundle-provenance` (roadmap).
+
 ---

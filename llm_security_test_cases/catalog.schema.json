@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/beejak/Argus/blob/main/llm_security_test_cases/catalog.schema.json",
+  "title": "LLM security test catalog",
+  "type": "object",
+  "required": ["catalog_version", "cases"],
+  "properties": {
+    "catalog_version": { "type": "string", "minLength": 1 },
+    "taxonomy_version": {
+      "type": "string",
+      "description": "Must match bundle Finding taxonomy when present (e.g. phase0)."
+    },
+    "description": { "type": "string" },
+    "cases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "risk_category": {
+      "type": "string",
+      "enum": [
+        "artifact",
+        "provenance",
+        "config",
+        "supply_chain",
+        "dynamic",
+        "runtime",
+        "content_policy",
+        "fairness",
+        "meta"
+      ]
+    },
+    "case": {
+      "type": "object",
+      "required": ["id", "category"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "category": { "$ref": "#/$defs/risk_category" },
+        "summary": { "type": "string" },
+        "owasp_code": {
+          "type": "string",
+          "pattern": "^LLM(0[1-9]|10)$"
+        },
+        "owasp_slug": { "type": "string", "minLength": 1 },
+        "risk_register_id": { "type": "string", "minLength": 1 },
+        "dynamic": { "type": "boolean", "default": false },
+        "markers": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    }
+  }
+}

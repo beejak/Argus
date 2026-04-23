@@ -57,3 +57,4 @@ See [LONG_HORIZON_HARNESS.md](LONG_HORIZON_HARNESS.md#scanner-catalog-pointers) 
 
 - **Shipped:** [`model-admission`](../model-admission/README.md), [`hf_bundle_scanner`](../hf_bundle_scanner/README.md), root [`Makefile`](../Makefile), MCP/HTTP per [`hf_bundle_scanner/docs/hermes-mcp.md`](../hf_bundle_scanner/docs/hermes-mcp.md).
 - **Planned:** phases above; track progress in [`docs/sessions/SESSION_LOG.md`](sessions/SESSION_LOG.md).
+- **Test catalog (LLM Scanner root):** default `llm_security_test_cases/catalog.json` (phase0-aligned, pytest guard); resolution order in [TEST_CASES_LLM_SECURITY_SCANNER.md](TEST_CASES_LLM_SECURITY_SCANNER.md#next-run-consumption) (config/CLI → `LLM_SCANNER_TEST_CATALOG` → default). **`add-catalog`** / **`wire-loader`** checklist: [TEST_CASES — todos](TEST_CASES_LLM_SECURITY_SCANNER.md#todos-under-llm-scanner).

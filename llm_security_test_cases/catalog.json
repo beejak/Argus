@@ -1,0 +1,217 @@
+{
+  "catalog_version": "0.2.0",
+  "taxonomy_version": "phase0",
+  "description": "Machine-readable test catalog aligned with model_admission.taxonomy: RiskCategory, OWASP_LLM_2025 (LLM01–LLM10), and RISK_REGISTER concept ids. Used by pytest (llm_security_test_catalog) and agent-verify harness.",
+  "cases": [
+    {
+      "id": "owasp_llm01_prompt_injection",
+      "category": "dynamic",
+      "owasp_code": "LLM01",
+      "owasp_slug": "prompt_injection",
+      "risk_register_id": "prompt_injection",
+      "summary": "Runtime / agent probes for prompt injection and instruction override (phase-5 staging).",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "owasp_llm02_sensitive_information_disclosure",
+      "category": "content_policy",
+      "owasp_code": "LLM02",
+      "owasp_slug": "sensitive_information_disclosure",
+      "risk_register_id": "sensitive_disclosure",
+      "summary": "Training-data memorization, PII in outputs, and leakage-class static signals where applicable.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "owasp_llm03_supply_chain",
+      "category": "supply_chain",
+      "owasp_code": "LLM03",
+      "owasp_slug": "supply_chain",
+      "summary": "Artifact integrity, Hub revision pinning, manifest/provenance, and dependency posture.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "owasp_llm04_data_and_model_poisoning",
+      "category": "supply_chain",
+      "owasp_code": "LLM04",
+      "owasp_slug": "data_and_model_poisoning",
+      "risk_register_id": "poison_train_data",
+      "summary": "Poisoned weights, adapters, and training-data lineage checks (static + policy).",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "owasp_llm05_improper_output_handling",
+      "category": "runtime",
+      "owasp_code": "LLM05",
+      "owasp_slug": "improper_output_handling",
+      "risk_register_id": "improper_output_handling",
+      "summary": "Downstream sinks, tool output handling, and runtime guardrail integration (phase-7 guides).",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "owasp_llm06_excessive_agency",
+      "category": "dynamic",
+      "owasp_code": "LLM06",
+      "owasp_slug": "excessive_agency",
+      "risk_register_id": "excessive_agency",
+      "summary": "Agent/tool autonomy budgets, capability reduction, and unsafe delegation patterns.",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "owasp_llm07_system_prompt_leakage",
+      "category": "config",
+      "owasp_code": "LLM07",
+      "owasp_slug": "system_prompt_leakage",
+      "risk_register_id": "system_prompt_leak",
+      "summary": "configlint: trust_remote_code, tokenizer auto_map, template and system prompt exposure.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "owasp_llm08_vector_and_embedding_weaknesses",
+      "category": "dynamic",
+      "owasp_code": "LLM08",
+      "owasp_slug": "vector_and_embedding_weaknesses",
+      "risk_register_id": "vector_embedding_weakness",
+      "summary": "RAG / retrieval robustness, corpus poisoning, embedding inversion class issues (staged probes).",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "owasp_llm09_misinformation",
+      "category": "content_policy",
+      "owasp_code": "LLM09",
+      "owasp_slug": "misinformation",
+      "risk_register_id": "misinformation",
+      "summary": "Hallucination and factual reliability policy packs; org truthfulness rules.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "owasp_llm10_unbounded_consumption",
+      "category": "meta",
+      "owasp_code": "LLM10",
+      "owasp_slug": "unbounded_consumption",
+      "risk_register_id": "unbounded_consumption",
+      "summary": "Cost/DoS, rate limits, token budgets, and observability for runaway jobs.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "artifact_static_modelscan_modelaudit",
+      "category": "artifact",
+      "risk_register_id": "adapter_trojan",
+      "summary": "Per-file admission: ModelScan / ModelAudit and unsafe serialization formats (register: adapter trojan / artifact lane).",
+      "dynamic": false,
+      "markers": ["integration"]
+    },
+    {
+      "id": "provenance_snapshot_manifest",
+      "category": "provenance",
+      "summary": "SHA-256 manifest, snapshot root, and revision metadata on bundle reports (integrity pillar; no separate OWASP slug).",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "fairness_bias_fairness_slice",
+      "category": "fairness",
+      "summary": "Locale/slice behavioral eval and bias policy (not static tensor-only heuristics).",
+      "risk_register_id": "bias_fairness_slice",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "content_reputational_policy",
+      "category": "content_policy",
+      "owasp_slug": "misinformation",
+      "owasp_code": "LLM09",
+      "risk_register_id": "reputational_policy",
+      "summary": "Political/reputational and brand-safety policy packs beyond generic misinformation.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "content_safety_harm",
+      "category": "content_policy",
+      "owasp_slug": "sensitive_information_disclosure",
+      "owasp_code": "LLM02",
+      "risk_register_id": "safety_harm",
+      "summary": "Safety and harm-class content controls (overlaps disclosure and policy severity).",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "dynamic_poison_rag_corpus",
+      "category": "dynamic",
+      "owasp_code": "LLM08",
+      "owasp_slug": "vector_and_embedding_weaknesses",
+      "risk_register_id": "poison_rag_corpus",
+      "summary": "Corpus-side poisoning and retrieval manipulation (RAG threat track).",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "config_poison_system_template",
+      "category": "config",
+      "owasp_code": "LLM07",
+      "owasp_slug": "system_prompt_leakage",
+      "risk_register_id": "poison_system_template",
+      "summary": "Malicious tokenizer/chat templates and system template substitution.",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "dynamic_tool_exfil",
+      "category": "dynamic",
+      "owasp_code": "LLM06",
+      "owasp_slug": "excessive_agency",
+      "risk_register_id": "tool_exfil",
+      "summary": "Tool-using agents and data exfiltration via plugins/MCP (staged dynamic).",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "dynamic_model_steal",
+      "category": "dynamic",
+      "risk_register_id": "model_steal",
+      "summary": "Model extraction / distillation abuse (API abuse); register-driven dynamic track (OWASP mapping omitted where defaults conflict).",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "dynamic_multimodal_abuse",
+      "category": "dynamic",
+      "owasp_code": "LLM01",
+      "owasp_slug": "prompt_injection",
+      "risk_register_id": "multimodal_abuse",
+      "summary": "Cross-modal injection and unsafe multimodal inputs (staged).",
+      "dynamic": true,
+      "markers": ["integration"]
+    },
+    {
+      "id": "meta_drift_post_deploy",
+      "category": "meta",
+      "owasp_code": "LLM10",
+      "owasp_slug": "unbounded_consumption",
+      "risk_register_id": "drift_post_deploy",
+      "summary": "Post-deploy drift hooks, monitoring, and regression gates (observability pillar).",
+      "dynamic": false,
+      "markers": []
+    },
+    {
+      "id": "content_memorization_pii",
+      "category": "content_policy",
+      "owasp_code": "LLM02",
+      "owasp_slug": "sensitive_information_disclosure",
+      "risk_register_id": "memorization_pii",
+      "summary": "Memorization and canary PII leakage checks (static + eval backlog).",
+      "dynamic": false,
+      "markers": []
+    }
+  ]
+}
