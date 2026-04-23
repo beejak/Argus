@@ -17,6 +17,28 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+# Authoritative narrative + OWASP mapping (phase0 taxonomy in repo).
+THREAT_MODEL_DOC_URL = (
+    "https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md"
+)
+OWASP_LLM_TOP10_URL = (
+    "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+)
+
+# Short labels — titles paraphrased; verify against OWASP project pages.
+OWASP_SHORT: dict[str, str] = {
+    "LLM01": "Prompt injection",
+    "LLM02": "Sensitive information disclosure",
+    "LLM03": "Supply chain vulnerabilities",
+    "LLM04": "Data and model poisoning",
+    "LLM05": "Improper output handling",
+    "LLM06": "Excessive agency",
+    "LLM07": "System prompt leakage",
+    "LLM08": "Vector and embedding weaknesses",
+    "LLM09": "Misinformation",
+    "LLM10": "Unbounded consumption",
+}
+
 
 @dataclass(frozen=True)
 class Demo:
@@ -97,6 +119,210 @@ def _policy_label(policy_path: str) -> str:
 
 def _suffix(rel: str) -> str:
     return Path(rel).suffix.lower()
+
+
+def _owasp_pair(code_a: str, code_b: str | None) -> str:
+    a = f"{code_a} ({OWASP_SHORT.get(code_a, code_a)})"
+    if not code_b:
+        return a
+    return f"{a}; {code_b} ({OWASP_SHORT.get(code_b, code_b)})"
+
+
+def _taxonomy_fields(
+    *,
+    demo_id: str,
+    row_kind: str,
+    rule_id: str = "",
+    finding_category: str | None = None,
+    relpath: str = "",
+) -> dict[str, str]:
+    """OWASP LLM + phase0 risk category + leadership signal (aligned to THREAT_MODEL_TAXONOMY.md)."""
+    rid = (rule_id or "").strip()
+    cat = (finding_category or "").strip().lower()
+    suf = _suffix(relpath)
+
+    base = {
+        "taxonomy_version": "phase0",
+        "threat_model_doc": THREAT_MODEL_DOC_URL,
+        "owasp_project_url": OWASP_LLM_TOP10_URL,
+    }
+
+    if row_kind == "EXEC_SUMMARY":
+        if demo_id == "01_baseline":
+            return {
+                **base,
+                "signal_light": "GREEN",
+                "exec_risk_score_1_to_5": "2",
+                "recommended_decision": "CONDITIONAL_GO",
+                "owasp_llm_primary": "LLM03",
+                "owasp_llm_secondary": "LLM04",
+                "owasp_touchpoints": _owasp_pair("LLM03", "LLM04"),
+                "risk_taxonomy_category": "supply_chain",
+                "taxonomy_note": (
+                    "Static gate only. OWASP LLM01/05/06/09 not evaluated by this bundle scan."
+                ),
+            }
+        if demo_id == "02_demo_config_risk":
+            return {
+                **base,
+                "signal_light": "RED",
+                "exec_risk_score_1_to_5": "5",
+                "recommended_decision": "STOP_SHIP",
+                "owasp_llm_primary": "LLM03",
+                "owasp_llm_secondary": "LLM04",
+                "owasp_touchpoints": _owasp_pair("LLM03", "LLM04"),
+                "risk_taxonomy_category": "config",
+                "taxonomy_note": (
+                    "`trust_remote_code` maps to supply-chain / integrity (LLM03) and "
+                    "untrusted execution paths adjacent to poisoning (LLM04) in phase0 framing."
+                ),
+            }
+        if demo_id == "03_strict_safetensors_only":
+            return {
+                **base,
+                "signal_light": "AMBER",
+                "exec_risk_score_1_to_5": "4",
+                "recommended_decision": "HOLD_WAIVE_OR_REMEDIATE",
+                "owasp_llm_primary": "LLM03",
+                "owasp_llm_secondary": "",
+                "owasp_touchpoints": _owasp_pair("LLM03", None),
+                "risk_taxonomy_category": "provenance",
+                "taxonomy_note": (
+                    "Policy gate enforces provenance / format posture (RiskCategory.provenance); "
+                    "remediate artifacts or record executive waiver."
+                ),
+            }
+        return {
+            **base,
+            "signal_light": "AMBER",
+            "exec_risk_score_1_to_5": "3",
+            "recommended_decision": "REVIEW",
+            "owasp_llm_primary": "LLM03",
+            "owasp_llm_secondary": "",
+            "owasp_touchpoints": _owasp_pair("LLM03", None),
+            "risk_taxonomy_category": "supply_chain",
+            "taxonomy_note": "Triage against docs/THREAT_MODEL_TAXONOMY.md.",
+        }
+
+    if row_kind == "CONFIG":
+        if rid == "trust_remote_code_enabled":
+            return {
+                **base,
+                "signal_light": "RED",
+                "exec_risk_score_1_to_5": "5",
+                "recommended_decision": "STOP_SHIP",
+                "owasp_llm_primary": "LLM03",
+                "owasp_llm_secondary": "LLM04",
+                "owasp_touchpoints": _owasp_pair("LLM03", "LLM04"),
+                "risk_taxonomy_category": "config",
+                "taxonomy_note": "Configlint rule trust_remote_code_enabled (see taxonomy doc).",
+            }
+        return {
+            **base,
+            "signal_light": "AMBER",
+            "exec_risk_score_1_to_5": "3",
+            "recommended_decision": "REVIEW",
+            "owasp_llm_primary": "LLM03",
+            "owasp_llm_secondary": "LLM07",
+            "owasp_touchpoints": _owasp_pair("LLM03", "LLM07"),
+            "risk_taxonomy_category": "config",
+            "taxonomy_note": "Generic configlint signal — map rule_id in threat model workshop.",
+        }
+
+    if row_kind == "FINDING" and rid == "policy.gate_violation":
+        rc = cat or "provenance"
+        return {
+            **base,
+            "signal_light": "AMBER",
+            "exec_risk_score_1_to_5": "4",
+            "recommended_decision": "HOLD_WAIVE_OR_REMEDIATE",
+            "owasp_llm_primary": "LLM03",
+            "owasp_llm_secondary": "",
+            "owasp_touchpoints": _owasp_pair("LLM03", None),
+            "risk_taxonomy_category": rc,
+            "taxonomy_note": (
+                f"Admission policy gate (rule_id={rid}); category `{rc}` in bundle finding."
+            ),
+        }
+
+    if row_kind == "WEIGHT_FILE":
+        if suf == ".bin":
+            return {
+                **base,
+                "signal_light": "AMBER",
+                "exec_risk_score_1_to_5": "3",
+                "recommended_decision": "WATCH_DESERIALIZATION",
+                "owasp_llm_primary": "LLM03",
+                "owasp_llm_secondary": "LLM04",
+                "owasp_touchpoints": _owasp_pair("LLM03", "LLM04"),
+                "risk_taxonomy_category": "artifact",
+                "taxonomy_note": "Pickle-era `.bin` weight surface — not a verdict of malicious content.",
+            }
+        if suf in (".onnx", ".h5", ".hdf5"):
+            return {
+                **base,
+                "signal_light": "GREEN",
+                "exec_risk_score_1_to_5": "2",
+                "recommended_decision": "ACCEPT_FORMAT_STATICALLY",
+                "owasp_llm_primary": "LLM03",
+                "owasp_llm_secondary": "",
+                "owasp_touchpoints": _owasp_pair("LLM03", None),
+                "risk_taxonomy_category": "artifact",
+                "taxonomy_note": "Residual supply-chain / integrity focus for alternate frameworks.",
+            }
+        return {
+            **base,
+            "signal_light": "GREEN",
+            "exec_risk_score_1_to_5": "2",
+            "recommended_decision": "ACCEPT_FORMAT_STATICALLY",
+            "owasp_llm_primary": "LLM03",
+            "owasp_llm_secondary": "",
+            "owasp_touchpoints": _owasp_pair("LLM03", None),
+            "risk_taxonomy_category": "artifact",
+            "taxonomy_note": "No static finding on this row for configured policy/drivers.",
+        }
+
+    if row_kind == "FINDING":
+        return {
+            **base,
+            "signal_light": "AMBER",
+            "exec_risk_score_1_to_5": "3",
+            "recommended_decision": "REVIEW",
+            "owasp_llm_primary": "LLM03",
+            "owasp_llm_secondary": "",
+            "owasp_touchpoints": _owasp_pair("LLM03", None),
+            "risk_taxonomy_category": cat or "artifact",
+            "taxonomy_note": f"rule_id={rid or 'unknown'} — map in taxonomy workshop.",
+        }
+
+    return {
+        **base,
+        "signal_light": "AMBER",
+        "exec_risk_score_1_to_5": "3",
+        "recommended_decision": "REVIEW",
+        "owasp_llm_primary": "LLM03",
+        "owasp_llm_secondary": "",
+        "owasp_touchpoints": _owasp_pair("LLM03", None),
+        "risk_taxonomy_category": "supply_chain",
+        "taxonomy_note": "See THREAT_MODEL_TAXONOMY.md for phase0 mappings.",
+    }
+
+
+def _decision_english(code: str) -> str:
+    return {
+        "CONDITIONAL_GO": "Proceed only if runtime + data controls are owned elsewhere.",
+        "STOP_SHIP": "Do not ship to prod until resolved or formally waived with controls.",
+        "HOLD_WAIVE_OR_REMEDIATE": "Hold: convert artifacts, or executive waiver + recorded risk.",
+        "WATCH_DESERIALIZATION": "No static hit; treat `.bin` as higher inherent risk in threat model.",
+        "ACCEPT_FORMAT_STATICALLY": "No static hit on this file for current policy/drivers.",
+        "REVIEW": "Needs joint security + ML review before leadership sign-off.",
+    }.get(code, code)
+
+
+def _taxonomy_bundle(**kwargs: Any) -> dict[str, str]:
+    d = _taxonomy_fields(**kwargs)
+    d["recommended_decision_explained"] = _decision_english(d["recommended_decision"])
+    return d
 
 
 def _blast_for_exec_summary(demo: Demo, data: dict[str, Any]) -> dict[str, str]:
@@ -310,6 +536,7 @@ def iter_rows(demo: Demo, data: dict[str, Any]) -> Iterable[dict[str, str]]:
         "severity": "",
         "exit_code": str(agg) if agg is not None else "",
         **blast_exec,
+        **_taxonomy_bundle(demo_id=demo.demo_id, row_kind="EXEC_SUMMARY"),
     }
 
     for cf in data.get("config_findings") or []:
@@ -332,6 +559,7 @@ def iter_rows(demo: Demo, data: dict[str, Any]) -> Iterable[dict[str, str]]:
             "severity": "HIGH" if "trust_remote" in rule_id else "MEDIUM",
             "exit_code": str(agg) if agg is not None else "",
             **b,
+            **_taxonomy_bundle(demo_id=demo.demo_id, row_kind="CONFIG", rule_id=rule_id),
         }
 
     for fs in data.get("file_scans") or []:
@@ -360,6 +588,7 @@ def iter_rows(demo: Demo, data: dict[str, Any]) -> Iterable[dict[str, str]]:
                 "severity": "OK",
                 "exit_code": str(ex) if ex is not None else "",
                 **b,
+                **_taxonomy_bundle(demo_id=demo.demo_id, row_kind="WEIGHT_FILE", relpath=rel),
             }
             continue
         for f in findings:
@@ -383,6 +612,13 @@ def iter_rows(demo: Demo, data: dict[str, Any]) -> Iterable[dict[str, str]]:
                 "severity": sev,
                 "exit_code": str(ex) if ex is not None else "",
                 **b,
+                **_taxonomy_bundle(
+                    demo_id=demo.demo_id,
+                    row_kind="FINDING",
+                    rule_id=rule_id,
+                    finding_category=str(f.get("category") or ""),
+                    relpath=rel,
+                ),
             }
 
 
@@ -401,6 +637,18 @@ FIELDNAMES = [
     "prod_impact_if_shipped",
     "blast_radius",
     "exec_one_liner",
+    "taxonomy_version",
+    "threat_model_doc",
+    "owasp_project_url",
+    "signal_light",
+    "exec_risk_score_1_to_5",
+    "recommended_decision",
+    "recommended_decision_explained",
+    "owasp_llm_primary",
+    "owasp_llm_secondary",
+    "owasp_touchpoints",
+    "risk_taxonomy_category",
+    "taxonomy_note",
 ]
 
 
@@ -480,6 +728,8 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> Non
         "    .lead { font-size: 0.95rem; line-height: 1.45; }",
         "    .callout { border: 1px solid #c9daf8; background: #eef5ff; padding: 12px 14px; border-radius: 6px; }",
         "    code { font-size: 0.88em; }",
+        "    details { margin-top: 1rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 12px; }",
+        "    summary { cursor: pointer; font-weight: 600; }",
         "    @media print { body { margin: 12px; } a { color: #000; text-decoration: none; } }",
         "  </style>",
         "</head>",
@@ -496,33 +746,41 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> Non
         "  <p class=\"muted\">Generated from committed sample bundle JSON. ",
         "  For a PDF: use your browser <strong>Print → Save as PDF</strong> on this page.</p>",
         "  <p class=\"lead\">",
-        "    <strong>For leadership:</strong> use the <em>Leadership blast radius</em> ",
-        "    table first (one row per demo). <strong>Blast radius</strong> means who and what could be ",
-        "    affected if this snapshot were deployed with today’s signals ignored — not a prediction ",
-        "    that this test model is malicious.",
+        "    <strong>For leadership:</strong> start with the <em>Executive dashboard</em> (one row per demo). ",
+        "    <strong>Signal</strong> is a traffic light for this static gate only. ",
+        "    <strong>Score (1–5)</strong> is a coarse leadership severity (not CVSS). ",
+        "    <strong>OWASP</strong> references the OWASP Top 10 for LLM Applications (2025 framing) as summarized in-repo.",
+        "  </p>",
+        "  <p class=\"muted\">",
+        "    <strong>References:</strong> ",
+        f"    <a href=\"{html.escape(THREAT_MODEL_DOC_URL)}\">Threat model &amp; taxonomy (phase0)</a> · ",
+        f"    <a href=\"{html.escape(OWASP_LLM_TOP10_URL)}\">OWASP LLM Top 10 (official project)</a>",
         "  </p>",
     ]
 
     exec_rows = [r for r in rows if r.get("row_kind") == "EXEC_SUMMARY"]
-    lines.extend(
-        _html_table_lines(
-            "Leadership — blast radius by demo",
-            [
-                "demo_id",
-                "demo_title",
-                "risk_rating",
-                "exec_one_liner",
-                "prod_impact_if_shipped",
-                "blast_radius",
-            ],
-            exec_rows,
-        )
-    )
+    dash_cols = [
+        "demo_id",
+        "demo_title",
+        "signal_light",
+        "exec_risk_score_1_to_5",
+        "recommended_decision",
+        "recommended_decision_explained",
+        "owasp_touchpoints",
+        "risk_taxonomy_category",
+        "taxonomy_note",
+    ]
+    lines.extend(_html_table_lines("Executive dashboard (decision-first)", dash_cols, exec_rows))
 
     detail_cols = [
         "row_kind",
         "subject",
         "path_or_artifact",
+        "signal_light",
+        "exec_risk_score_1_to_5",
+        "recommended_decision",
+        "owasp_touchpoints",
+        "risk_taxonomy_category",
         "scanner_signal",
         "human_meaning",
         "recommended_next_step",
@@ -532,20 +790,44 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]]) -> Non
         "prod_impact_if_shipped",
         "blast_radius",
         "exec_one_liner",
+        "taxonomy_note",
+        "threat_model_doc",
     ]
 
     by_demo: dict[str, list[dict[str, str]]] = {}
     for r in rows:
         by_demo.setdefault(r["demo_id"], []).append(r)
 
+    lines.append("  <details>")
+    lines.append(
+        "    <summary>Supporting detail — long-form blast radius &amp; per-file rows (optional)</summary>"
+    )
+    lines.append("    <div class=\"muted\" style=\"margin:10px 0;\">")
+    lines.append(
+        "      Expand only when you need evidence for security / audit. The dashboard above is the board call."
+    )
+    lines.append("    </div>")
+    for ln in _html_table_lines(
+        "Blast radius — full narrative (exec rows only)",
+        [
+            "demo_id",
+            "demo_title",
+            "risk_rating",
+            "exec_one_liner",
+            "prod_impact_if_shipped",
+            "blast_radius",
+        ],
+        exec_rows,
+    ):
+        lines.append("    " + ln)
     for demo in demos:
-        lines.extend(
-            _html_table_lines(
-                f"Detail — {demo.title} ({demo.demo_id})",
-                detail_cols,
-                by_demo.get(demo.demo_id, []),
-            )
-        )
+        for ln in _html_table_lines(
+            f"Detail — {demo.title} ({demo.demo_id})",
+            detail_cols,
+            by_demo.get(demo.demo_id, []),
+        ):
+            lines.append("    " + ln)
+    lines.append("  </details>")
 
     lines.extend(["</body>", "</html>"])
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
@@ -565,11 +847,42 @@ def write_blast_radius_md(path: Path, demos: list[Demo], rows: list[dict[str, st
         "toxicity, full supply-chain pen tests, or runtime guardrails. Treat as **one control "
         "column** in a broader AI governance program.",
         "",
+        "## References (read with the dashboard)",
+        "",
+        f"- **In-repo threat model & OWASP mapping (phase0):** [THREAT_MODEL_TAXONOMY.md]({THREAT_MODEL_DOC_URL})",
+        f"- **OWASP LLM Top 10 (official):** [Top 10 for LLM Applications]({OWASP_LLM_TOP10_URL})",
+        "",
+        "### How to use the score (1–5)",
+        "",
+        "| Score | Meaning for leadership |",
+        "| ----- | ------------------------ |",
+        "| 1–2 | Static gate is green or only residual supply-chain hygiene. |",
+        "| 3 | Needs explicit owner; not automatically blocking. |",
+        "| 4 | Hold for governance / policy mismatch until waived or remediated. |",
+        "| 5 | Stop-the-line on static evidence as modeled here (e.g. remote-code posture). |",
+        "",
         "---",
         "",
     ]
 
     exec_by_id = {r["demo_id"]: r for r in rows if r.get("row_kind") == "EXEC_SUMMARY"}
+    lines.extend(
+        [
+            "## Executive dashboard (one row per demo)",
+            "",
+            "| Demo | Signal | Score (1–5) | Board decision | OWASP touchpoints | Phase0 category |",
+            "| ---- | ------ | ----------- | ---------------- | ----------------- | --------------- |",
+        ]
+    )
+    for demo in demos:
+        er = exec_by_id.get(demo.demo_id, {})
+        lines.append(
+            f"| `{demo.demo_id}` | **{er.get('signal_light', '')}** | **{er.get('exec_risk_score_1_to_5', '')}** | "
+            f"{(er.get('recommended_decision_explained') or '').replace('|', '\\|')} | "
+            f"{(er.get('owasp_touchpoints') or '').replace('|', '\\|')} | "
+            f"`{er.get('risk_taxonomy_category', '')}` |"
+        )
+    lines.extend(["", "---", ""])
     by_demo: dict[str, list[dict[str, str]]] = {}
     for r in rows:
         if r.get("row_kind") == "EXEC_SUMMARY":
@@ -627,15 +940,17 @@ def write_blast_radius_md(path: Path, demos: list[Demo], rows: list[dict[str, st
         [
             "## Cross-demo comparison (for steering committees)",
             "",
-            "| Demo | Static gate | Main leadership story |",
-            "| ---- | ----------- | ----------------------- |",
+            "| Demo | Exit | Signal | Score | OWASP (primary) |",
+            "| ---- | ---- | ------ | ----- | --------------- |",
         ]
     )
     for demo in demos:
         er = exec_by_id.get(demo.demo_id, {})
         agg = er.get("exit_code", "")
-        story = er.get("exec_one_liner", "").replace("|", "\\|")
-        lines.append(f"| `{demo.demo_id}` | exit **{agg}** | {story} |")
+        lines.append(
+            f"| `{demo.demo_id}` | **{agg}** | **{er.get('signal_light', '')}** | "
+            f"**{er.get('exec_risk_score_1_to_5', '')}** | `{er.get('owasp_llm_primary', '')}` |"
+        )
     lines.append("")
     lines.append(
         "_Regenerate:_ `python3 scripts/export_bundle_action_sheet.py` "

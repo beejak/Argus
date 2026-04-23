@@ -31,6 +31,14 @@ If `raw.githack.com` is slow or blocked, use (1) or print the Markdown brief [`B
 - **`prod_impact_if_shipped`**: what could go wrong if this snapshot were deployed **while ignoring** the static gate for that row.
 - **`blast_radius`**: who and what could be touched (fleet IAM, secrets, compliance, customers) — **scenario text**, not incident forensics.
 - **`exec_one_liner`**: one sentence suitable for a steering slide or Jira summary.
+- **`signal_light`**: **GREEN / AMBER / RED** traffic light for this row (static gate lens only).
+- **`exec_risk_score_1_to_5`**: coarse leadership severity (not CVSS); see the score rubric in [`BLAST_RADIUS_LEADERSHIP.md`](BLAST_RADIUS_LEADERSHIP.md).
+- **`recommended_decision` / `recommended_decision_explained`**: machine token + one-line board call.
+- **`owasp_llm_primary` / `owasp_llm_secondary` / `owasp_touchpoints`**: mapping to **OWASP Top 10 for LLM Applications (2025 framing)** as summarized in-repo.
+- **`risk_taxonomy_category`**: phase0 `RiskCategory` bucket (`config`, `provenance`, `artifact`, `supply_chain`, …).
+- **`taxonomy_version`**, **`threat_model_doc`**, **`owasp_project_url`**: pointers to [`docs/THREAT_MODEL_TAXONOMY.md`](../../THREAT_MODEL_TAXONOMY.md) and the official OWASP project.
+
+Dynamic/runtime risks (e.g. **LLM01** prompt injection) are **out of scope** for these static sample exports; see roadmap for later phases.
 
 ## Regenerate (maintainers)
 

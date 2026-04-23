@@ -20,6 +20,8 @@
     .lead { font-size: 0.95rem; line-height: 1.45; }
     .callout { border: 1px solid #c9daf8; background: #eef5ff; padding: 12px 14px; border-radius: 6px; }
     code { font-size: 0.88em; }
+    details { margin-top: 1rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 12px; }
+    summary { cursor: pointer; font-weight: 600; }
     @media print { body { margin: 12px; } a { color: #000; text-decoration: none; } }
   </style>
 </head>
@@ -36,294 +38,468 @@
   <p class="muted">Generated from committed sample bundle JSON. 
   For a PDF: use your browser <strong>Print → Save as PDF</strong> on this page.</p>
   <p class="lead">
-    <strong>For leadership:</strong> use the <em>Leadership blast radius</em> 
-    table first (one row per demo). <strong>Blast radius</strong> means who and what could be 
-    affected if this snapshot were deployed with today’s signals ignored — not a prediction 
-    that this test model is malicious.
+    <strong>For leadership:</strong> start with the <em>Executive dashboard</em> (one row per demo). 
+    <strong>Signal</strong> is a traffic light for this static gate only. 
+    <strong>Score (1–5)</strong> is a coarse leadership severity (not CVSS). 
+    <strong>OWASP</strong> references the OWASP Top 10 for LLM Applications (2025 framing) as summarized in-repo.
   </p>
-  <h2>Leadership — blast radius by demo</h2>
+  <p class="muted">
+    <strong>References:</strong> 
+    <a href="https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md">Threat model &amp; taxonomy (phase0)</a> · 
+    <a href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">OWASP LLM Top 10 (official project)</a>
+  </p>
+  <h2>Executive dashboard (decision-first)</h2>
   <table>
     <thead>
       <tr>
         <th>demo_id</th>
         <th>demo_title</th>
-        <th>risk_rating</th>
-        <th>exec_one_liner</th>
-        <th>prod_impact_if_shipped</th>
-        <th>blast_radius</th>
+        <th>signal_light</th>
+        <th>exec_risk_score_1_to_5</th>
+        <th>recommended_decision</th>
+        <th>recommended_decision_explained</th>
+        <th>owasp_touchpoints</th>
+        <th>risk_taxonomy_category</th>
+        <th>taxonomy_note</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>01_baseline</td>
         <td>Baseline — permissive policy, no injected config risk</td>
-        <td>LOW (static admission gate)</td>
-        <td>Static gate SHIP_OK_ON_STATIC_GATE for this snapshot — leadership should still budget runtime AI risk and supply-chain controls outside this JSON.</td>
-        <td>If `hf-internal-testing/tiny-random-BertModel` reached production with the same loader posture as this scan, nothing in this **static** report blocks release: policy and empty driver lane raised no finding. That does **not** prove safety—only that this gate did not fire. Residual classes of prod risk still apply: prompt injection and toxic outputs, application data exfiltration, wrong revision or mirror substitution, and higher inherent risk for pickle-era formats such as `pytorch_model.bin` if an attacker could swap weights.</td>
-        <td>**Primary:** the serving/training fleet identity (cloud IAM, k8s service accounts) and any databases or APIs the app can reach while running this model. **Secondary:** customer trust, regulatory reporting if PII is processed, and SOC workload if behavior changes. **Not modeled here:** runtime guardrails, network egress policy, or human review of Hub revision history.</td>
+        <td>GREEN</td>
+        <td>2</td>
+        <td>CONDITIONAL_GO</td>
+        <td>Proceed only if runtime + data controls are owned elsewhere.</td>
+        <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+        <td>supply_chain</td>
+        <td>Static gate only. OWASP LLM01/05/06/09 not evaluated by this bundle scan.</td>
       </tr>
       <tr>
         <td>02_demo_config_risk</td>
         <td>Same snapshot — demo tokenizer_config (trust_remote_code)</td>
-        <td>CRITICAL (remote code execution path on load)</td>
-        <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — treat as **undeclared RCE-class supply chain** on load until explicitly waived with hardened controls and owner sign-off.</td>
-        <td>If production loaders honor `trust_remote_code`, a malicious or compromised Hub revision (or dependency confusion) can execute **Python during model/tokenizer load**, before your application logic runs its usual checks. That is comparable to shipping an unreviewed install hook on the hot path: environment secrets, cloud metadata credentials, lateral movement to batch jobs, and silent persistence become plausible incident shapes.</td>
-        <td>**Typically:** the whole namespace or VM scale set running inference, shared images and caches, CI runners that materialize tokenizer files, and any secrets mounted into those workloads. **Regulatory / comms:** expands materially if the model touches regulated data — breach timelines and customer notification may enter scope even without proven exfiltration.</td>
+        <td>RED</td>
+        <td>5</td>
+        <td>STOP_SHIP</td>
+        <td>Do not ship to prod until resolved or formally waived with controls.</td>
+        <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+        <td>config</td>
+        <td>`trust_remote_code` maps to supply-chain / integrity (LLM03) and untrusted execution paths adjacent to poisoning (LLM04) in phase0 framing.</td>
       </tr>
       <tr>
         <td>03_strict_safetensors_only</td>
         <td>Same snapshot — safetensors-only policy (reject .bin/.onnx/.h5)</td>
-        <td>HIGH (governance / policy breach; format risk)</td>
-        <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — leadership question is: **waive with recorded risk acceptance** or **convert/remove blocked artifacts** before prod.</td>
-        <td>If teams bypass this gate and deploy anyway, production would contain **file types your org explicitly banned** (here: `.onnx`, `.bin`, `.h5`). That weakens audit answers (“safetensors-only”), increases operational surprise, and raises the likelihood of **unsafe deserialization** incidents if weights ever become attacker-controlled or accidentally swapped.</td>
-        <td>**Compliance &amp; procurement:** SOC2 / ISO evidence gaps and vendor questionnaires. **Operations:** downstream systems that assumed “no pickle weights” may behave incorrectly or open incident bridges. **Security:** incident blast follows the inference footprint and any shared artifact store where the disallowed files land.</td>
+        <td>AMBER</td>
+        <td>4</td>
+        <td>HOLD_WAIVE_OR_REMEDIATE</td>
+        <td>Hold: convert artifacts, or executive waiver + recorded risk.</td>
+        <td>LLM03 (Supply chain vulnerabilities)</td>
+        <td>provenance</td>
+        <td>Policy gate enforces provenance / format posture (RiskCategory.provenance); remediate artifacts or record executive waiver.</td>
       </tr>
     </tbody>
   </table>
-  <h2>Detail — Baseline — permissive policy, no injected config risk (01_baseline)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>row_kind</th>
-        <th>subject</th>
-        <th>path_or_artifact</th>
-        <th>scanner_signal</th>
-        <th>human_meaning</th>
-        <th>recommended_next_step</th>
-        <th>severity</th>
-        <th>exit_code</th>
-        <th>risk_rating</th>
-        <th>prod_impact_if_shipped</th>
-        <th>blast_radius</th>
-        <th>exec_one_liner</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>EXEC_SUMMARY</td>
-        <td>(entire bundle)</td>
-        <td></td>
-        <td>aggregate_exit_code=0; schema=hf_bundle_scanner.bundle_report.v2</td>
-        <td>Hub snapshot hf-internal-testing/tiny-random-BertModel scanned with policy policy.permissive.json (fixture in repo). Verdict for CI-style static gate: SHIP_OK_ON_STATIC_GATE.</td>
-        <td>If HOLD: triage config_findings first, then per-file findings. If SHIP: still verify provenance, revision pin, and runtime controls outside this scanner.</td>
-        <td></td>
-        <td>0</td>
-        <td>LOW (static admission gate)</td>
-        <td>If `hf-internal-testing/tiny-random-BertModel` reached production with the same loader posture as this scan, nothing in this **static** report blocks release: policy and empty driver lane raised no finding. That does **not** prove safety—only that this gate did not fire. Residual classes of prod risk still apply: prompt injection and toxic outputs, application data exfiltration, wrong revision or mirror substitution, and higher inherent risk for pickle-era formats such as `pytorch_model.bin` if an attacker could swap weights.</td>
-        <td>**Primary:** the serving/training fleet identity (cloud IAM, k8s service accounts) and any databases or APIs the app can reach while running this model. **Secondary:** customer trust, regulatory reporting if PII is processed, and SOC workload if behavior changes. **Not modeled here:** runtime guardrails, network egress policy, or human review of Hub revision history.</td>
-        <td>Static gate SHIP_OK_ON_STATIC_GATE for this snapshot — leadership should still budget runtime AI risk and supply-chain controls outside this JSON.</td>
-      </tr>
-      <tr>
-        <td>WEIGHT_FILE</td>
-        <td>weight-like artifact gate</td>
-        <td>onnx/model.onnx</td>
-        <td>exit_code=0; findings=0</td>
-        <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
-        <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
-        <td>OK</td>
-        <td>0</td>
-        <td>LOW–MEDIUM (residual supply chain)</td>
-        <td>`onnx/model.onnx` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
-        <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
-        <td>No static blocker — confirm revision pinning and mirror policy.</td>
-      </tr>
-      <tr>
-        <td>WEIGHT_FILE</td>
-        <td>weight-like artifact gate</td>
-        <td>pytorch_model.bin</td>
-        <td>exit_code=0; findings=0</td>
-        <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
-        <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
-        <td>OK</td>
-        <td>0</td>
-        <td>MEDIUM (residual format risk)</td>
-        <td>`pytorch_model.bin` is a **pickle deserialization surface** in many stacks. With **benign** test weights the practical incident rate is low, but with **swapped** or **attacker-supplied** weights it becomes a classic high-impact deserialization bug class. Static scan did not prove malicious content here.</td>
-        <td>The inference/training process that deserializes this file; expands if weights live on shared storage or multi-tenant caches.</td>
-        <td>No static finding — leadership should still ask whether **.bin** is acceptable in **your** prod threat model.</td>
-      </tr>
-      <tr>
-        <td>WEIGHT_FILE</td>
-        <td>weight-like artifact gate</td>
-        <td>tf_model.h5</td>
-        <td>exit_code=0; findings=0</td>
-        <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
-        <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
-        <td>OK</td>
-        <td>0</td>
-        <td>LOW–MEDIUM (residual supply chain)</td>
-        <td>`tf_model.h5` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
-        <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
-        <td>No static blocker — confirm revision pinning and mirror policy.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h2>Detail — Same snapshot — demo tokenizer_config (trust_remote_code) (02_demo_config_risk)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>row_kind</th>
-        <th>subject</th>
-        <th>path_or_artifact</th>
-        <th>scanner_signal</th>
-        <th>human_meaning</th>
-        <th>recommended_next_step</th>
-        <th>severity</th>
-        <th>exit_code</th>
-        <th>risk_rating</th>
-        <th>prod_impact_if_shipped</th>
-        <th>blast_radius</th>
-        <th>exec_one_liner</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>EXEC_SUMMARY</td>
-        <td>(entire bundle)</td>
-        <td></td>
-        <td>aggregate_exit_code=1; schema=hf_bundle_scanner.bundle_report.v2</td>
-        <td>Hub snapshot hf-internal-testing/tiny-random-BertModel scanned with policy policy.permissive.json (fixture in repo). Verdict for CI-style static gate: HOLD_REVIEW_POLICY_OR_CONFIG.</td>
-        <td>If HOLD: triage config_findings first, then per-file findings. If SHIP: still verify provenance, revision pin, and runtime controls outside this scanner.</td>
-        <td></td>
-        <td>1</td>
-        <td>CRITICAL (remote code execution path on load)</td>
-        <td>If production loaders honor `trust_remote_code`, a malicious or compromised Hub revision (or dependency confusion) can execute **Python during model/tokenizer load**, before your application logic runs its usual checks. That is comparable to shipping an unreviewed install hook on the hot path: environment secrets, cloud metadata credentials, lateral movement to batch jobs, and silent persistence become plausible incident shapes.</td>
-        <td>**Typically:** the whole namespace or VM scale set running inference, shared images and caches, CI runners that materialize tokenizer files, and any secrets mounted into those workloads. **Regulatory / comms:** expands materially if the model touches regulated data — breach timelines and customer notification may enter scope even without proven exfiltration.</td>
-        <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — treat as **undeclared RCE-class supply chain** on load until explicitly waived with hardened controls and owner sign-off.</td>
-      </tr>
-      <tr>
-        <td>CONFIG</td>
-        <td>tokenizer / loader config</td>
-        <td>/tmp/&lt;ephemeral-hub-demo&gt;/tokenizer_config.json</td>
-        <td>trust_remote_code_enabled: trust_remote_code is truthy (&#x27;True&#x27;); loading with trust_remote_code can execute Hub Python</td>
-        <td>Configlint: trust_remote_code is set truthy — loading may execute Hub-supplied Python.</td>
-        <td>Treat like a code dependency change: review, pin revision, and require explicit approval.</td>
-        <td>HIGH</td>
-        <td>1</td>
-        <td>CRITICAL</td>
-        <td>Same as exec summary: trusted Hub Python may run at load time; secrets and lateral movement are in play if an adversary influences revision content or build caches.</td>
-        <td>Inference/training hosts, mounted secrets, shared registries, CI artifact caches; customer/regulator exposure if regulated data is processed.</td>
-        <td>`trust_remote_code` truthy — **stop-the-line** for prod until removed or formally accepted with compensating controls.</td>
-      </tr>
-      <tr>
-        <td>WEIGHT_FILE</td>
-        <td>weight-like artifact gate</td>
-        <td>onnx/model.onnx</td>
-        <td>exit_code=0; findings=0</td>
-        <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
-        <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
-        <td>OK</td>
-        <td>0</td>
-        <td>LOW–MEDIUM (residual supply chain)</td>
-        <td>`onnx/model.onnx` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
-        <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
-        <td>No static blocker — confirm revision pinning and mirror policy.</td>
-      </tr>
-      <tr>
-        <td>WEIGHT_FILE</td>
-        <td>weight-like artifact gate</td>
-        <td>pytorch_model.bin</td>
-        <td>exit_code=0; findings=0</td>
-        <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
-        <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
-        <td>OK</td>
-        <td>0</td>
-        <td>MEDIUM (residual format risk)</td>
-        <td>`pytorch_model.bin` is a **pickle deserialization surface** in many stacks. With **benign** test weights the practical incident rate is low, but with **swapped** or **attacker-supplied** weights it becomes a classic high-impact deserialization bug class. Static scan did not prove malicious content here.</td>
-        <td>The inference/training process that deserializes this file; expands if weights live on shared storage or multi-tenant caches.</td>
-        <td>No static finding — leadership should still ask whether **.bin** is acceptable in **your** prod threat model.</td>
-      </tr>
-      <tr>
-        <td>WEIGHT_FILE</td>
-        <td>weight-like artifact gate</td>
-        <td>tf_model.h5</td>
-        <td>exit_code=0; findings=0</td>
-        <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
-        <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
-        <td>OK</td>
-        <td>0</td>
-        <td>LOW–MEDIUM (residual supply chain)</td>
-        <td>`tf_model.h5` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
-        <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
-        <td>No static blocker — confirm revision pinning and mirror policy.</td>
-      </tr>
-    </tbody>
-  </table>
-  <h2>Detail — Same snapshot — safetensors-only policy (reject .bin/.onnx/.h5) (03_strict_safetensors_only)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>row_kind</th>
-        <th>subject</th>
-        <th>path_or_artifact</th>
-        <th>scanner_signal</th>
-        <th>human_meaning</th>
-        <th>recommended_next_step</th>
-        <th>severity</th>
-        <th>exit_code</th>
-        <th>risk_rating</th>
-        <th>prod_impact_if_shipped</th>
-        <th>blast_radius</th>
-        <th>exec_one_liner</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>EXEC_SUMMARY</td>
-        <td>(entire bundle)</td>
-        <td></td>
-        <td>aggregate_exit_code=1; schema=hf_bundle_scanner.bundle_report.v2</td>
-        <td>Hub snapshot hf-internal-testing/tiny-random-BertModel scanned with policy policy.safetensors-only.json (fixture in repo). Verdict for CI-style static gate: HOLD_REVIEW_POLICY_OR_CONFIG.</td>
-        <td>If HOLD: triage config_findings first, then per-file findings. If SHIP: still verify provenance, revision pin, and runtime controls outside this scanner.</td>
-        <td></td>
-        <td>1</td>
-        <td>HIGH (governance / policy breach; format risk)</td>
-        <td>If teams bypass this gate and deploy anyway, production would contain **file types your org explicitly banned** (here: `.onnx`, `.bin`, `.h5`). That weakens audit answers (“safetensors-only”), increases operational surprise, and raises the likelihood of **unsafe deserialization** incidents if weights ever become attacker-controlled or accidentally swapped.</td>
-        <td>**Compliance &amp; procurement:** SOC2 / ISO evidence gaps and vendor questionnaires. **Operations:** downstream systems that assumed “no pickle weights” may behave incorrectly or open incident bridges. **Security:** incident blast follows the inference footprint and any shared artifact store where the disallowed files land.</td>
-        <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — leadership question is: **waive with recorded risk acceptance** or **convert/remove blocked artifacts** before prod.</td>
-      </tr>
-      <tr>
-        <td>FINDING</td>
-        <td>weight-like artifact gate</td>
-        <td>onnx/model.onnx</td>
-        <td>Policy violation — extension &#x27;.onnx&#x27; not in allowed_extensions</td>
-        <td>Your admission policy rejected this file (extension, size, or hash allow-list).</td>
-        <td>If this format is intentional, update policy with an explicit exception and record why the risk is accepted; otherwise convert weights (e.g. safetensors) or drop the file.</td>
-        <td>HIGH</td>
-        <td>1</td>
-        <td>HIGH</td>
-        <td>If `onnx/model.onnx` ships despite policy, you are **operating outside the signed control baseline** for file types. For `.onnx` specifically, deserialization and tooling surprises are the common technical concern; the business concern is **audit failure** and **unplanned incident response** when reality diverges from what security told auditors.</td>
-        <td>Release pipeline integrity, downstream “safetensors-only” consumers, and the security/compliance interface (evidence packs, customer DPA answers).</td>
-        <td>Blocked artifact `onnx/model.onnx` — waive only with **named executive risk acceptance**.</td>
-      </tr>
-      <tr>
-        <td>FINDING</td>
-        <td>weight-like artifact gate</td>
-        <td>pytorch_model.bin</td>
-        <td>Policy violation — extension &#x27;.bin&#x27; not in allowed_extensions</td>
-        <td>Your admission policy rejected this file (extension, size, or hash allow-list).</td>
-        <td>If this format is intentional, update policy with an explicit exception and record why the risk is accepted; otherwise convert weights (e.g. safetensors) or drop the file.</td>
-        <td>HIGH</td>
-        <td>1</td>
-        <td>HIGH</td>
-        <td>If `pytorch_model.bin` ships despite policy, you are **operating outside the signed control baseline** for file types. For `.bin` specifically, deserialization and tooling surprises are the common technical concern; the business concern is **audit failure** and **unplanned incident response** when reality diverges from what security told auditors.</td>
-        <td>Release pipeline integrity, downstream “safetensors-only” consumers, and the security/compliance interface (evidence packs, customer DPA answers).</td>
-        <td>Blocked artifact `pytorch_model.bin` — waive only with **named executive risk acceptance**.</td>
-      </tr>
-      <tr>
-        <td>FINDING</td>
-        <td>weight-like artifact gate</td>
-        <td>tf_model.h5</td>
-        <td>Policy violation — extension &#x27;.h5&#x27; not in allowed_extensions</td>
-        <td>Your admission policy rejected this file (extension, size, or hash allow-list).</td>
-        <td>If this format is intentional, update policy with an explicit exception and record why the risk is accepted; otherwise convert weights (e.g. safetensors) or drop the file.</td>
-        <td>HIGH</td>
-        <td>1</td>
-        <td>HIGH</td>
-        <td>If `tf_model.h5` ships despite policy, you are **operating outside the signed control baseline** for file types. For `.h5` specifically, deserialization and tooling surprises are the common technical concern; the business concern is **audit failure** and **unplanned incident response** when reality diverges from what security told auditors.</td>
-        <td>Release pipeline integrity, downstream “safetensors-only” consumers, and the security/compliance interface (evidence packs, customer DPA answers).</td>
-        <td>Blocked artifact `tf_model.h5` — waive only with **named executive risk acceptance**.</td>
-      </tr>
-    </tbody>
-  </table>
+  <details>
+    <summary>Supporting detail — long-form blast radius &amp; per-file rows (optional)</summary>
+    <div class="muted" style="margin:10px 0;">
+      Expand only when you need evidence for security / audit. The dashboard above is the board call.
+    </div>
+      <h2>Blast radius — full narrative (exec rows only)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>demo_id</th>
+            <th>demo_title</th>
+            <th>risk_rating</th>
+            <th>exec_one_liner</th>
+            <th>prod_impact_if_shipped</th>
+            <th>blast_radius</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>01_baseline</td>
+            <td>Baseline — permissive policy, no injected config risk</td>
+            <td>LOW (static admission gate)</td>
+            <td>Static gate SHIP_OK_ON_STATIC_GATE for this snapshot — leadership should still budget runtime AI risk and supply-chain controls outside this JSON.</td>
+            <td>If `hf-internal-testing/tiny-random-BertModel` reached production with the same loader posture as this scan, nothing in this **static** report blocks release: policy and empty driver lane raised no finding. That does **not** prove safety—only that this gate did not fire. Residual classes of prod risk still apply: prompt injection and toxic outputs, application data exfiltration, wrong revision or mirror substitution, and higher inherent risk for pickle-era formats such as `pytorch_model.bin` if an attacker could swap weights.</td>
+            <td>**Primary:** the serving/training fleet identity (cloud IAM, k8s service accounts) and any databases or APIs the app can reach while running this model. **Secondary:** customer trust, regulatory reporting if PII is processed, and SOC workload if behavior changes. **Not modeled here:** runtime guardrails, network egress policy, or human review of Hub revision history.</td>
+          </tr>
+          <tr>
+            <td>02_demo_config_risk</td>
+            <td>Same snapshot — demo tokenizer_config (trust_remote_code)</td>
+            <td>CRITICAL (remote code execution path on load)</td>
+            <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — treat as **undeclared RCE-class supply chain** on load until explicitly waived with hardened controls and owner sign-off.</td>
+            <td>If production loaders honor `trust_remote_code`, a malicious or compromised Hub revision (or dependency confusion) can execute **Python during model/tokenizer load**, before your application logic runs its usual checks. That is comparable to shipping an unreviewed install hook on the hot path: environment secrets, cloud metadata credentials, lateral movement to batch jobs, and silent persistence become plausible incident shapes.</td>
+            <td>**Typically:** the whole namespace or VM scale set running inference, shared images and caches, CI runners that materialize tokenizer files, and any secrets mounted into those workloads. **Regulatory / comms:** expands materially if the model touches regulated data — breach timelines and customer notification may enter scope even without proven exfiltration.</td>
+          </tr>
+          <tr>
+            <td>03_strict_safetensors_only</td>
+            <td>Same snapshot — safetensors-only policy (reject .bin/.onnx/.h5)</td>
+            <td>HIGH (governance / policy breach; format risk)</td>
+            <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — leadership question is: **waive with recorded risk acceptance** or **convert/remove blocked artifacts** before prod.</td>
+            <td>If teams bypass this gate and deploy anyway, production would contain **file types your org explicitly banned** (here: `.onnx`, `.bin`, `.h5`). That weakens audit answers (“safetensors-only”), increases operational surprise, and raises the likelihood of **unsafe deserialization** incidents if weights ever become attacker-controlled or accidentally swapped.</td>
+            <td>**Compliance &amp; procurement:** SOC2 / ISO evidence gaps and vendor questionnaires. **Operations:** downstream systems that assumed “no pickle weights” may behave incorrectly or open incident bridges. **Security:** incident blast follows the inference footprint and any shared artifact store where the disallowed files land.</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2>Detail — Baseline — permissive policy, no injected config risk (01_baseline)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>row_kind</th>
+            <th>subject</th>
+            <th>path_or_artifact</th>
+            <th>signal_light</th>
+            <th>exec_risk_score_1_to_5</th>
+            <th>recommended_decision</th>
+            <th>owasp_touchpoints</th>
+            <th>risk_taxonomy_category</th>
+            <th>scanner_signal</th>
+            <th>human_meaning</th>
+            <th>recommended_next_step</th>
+            <th>severity</th>
+            <th>exit_code</th>
+            <th>risk_rating</th>
+            <th>prod_impact_if_shipped</th>
+            <th>blast_radius</th>
+            <th>exec_one_liner</th>
+            <th>taxonomy_note</th>
+            <th>threat_model_doc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>EXEC_SUMMARY</td>
+            <td>(entire bundle)</td>
+            <td></td>
+            <td>GREEN</td>
+            <td>2</td>
+            <td>CONDITIONAL_GO</td>
+            <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+            <td>supply_chain</td>
+            <td>aggregate_exit_code=0; schema=hf_bundle_scanner.bundle_report.v2</td>
+            <td>Hub snapshot hf-internal-testing/tiny-random-BertModel scanned with policy policy.permissive.json (fixture in repo). Verdict for CI-style static gate: SHIP_OK_ON_STATIC_GATE.</td>
+            <td>If HOLD: triage config_findings first, then per-file findings. If SHIP: still verify provenance, revision pin, and runtime controls outside this scanner.</td>
+            <td></td>
+            <td>0</td>
+            <td>LOW (static admission gate)</td>
+            <td>If `hf-internal-testing/tiny-random-BertModel` reached production with the same loader posture as this scan, nothing in this **static** report blocks release: policy and empty driver lane raised no finding. That does **not** prove safety—only that this gate did not fire. Residual classes of prod risk still apply: prompt injection and toxic outputs, application data exfiltration, wrong revision or mirror substitution, and higher inherent risk for pickle-era formats such as `pytorch_model.bin` if an attacker could swap weights.</td>
+            <td>**Primary:** the serving/training fleet identity (cloud IAM, k8s service accounts) and any databases or APIs the app can reach while running this model. **Secondary:** customer trust, regulatory reporting if PII is processed, and SOC workload if behavior changes. **Not modeled here:** runtime guardrails, network egress policy, or human review of Hub revision history.</td>
+            <td>Static gate SHIP_OK_ON_STATIC_GATE for this snapshot — leadership should still budget runtime AI risk and supply-chain controls outside this JSON.</td>
+            <td>Static gate only. OWASP LLM01/05/06/09 not evaluated by this bundle scan.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>WEIGHT_FILE</td>
+            <td>weight-like artifact gate</td>
+            <td>onnx/model.onnx</td>
+            <td>GREEN</td>
+            <td>2</td>
+            <td>ACCEPT_FORMAT_STATICALLY</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>artifact</td>
+            <td>exit_code=0; findings=0</td>
+            <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
+            <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
+            <td>OK</td>
+            <td>0</td>
+            <td>LOW–MEDIUM (residual supply chain)</td>
+            <td>`onnx/model.onnx` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
+            <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
+            <td>No static blocker — confirm revision pinning and mirror policy.</td>
+            <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>WEIGHT_FILE</td>
+            <td>weight-like artifact gate</td>
+            <td>pytorch_model.bin</td>
+            <td>AMBER</td>
+            <td>3</td>
+            <td>WATCH_DESERIALIZATION</td>
+            <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+            <td>artifact</td>
+            <td>exit_code=0; findings=0</td>
+            <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
+            <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
+            <td>OK</td>
+            <td>0</td>
+            <td>MEDIUM (residual format risk)</td>
+            <td>`pytorch_model.bin` is a **pickle deserialization surface** in many stacks. With **benign** test weights the practical incident rate is low, but with **swapped** or **attacker-supplied** weights it becomes a classic high-impact deserialization bug class. Static scan did not prove malicious content here.</td>
+            <td>The inference/training process that deserializes this file; expands if weights live on shared storage or multi-tenant caches.</td>
+            <td>No static finding — leadership should still ask whether **.bin** is acceptable in **your** prod threat model.</td>
+            <td>Pickle-era `.bin` weight surface — not a verdict of malicious content.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>WEIGHT_FILE</td>
+            <td>weight-like artifact gate</td>
+            <td>tf_model.h5</td>
+            <td>GREEN</td>
+            <td>2</td>
+            <td>ACCEPT_FORMAT_STATICALLY</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>artifact</td>
+            <td>exit_code=0; findings=0</td>
+            <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
+            <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
+            <td>OK</td>
+            <td>0</td>
+            <td>LOW–MEDIUM (residual supply chain)</td>
+            <td>`tf_model.h5` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
+            <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
+            <td>No static blocker — confirm revision pinning and mirror policy.</td>
+            <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2>Detail — Same snapshot — demo tokenizer_config (trust_remote_code) (02_demo_config_risk)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>row_kind</th>
+            <th>subject</th>
+            <th>path_or_artifact</th>
+            <th>signal_light</th>
+            <th>exec_risk_score_1_to_5</th>
+            <th>recommended_decision</th>
+            <th>owasp_touchpoints</th>
+            <th>risk_taxonomy_category</th>
+            <th>scanner_signal</th>
+            <th>human_meaning</th>
+            <th>recommended_next_step</th>
+            <th>severity</th>
+            <th>exit_code</th>
+            <th>risk_rating</th>
+            <th>prod_impact_if_shipped</th>
+            <th>blast_radius</th>
+            <th>exec_one_liner</th>
+            <th>taxonomy_note</th>
+            <th>threat_model_doc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>EXEC_SUMMARY</td>
+            <td>(entire bundle)</td>
+            <td></td>
+            <td>RED</td>
+            <td>5</td>
+            <td>STOP_SHIP</td>
+            <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+            <td>config</td>
+            <td>aggregate_exit_code=1; schema=hf_bundle_scanner.bundle_report.v2</td>
+            <td>Hub snapshot hf-internal-testing/tiny-random-BertModel scanned with policy policy.permissive.json (fixture in repo). Verdict for CI-style static gate: HOLD_REVIEW_POLICY_OR_CONFIG.</td>
+            <td>If HOLD: triage config_findings first, then per-file findings. If SHIP: still verify provenance, revision pin, and runtime controls outside this scanner.</td>
+            <td></td>
+            <td>1</td>
+            <td>CRITICAL (remote code execution path on load)</td>
+            <td>If production loaders honor `trust_remote_code`, a malicious or compromised Hub revision (or dependency confusion) can execute **Python during model/tokenizer load**, before your application logic runs its usual checks. That is comparable to shipping an unreviewed install hook on the hot path: environment secrets, cloud metadata credentials, lateral movement to batch jobs, and silent persistence become plausible incident shapes.</td>
+            <td>**Typically:** the whole namespace or VM scale set running inference, shared images and caches, CI runners that materialize tokenizer files, and any secrets mounted into those workloads. **Regulatory / comms:** expands materially if the model touches regulated data — breach timelines and customer notification may enter scope even without proven exfiltration.</td>
+            <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — treat as **undeclared RCE-class supply chain** on load until explicitly waived with hardened controls and owner sign-off.</td>
+            <td>`trust_remote_code` maps to supply-chain / integrity (LLM03) and untrusted execution paths adjacent to poisoning (LLM04) in phase0 framing.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>CONFIG</td>
+            <td>tokenizer / loader config</td>
+            <td>/tmp/&lt;ephemeral-hub-demo&gt;/tokenizer_config.json</td>
+            <td>RED</td>
+            <td>5</td>
+            <td>STOP_SHIP</td>
+            <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+            <td>config</td>
+            <td>trust_remote_code_enabled: trust_remote_code is truthy (&#x27;True&#x27;); loading with trust_remote_code can execute Hub Python</td>
+            <td>Configlint: trust_remote_code is set truthy — loading may execute Hub-supplied Python.</td>
+            <td>Treat like a code dependency change: review, pin revision, and require explicit approval.</td>
+            <td>HIGH</td>
+            <td>1</td>
+            <td>CRITICAL</td>
+            <td>Same as exec summary: trusted Hub Python may run at load time; secrets and lateral movement are in play if an adversary influences revision content or build caches.</td>
+            <td>Inference/training hosts, mounted secrets, shared registries, CI artifact caches; customer/regulator exposure if regulated data is processed.</td>
+            <td>`trust_remote_code` truthy — **stop-the-line** for prod until removed or formally accepted with compensating controls.</td>
+            <td>Configlint rule trust_remote_code_enabled (see taxonomy doc).</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>WEIGHT_FILE</td>
+            <td>weight-like artifact gate</td>
+            <td>onnx/model.onnx</td>
+            <td>GREEN</td>
+            <td>2</td>
+            <td>ACCEPT_FORMAT_STATICALLY</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>artifact</td>
+            <td>exit_code=0; findings=0</td>
+            <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
+            <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
+            <td>OK</td>
+            <td>0</td>
+            <td>LOW–MEDIUM (residual supply chain)</td>
+            <td>`onnx/model.onnx` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
+            <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
+            <td>No static blocker — confirm revision pinning and mirror policy.</td>
+            <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>WEIGHT_FILE</td>
+            <td>weight-like artifact gate</td>
+            <td>pytorch_model.bin</td>
+            <td>AMBER</td>
+            <td>3</td>
+            <td>WATCH_DESERIALIZATION</td>
+            <td>LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning)</td>
+            <td>artifact</td>
+            <td>exit_code=0; findings=0</td>
+            <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
+            <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
+            <td>OK</td>
+            <td>0</td>
+            <td>MEDIUM (residual format risk)</td>
+            <td>`pytorch_model.bin` is a **pickle deserialization surface** in many stacks. With **benign** test weights the practical incident rate is low, but with **swapped** or **attacker-supplied** weights it becomes a classic high-impact deserialization bug class. Static scan did not prove malicious content here.</td>
+            <td>The inference/training process that deserializes this file; expands if weights live on shared storage or multi-tenant caches.</td>
+            <td>No static finding — leadership should still ask whether **.bin** is acceptable in **your** prod threat model.</td>
+            <td>Pickle-era `.bin` weight surface — not a verdict of malicious content.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>WEIGHT_FILE</td>
+            <td>weight-like artifact gate</td>
+            <td>tf_model.h5</td>
+            <td>GREEN</td>
+            <td>2</td>
+            <td>ACCEPT_FORMAT_STATICALLY</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>artifact</td>
+            <td>exit_code=0; findings=0</td>
+            <td>This file was scanned; policy + configured drivers did not raise a finding (for this demo, drivers are empty).</td>
+            <td>Still treat formats like .bin as higher deserialization risk in real threat models.</td>
+            <td>OK</td>
+            <td>0</td>
+            <td>LOW–MEDIUM (residual supply chain)</td>
+            <td>`tf_model.h5` passed this static gate; prod risk is mostly **integrity and supply chain** (wrong revision, poisoned mirror) plus whatever your runtime allows the framework to do with that format.</td>
+            <td>Serving fleet and adjacent services that trust this artifact hash and revision pin.</td>
+            <td>No static blocker — confirm revision pinning and mirror policy.</td>
+            <td>Residual supply-chain / integrity focus for alternate frameworks.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2>Detail — Same snapshot — safetensors-only policy (reject .bin/.onnx/.h5) (03_strict_safetensors_only)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>row_kind</th>
+            <th>subject</th>
+            <th>path_or_artifact</th>
+            <th>signal_light</th>
+            <th>exec_risk_score_1_to_5</th>
+            <th>recommended_decision</th>
+            <th>owasp_touchpoints</th>
+            <th>risk_taxonomy_category</th>
+            <th>scanner_signal</th>
+            <th>human_meaning</th>
+            <th>recommended_next_step</th>
+            <th>severity</th>
+            <th>exit_code</th>
+            <th>risk_rating</th>
+            <th>prod_impact_if_shipped</th>
+            <th>blast_radius</th>
+            <th>exec_one_liner</th>
+            <th>taxonomy_note</th>
+            <th>threat_model_doc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>EXEC_SUMMARY</td>
+            <td>(entire bundle)</td>
+            <td></td>
+            <td>AMBER</td>
+            <td>4</td>
+            <td>HOLD_WAIVE_OR_REMEDIATE</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>provenance</td>
+            <td>aggregate_exit_code=1; schema=hf_bundle_scanner.bundle_report.v2</td>
+            <td>Hub snapshot hf-internal-testing/tiny-random-BertModel scanned with policy policy.safetensors-only.json (fixture in repo). Verdict for CI-style static gate: HOLD_REVIEW_POLICY_OR_CONFIG.</td>
+            <td>If HOLD: triage config_findings first, then per-file findings. If SHIP: still verify provenance, revision pin, and runtime controls outside this scanner.</td>
+            <td></td>
+            <td>1</td>
+            <td>HIGH (governance / policy breach; format risk)</td>
+            <td>If teams bypass this gate and deploy anyway, production would contain **file types your org explicitly banned** (here: `.onnx`, `.bin`, `.h5`). That weakens audit answers (“safetensors-only”), increases operational surprise, and raises the likelihood of **unsafe deserialization** incidents if weights ever become attacker-controlled or accidentally swapped.</td>
+            <td>**Compliance &amp; procurement:** SOC2 / ISO evidence gaps and vendor questionnaires. **Operations:** downstream systems that assumed “no pickle weights” may behave incorrectly or open incident bridges. **Security:** incident blast follows the inference footprint and any shared artifact store where the disallowed files land.</td>
+            <td>Static gate HOLD_REVIEW_POLICY_OR_CONFIG — leadership question is: **waive with recorded risk acceptance** or **convert/remove blocked artifacts** before prod.</td>
+            <td>Policy gate enforces provenance / format posture (RiskCategory.provenance); remediate artifacts or record executive waiver.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>FINDING</td>
+            <td>weight-like artifact gate</td>
+            <td>onnx/model.onnx</td>
+            <td>AMBER</td>
+            <td>4</td>
+            <td>HOLD_WAIVE_OR_REMEDIATE</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>provenance</td>
+            <td>Policy violation — extension &#x27;.onnx&#x27; not in allowed_extensions</td>
+            <td>Your admission policy rejected this file (extension, size, or hash allow-list).</td>
+            <td>If this format is intentional, update policy with an explicit exception and record why the risk is accepted; otherwise convert weights (e.g. safetensors) or drop the file.</td>
+            <td>HIGH</td>
+            <td>1</td>
+            <td>HIGH</td>
+            <td>If `onnx/model.onnx` ships despite policy, you are **operating outside the signed control baseline** for file types. For `.onnx` specifically, deserialization and tooling surprises are the common technical concern; the business concern is **audit failure** and **unplanned incident response** when reality diverges from what security told auditors.</td>
+            <td>Release pipeline integrity, downstream “safetensors-only” consumers, and the security/compliance interface (evidence packs, customer DPA answers).</td>
+            <td>Blocked artifact `onnx/model.onnx` — waive only with **named executive risk acceptance**.</td>
+            <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>FINDING</td>
+            <td>weight-like artifact gate</td>
+            <td>pytorch_model.bin</td>
+            <td>AMBER</td>
+            <td>4</td>
+            <td>HOLD_WAIVE_OR_REMEDIATE</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>provenance</td>
+            <td>Policy violation — extension &#x27;.bin&#x27; not in allowed_extensions</td>
+            <td>Your admission policy rejected this file (extension, size, or hash allow-list).</td>
+            <td>If this format is intentional, update policy with an explicit exception and record why the risk is accepted; otherwise convert weights (e.g. safetensors) or drop the file.</td>
+            <td>HIGH</td>
+            <td>1</td>
+            <td>HIGH</td>
+            <td>If `pytorch_model.bin` ships despite policy, you are **operating outside the signed control baseline** for file types. For `.bin` specifically, deserialization and tooling surprises are the common technical concern; the business concern is **audit failure** and **unplanned incident response** when reality diverges from what security told auditors.</td>
+            <td>Release pipeline integrity, downstream “safetensors-only” consumers, and the security/compliance interface (evidence packs, customer DPA answers).</td>
+            <td>Blocked artifact `pytorch_model.bin` — waive only with **named executive risk acceptance**.</td>
+            <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+          <tr>
+            <td>FINDING</td>
+            <td>weight-like artifact gate</td>
+            <td>tf_model.h5</td>
+            <td>AMBER</td>
+            <td>4</td>
+            <td>HOLD_WAIVE_OR_REMEDIATE</td>
+            <td>LLM03 (Supply chain vulnerabilities)</td>
+            <td>provenance</td>
+            <td>Policy violation — extension &#x27;.h5&#x27; not in allowed_extensions</td>
+            <td>Your admission policy rejected this file (extension, size, or hash allow-list).</td>
+            <td>If this format is intentional, update policy with an explicit exception and record why the risk is accepted; otherwise convert weights (e.g. safetensors) or drop the file.</td>
+            <td>HIGH</td>
+            <td>1</td>
+            <td>HIGH</td>
+            <td>If `tf_model.h5` ships despite policy, you are **operating outside the signed control baseline** for file types. For `.h5` specifically, deserialization and tooling surprises are the common technical concern; the business concern is **audit failure** and **unplanned incident response** when reality diverges from what security told auditors.</td>
+            <td>Release pipeline integrity, downstream “safetensors-only” consumers, and the security/compliance interface (evidence packs, customer DPA answers).</td>
+            <td>Blocked artifact `tf_model.h5` — waive only with **named executive risk acceptance**.</td>
+            <td>Admission policy gate (rule_id=policy.gate_violation); category `provenance` in bundle finding.</td>
+            <td>https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md</td>
+          </tr>
+        </tbody>
+      </table>
+  </details>
 </body>
 </html>

@@ -4,6 +4,30 @@ This document is generated from the same three committed bundle JSON samples as 
 
 > **Scope:** static admission + configlint only. It does **not** cover prompt abuse, toxicity, full supply-chain pen tests, or runtime guardrails. Treat as **one control column** in a broader AI governance program.
 
+## References (read with the dashboard)
+
+- **In-repo threat model & OWASP mapping (phase0):** [THREAT_MODEL_TAXONOMY.md](https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md)
+- **OWASP LLM Top 10 (official):** [Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+
+### How to use the score (1–5)
+
+| Score | Meaning for leadership |
+| ----- | ------------------------ |
+| 1–2 | Static gate is green or only residual supply-chain hygiene. |
+| 3 | Needs explicit owner; not automatically blocking. |
+| 4 | Hold for governance / policy mismatch until waived or remediated. |
+| 5 | Stop-the-line on static evidence as modeled here (e.g. remote-code posture). |
+
+---
+
+## Executive dashboard (one row per demo)
+
+| Demo | Signal | Score (1–5) | Board decision | OWASP touchpoints | Phase0 category |
+| ---- | ------ | ----------- | ---------------- | ----------------- | --------------- |
+| `01_baseline` | **GREEN** | **2** | Proceed only if runtime + data controls are owned elsewhere. | LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning) | `supply_chain` |
+| `02_demo_config_risk` | **RED** | **5** | Do not ship to prod until resolved or formally waived with controls. | LLM03 (Supply chain vulnerabilities); LLM04 (Data and model poisoning) | `config` |
+| `03_strict_safetensors_only` | **AMBER** | **4** | Hold: convert artifacts, or executive waiver + recorded risk. | LLM03 (Supply chain vulnerabilities) | `provenance` |
+
 ---
 
 ## Baseline — permissive policy, no injected config risk
@@ -91,10 +115,10 @@ If teams bypass this gate and deploy anyway, production would contain **file typ
 
 ## Cross-demo comparison (for steering committees)
 
-| Demo | Static gate | Main leadership story |
-| ---- | ----------- | ----------------------- |
-| `01_baseline` | exit **0** | Static gate SHIP_OK_ON_STATIC_GATE for this snapshot — leadership should still budget runtime AI risk and supply-chain controls outside this JSON. |
-| `02_demo_config_risk` | exit **1** | Static gate HOLD_REVIEW_POLICY_OR_CONFIG — treat as **undeclared RCE-class supply chain** on load until explicitly waived with hardened controls and owner sign-off. |
-| `03_strict_safetensors_only` | exit **1** | Static gate HOLD_REVIEW_POLICY_OR_CONFIG — leadership question is: **waive with recorded risk acceptance** or **convert/remove blocked artifacts** before prod. |
+| Demo | Exit | Signal | Score | OWASP (primary) |
+| ---- | ---- | ------ | ----- | --------------- |
+| `01_baseline` | **0** | **GREEN** | **2** | `LLM03` |
+| `02_demo_config_risk` | **1** | **RED** | **5** | `LLM03` |
+| `03_strict_safetensors_only` | **1** | **AMBER** | **4** | `LLM03` |
 
 _Regenerate:_ `python3 scripts/export_bundle_action_sheet.py` or `make sample-action-sheets`.
