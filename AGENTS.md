@@ -27,6 +27,8 @@ make test
 make scan-fixture
 ```
 
+If **`git commit -m …`** fails with **`option trailer requires a value`**, run **`make git-doctor`**, then commit with **`make commit-msg MSG='…'`** or **`python3 scripts/git_commit_via_file.py '…'`** (see [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)).
+
 ## Long-horizon discipline
 
 - Cursor skill: [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md)
