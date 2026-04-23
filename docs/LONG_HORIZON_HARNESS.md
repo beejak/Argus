@@ -17,6 +17,7 @@ Feedback loop: [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (append mistakes and fix
 | `make graphify-update` | Refresh `graphify-out/` if `graphify` CLI or Python module is available |
 | `make memory-open` | Print path to session log for append-only notes |
 | `make agent-verify` | Run **[`scripts/run_tests_for_agent.py`](../scripts/run_tests_for_agent.py)** (repo `.venv` if present, else `sys.executable`); writes [`.agent/pytest-last.log`](../.agent/pytest-last.log) + `.agent/pytest-last.exit` so agents can **read** results when terminal stdout is empty |
+| `make drivers-help` | Print `model-admission` scan driver names (`modelscan`, `modelaudit`) + `MODELSCAN_BIN` / `MODELAUDIT_BIN` hints (needs `make install`) |
 
 Delegate from `hf_bundle_scanner/` with `make -C .. <target>` (see that folder’s stub Makefile).
 

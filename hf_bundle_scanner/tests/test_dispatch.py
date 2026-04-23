@@ -73,6 +73,21 @@ def test_scan_bundle_with_weight(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     assert "manifest_summary" in d["provenance"]
 
 
+def test_scan_bundle_modelscan_missing_binary_is_driver_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Phase2 static drivers: missing ModelScan binary → admit exit 2 → bundle aggregate 2."""
+    _patch_admit_env(monkeypatch)
+    monkeypatch.setenv("MODELSCAN_BIN", str(tmp_path / "no-such-modelscan"))
+    _write_minimal_safetensors(tmp_path / "m.safetensors")
+    (tmp_path / "config.json").write_text('{"model_type": "bert"}', encoding="utf-8")
+    pol = _policy(tmp_path)
+    bundle = scan_bundle(tmp_path, pol, drivers="modelscan", timeout=60)
+    assert len(bundle.file_scans) == 1
+    assert bundle.file_scans[0].exit_code == 2
+    assert bundle.aggregate_exit_code == 2
+
+
 def test_scan_bundle_trust_remote_raises_exit(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

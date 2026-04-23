@@ -39,14 +39,18 @@ OWASP_SHORT: dict[str, str] = {
     "LLM10": "Unbounded consumption",
 }
 
-# Must stay aligned with `hf_bundle_scanner.dispatch.scan_bundle` config_risk escalation.
-_DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS: frozenset[str] = frozenset(
-    {
-        "trust_remote_code_enabled",
-        "auto_map_custom_classes",
-        "config_json_invalid",
-    }
-)
+# Must stay aligned with `hf_bundle_scanner.dispatch.CONFIG_RISK_RULE_IDS` / org template
+# ``docs/policy/configlint_rule_defaults.json`` (see hf_bundle_scanner tests).
+try:
+    from hf_bundle_scanner.dispatch import CONFIG_RISK_RULE_IDS as _DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS
+except Exception:  # pragma: no cover - script may run without editable install
+    _DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS = frozenset(
+        {
+            "trust_remote_code_enabled",
+            "auto_map_custom_classes",
+            "config_json_invalid",
+        }
+    )
 
 # Cached JSON under docs/reporting/decision_support_rule_catalog.json (keyed by resolved repo root).
 _CATALOG_CACHE: dict[str, dict[str, Any] | None] = {}
@@ -104,7 +108,7 @@ def _validate_catalog_blocking(cat: dict[str, Any]) -> None:
         flag = r.get("blocks_default_ci")
         if not isinstance(flag, bool):
             continue
-        in_dispatch = rid in _DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS
+        in_dispatch = rid in _DEFAULT_CI_BLOCKING_CONFIG_RULE_IDS  # mirrors CONFIG_RISK_RULE_IDS
         if in_dispatch and not flag:
             print(
                 f"WARNING: catalog blocks_default_ci=false for {rid!r} but dispatch.py "

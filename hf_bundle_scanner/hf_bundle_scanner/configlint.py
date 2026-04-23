@@ -13,6 +13,19 @@ from pathlib import Path
 from typing import Any
 
 
+# Stable ``rule_id`` strings emitted by this module (for org policy templates + drift tests).
+RULE_IDS_EMITTED: frozenset[str] = frozenset(
+    {
+        "config_json_invalid",
+        "trust_remote_code_enabled",
+        "use_auth_token_present",
+        "use_fast_tokenizer_truthy",
+        "auto_map_custom_classes",
+        "use_safetensors_disabled",
+    }
+)
+
+
 @dataclass
 class ConfigFinding:
     path: str

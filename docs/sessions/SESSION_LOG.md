@@ -140,4 +140,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** `configlint` emits `use_safetensors_disabled` when `use_safetensors` is explicitly false in HF-style JSON; catalog row + legend order + exporter validation tuple; `tests/test_configlint.py`; roadmap note; `python3 scripts/export_bundle_action_sheet.py` to refresh actionable outputs.
 - **Commands:** `make agent-verify`, `python3 scripts/export_bundle_action_sheet.py`.
 
+### 2026-04-24 — phase3 org policy template + phase2 driver discoverability
+
+- **Phase:** `phase3-configlint-oss` + `phase2-static-drivers`.
+- **Changes:** `CONFIG_RISK_RULE_IDS` + `RULE_IDS_EMITTED`; `docs/policy/configlint_rule_defaults.json` + `docs/policy/README.md`; `test_configlint_policy_template.py`; exporter tries `CONFIG_RISK_RULE_IDS` import; `make drivers-help`; `hf_bundle_scanner/README.md` bundle drivers section; `test_dispatch.py` driver exit 2 path; ModelAudit JSON parse unit tests; roadmap + reporting README cross-links.
+- **Commands:** `make agent-verify`, `make drivers-help` (after `make install`).
+
 ---

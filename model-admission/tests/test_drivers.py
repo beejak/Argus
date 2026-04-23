@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from model_admission.drivers import DRIVERS, get_driver
+from model_admission.drivers.modelaudit import ModelAuditDriver
 from model_admission.drivers.modelscan import ModelScanDriver
 from model_admission.report import Severity
 
@@ -40,5 +41,22 @@ def test_modelscan_parse_nested_all_issues() -> None:
     drv = ModelScanDriver()
     sample = {"issues": {"all_issues": [{"severity": "CRITICAL", "type": "X", "message": "m"}]}}
     findings = drv._parse_json_report(sample)
+    assert len(findings) == 1
+    assert findings[0].severity == Severity.CRITICAL
+
+
+def test_modelaudit_parse_findings_list() -> None:
+    drv = ModelAuditDriver()
+    sample = {"findings": [{"severity": "HIGH", "title": "Leak", "message": "detail"}]}
+    findings = drv._parse_json(sample)
+    assert len(findings) == 1
+    assert findings[0].severity == Severity.HIGH
+    assert findings[0].title == "Leak"
+
+
+def test_modelaudit_parse_summary_fallback() -> None:
+    drv = ModelAuditDriver()
+    sample = {"summary": {"critical": 1, "high": 0}}
+    findings = drv._parse_json(sample)
     assert len(findings) == 1
     assert findings[0].severity == Severity.CRITICAL

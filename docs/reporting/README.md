@@ -7,6 +7,7 @@ This folder holds **human-decision** material that is safe to version in git (no
 | File | Purpose |
 | ---- | ------- |
 | [`decision_support_rule_catalog.json`](decision_support_rule_catalog.json) | Machine-readable **rule_id → references + guidance** used by [`scripts/export_bundle_action_sheet.py`](../../scripts/export_bundle_action_sheet.py) for CSV / HTML / `BLAST_RADIUS_LEADERSHIP.md`. |
+| [`../policy/configlint_rule_defaults.json`](../policy/configlint_rule_defaults.json) | Org-facing **default_aggregate_escalates** matrix for configlint `rule_id`s (must match [`dispatch.py`](../../hf_bundle_scanner/hf_bundle_scanner/dispatch.py) `CONFIG_RISK_RULE_IDS`; drift-tested). |
 
 ## When to edit
 

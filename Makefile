@@ -3,7 +3,7 @@
 VENVDIR ?= .venv
 PY := $(abspath $(VENVDIR))/bin/python
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets drivers-help
 
 help:
 	@echo "LLM Scanner harness"
@@ -20,6 +20,7 @@ help:
 	@echo "  make slogan-dry-run   - print next README slogan (no file writes)"
 	@echo "  make ephemeral-hub-scan - Hub download → scan → delete (needs OUT=/path.json; optional INJECT=1)"
 	@echo "  make sample-action-sheets - regenerate docs/sample_reports/actionable/* from sample JSON"
+	@echo "  make drivers-help       - list model-admission scan drivers + env overrides"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
 install:
@@ -93,3 +94,9 @@ ephemeral-hub-scan:
 
 sample-action-sheets:
 	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/export_bundle_action_sheet.py"
+
+drivers-help:
+	@"$(PY)" -c "from model_admission.drivers import DRIVERS; \
+print('Known admit-model drivers:', ', '.join(sorted(DRIVERS))); \
+print('Env overrides: MODELSCAN_BIN, MODELAUDIT_BIN'); \
+print('Bundle scan: scan-bundle scan ... --drivers modelscan,modelaudit')"

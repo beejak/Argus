@@ -19,6 +19,17 @@ from hf_bundle_scanner.report import BundleReport, FileScanRecord, compute_aggre
 from hf_bundle_scanner.snapshot import build_manifest
 
 
+# Configlint rule_ids that flip ``config_risk`` → bundle aggregate exit 1 when file scans are clean.
+# Keep aligned with ``docs/policy/configlint_rule_defaults.json`` (see tests) and reporting exports.
+CONFIG_RISK_RULE_IDS: frozenset[str] = frozenset(
+    {
+        "trust_remote_code_enabled",
+        "auto_map_custom_classes",
+        "config_json_invalid",
+    }
+)
+
+
 def admit_argv() -> list[str]:
     """Command prefix to invoke model-admission (``python -m model_admission`` or ``admit-model``).
 
@@ -112,15 +123,7 @@ def scan_bundle(
 
     cfg_paths = discover_config_files(root, discovery)
     cfg_findings = [f.to_dict() for f in lint_tree(cfg_paths)]
-    config_risk = any(
-        f["rule_id"]
-        in (
-            "trust_remote_code_enabled",
-            "auto_map_custom_classes",
-            "config_json_invalid",
-        )
-        for f in cfg_findings
-    )
+    config_risk = any(f["rule_id"] in CONFIG_RISK_RULE_IDS for f in cfg_findings)
 
     targets = discover_scan_artifacts(root, discovery)
     records: list[FileScanRecord] = []

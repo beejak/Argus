@@ -27,6 +27,19 @@ python -m hf_bundle_scanner manifest --root /path --out /tmp/m.json
 
 Environment mirrors / SBOM merge with CLI flags: **`HF_BUNDLE_MIRROR_ALLOWLIST`** (comma-separated hosts), **`HF_BUNDLE_SBOM_URI`**.
 
+### Optional static drivers (ModelScan / ModelAudit)
+
+`scan-bundle scan` forwards **`--drivers`** to [`model-admission`](../model-admission/README.md) (`admit-model scan`). Built-in driver names today: **`modelscan`**, **`modelaudit`** (comma-separated).
+
+```bash
+scan-bundle scan --root "$D" --policy policy.json --out /tmp/bundle.json \
+  --drivers modelscan,modelaudit --fail-on MEDIUM
+```
+
+If the external CLI is missing, per-file **`exit_code`** is **`2`** (tooling/driver lane) and the bundle aggregate follows the usual priority rules. Override binaries with **`MODELSCAN_BIN`** / **`MODELAUDIT_BIN`** (see model-admission README). From repo root: **`make drivers-help`**.
+
+Org-level defaults for **configlint** severities vs CI escalation live in [`docs/policy/configlint_rule_defaults.json`](../docs/policy/configlint_rule_defaults.json).
+
 See [docs/hermes-mcp.md](docs/hermes-mcp.md) for MCP and optional HTTP.
 
 ### Optional: scan a small file from the “uncensored-models” collection

@@ -1,0 +1,44 @@
+{
+  "schema": "llm_scanner.configlint_org_policy.v1",
+  "version": "2026-04-24",
+  "description": "Default classification for configlint rule_id values. default_aggregate_escalates must match hf_bundle_scanner.dispatch.CONFIG_RISK_RULE_IDS (enforced by hf_bundle_scanner/tests/test_configlint_policy_template.py).",
+  "code_reference": "hf_bundle_scanner.dispatch.CONFIG_RISK_RULE_IDS",
+  "rules": [
+    {
+      "rule_id": "config_json_invalid",
+      "default_aggregate_escalates": true,
+      "signal_class": "integrity_parse",
+      "notes": "Fix JSON before trusting other loader fields; blocks default bundle aggregate today."
+    },
+    {
+      "rule_id": "trust_remote_code_enabled",
+      "default_aggregate_escalates": true,
+      "signal_class": "loader_remote_code",
+      "notes": "Worst-case static loader posture in default CI; treat as security + legal, not a hyperparameter."
+    },
+    {
+      "rule_id": "auto_map_custom_classes",
+      "default_aggregate_escalates": true,
+      "signal_class": "custom_class_mapping",
+      "notes": "Unexpected class wiring / provenance story; blocking in default CI today."
+    },
+    {
+      "rule_id": "use_auth_token_present",
+      "default_aggregate_escalates": false,
+      "signal_class": "secrets_hygiene",
+      "notes": "Credential-in-config posture; informational in default CI today."
+    },
+    {
+      "rule_id": "use_fast_tokenizer_truthy",
+      "default_aggregate_escalates": false,
+      "signal_class": "tokenizer_hygiene",
+      "notes": "Legacy fast tokenizer path; audits/reproducibility, not RCE-by-itself."
+    },
+    {
+      "rule_id": "use_safetensors_disabled",
+      "default_aggregate_escalates": false,
+      "signal_class": "weights_format_posture",
+      "notes": "Explicit opt-out of safetensors; pairs with pickle-era weight risk in threat models."
+    }
+  ]
+}
