@@ -16,6 +16,10 @@ signal (``trust_remote_code``) for teaching — not a supply-chain trojan.
 - ``hf-internal-testing/tiny-random-BartModel`` — richer ONNX surface + ``pytorch_model.bin``;
   pair with ``--inject-demo-tokenizer-risk`` to see **aggregate exit 1** from configlint
   without downloading known-malicious content.
+
+**HTML:** after a successful scan, this script runs ``scripts/export_bundle_action_sheet.py``
+with ``--bundle-json`` pointing at the written bundle JSON (unless ``--no-html``). Default
+HTML path is the bundle ``--out`` path with a ``.html`` suffix.
 """
 
 from __future__ import annotations
@@ -49,6 +53,17 @@ def main(argv: list[str] | None = None) -> int:
         help="Policy JSON path relative to repo root unless absolute",
     )
     ap.add_argument("--out", required=True, help="Output bundle report JSON path")
+    ap.add_argument(
+        "--html-out",
+        type=str,
+        default=None,
+        help="HTML briefing output path (default: same path as --out but with .html suffix)",
+    )
+    ap.add_argument(
+        "--no-html",
+        action="store_true",
+        help="Skip HTML export after a successful scan",
+    )
     ap.add_argument(
         "--inject-demo-tokenizer-risk",
         action="store_true",
@@ -139,16 +154,33 @@ def main(argv: list[str] | None = None) -> int:
 
         if out.is_file():
             data = json.loads(out.read_text(encoding="utf-8"))
-            print(
-                json.dumps(
-                    {
-                        "wrote": str(out),
-                        "aggregate_exit_code": data.get("aggregate_exit_code"),
-                        "schema": data.get("schema"),
-                    },
-                    indent=2,
-                )
-            )
+            summary = {
+                "wrote": str(out),
+                "aggregate_exit_code": data.get("aggregate_exit_code"),
+                "schema": data.get("schema"),
+            }
+            if not bool(args.no_html):
+                html_out = Path(args.html_out).resolve() if args.html_out else out.with_suffix(".html")
+                html_out.parent.mkdir(parents=True, exist_ok=True)
+                exp = [
+                    str(py),
+                    str(root / "scripts" / "export_bundle_action_sheet.py"),
+                    "--repo-root",
+                    str(root),
+                    "--bundle-json",
+                    str(out),
+                    "--html-out",
+                    str(html_out),
+                ]
+                r2 = subprocess.run(exp, cwd=str(root), env=env, capture_output=True, text=True)
+                if r2.stdout:
+                    print(r2.stdout, end="" if r2.stdout.endswith("\n") else "\n")
+                if r2.stderr:
+                    print(r2.stderr, file=sys.stderr, end="" if r2.stderr.endswith("\n") else "\n")
+                if r2.returncode != 0:
+                    return int(r2.returncode)
+                summary["html"] = str(html_out)
+            print(json.dumps(summary, indent=2))
         return 0
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

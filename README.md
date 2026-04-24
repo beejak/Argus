@@ -170,6 +170,8 @@ Use the venv interpreter for the helper itself when system Python lacks **`huggi
 "$(pwd)/.venv/bin/python" scripts/ephemeral_hub_scan.py --out /tmp/x.json --repo hf-internal-testing/tiny-random-GPT2Model
 ```
 
+After a successful scan, the helper also writes an **HTML briefing** next to the bundle JSON (same path with a ``.html`` suffix) via ``scripts/export_bundle_action_sheet.py``, unless you pass ``--no-html``. Override the HTML path with ``--html-out PATH``.
+
 Summarize any written bundle JSON: **`python3 scripts/summarize_bundle_json.py /tmp/ephemeral-gpt2.json`**.
 
 **Broaden candidate discovery (metadata, ≤200 MiB default):** search the Hub for small model repos before you download anything heavy::

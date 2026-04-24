@@ -1,6 +1,16 @@
 # Blast radius & leadership brief (sample Hub demos)
 
-This document is generated from the same three committed bundle JSON samples as [`UNIFIED_ACTION_SHEET.csv`](UNIFIED_ACTION_SHEET.csv). It answers: **if we ignored these static signals and deployed, what breaks — and who cares?**
+**Report generated (IST, Asia/Kolkata):** `2026-04-24T10:59:17+05:30`
+
+## Scan scope (model identity)
+
+| demo_id | title (briefing) | model name (Hub repo id) | source | revision | canonical URL |
+| ------- | ---------------- | ------------------------ | ------ | -------- | -------------- |
+| `01_baseline` | Baseline — permissive policy, no injected config risk | `hf-internal-testing/tiny-random-BertModel` | Hugging Face Hub | — | https://huggingface.co/hf-internal-testing/tiny-random-BertModel |
+| `02_demo_config_risk` | Same snapshot — demo tokenizer_config (trust_remote_code) | `hf-internal-testing/tiny-random-BertModel` | Hugging Face Hub | — | https://huggingface.co/hf-internal-testing/tiny-random-BertModel |
+| `03_strict_safetensors_only` | Same snapshot — safetensors-only policy (reject .bin/.onnx/.h5) | `hf-internal-testing/tiny-random-BertModel` | Hugging Face Hub | — | https://huggingface.co/hf-internal-testing/tiny-random-BertModel |
+
+This document is generated from the same inputs as [`UNIFIED_ACTION_SHEET.csv`](UNIFIED_ACTION_SHEET.csv) (committed bundle JSON samples unless you regenerated rows locally). It answers: **if we ignored these static signals and deployed, what breaks — and who cares?**
 
 > **Scope:** static admission + configlint only. It does **not** cover prompt abuse, toxicity, full supply-chain pen tests, or runtime guardrails. Treat as **one control column** in a broader AI governance program.
 
@@ -23,6 +33,11 @@ These rows are **scanner defaults** (what flips `aggregate_exit_code` in CI toda
 | `use_fast_tokenizer_truthy` | **NO (today)** | Much lower incident class than trust_remote_code in typical stacks: does not assert arbitrary Hub Python will run; flags legacy fast-tokenizer paths that complicate audits. | Engineering + audit follow-up; not an automatic emergency bridge. | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ \| THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md |
 | `use_auth_token_present` | **NO (today)** | Different class: credential exposure and secret sprawl risk, not the same as execute Hub code at load. | Secrets hygiene: rotate, remove from repos, use secret stores. | Hugging Face Hub — User access tokens — https://huggingface.co/docs/hub/security-tokens \| Hugging Face Hub — Secrets scanning — https://huggingface.co/docs/hub/security-secrets |
 | `use_safetensors_disabled` | **NO (today)** | Not remote code at load; it is a **weights format / deserialization posture** signal that pairs with `.bin` risk in threat models. | Align with org policy (safetensors-first); track as backlog unless policy makes it blocking. | Hugging Face — safetensors documentation — https://huggingface.co/docs/safetensors/index \| Hugging Face Hub — Pickle scanning — https://huggingface.co/docs/hub/security-pickle \| OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ |
+| `local_files_only_false` | **NO (today)** | Not the same as arbitrary Hub Python execution; it is a **remote fetch / mirror / integrity** posture signal. | Confirm mirror allowlists, revision pins, and egress controls; not automatic stop-the-line in default CI today. | Hugging Face Hub — Security — https://huggingface.co/docs/hub/security \| OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ |
+| `remote_pretrained_identifier_url` | **NO (today)** | Remote dependency / supply-chain signal, not the same statement as trust_remote_code execution class. | Review URL ownership, TLS pinning posture, and whether this belongs in prod configs at all. | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ \| NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework |
+| `tokenizer_subfolder_path_traversal` | **NO (today)** | Integrity / packaging issue class, not Hub RCE semantics by itself. | Tokenizer packaging review; escalate if archives are extracted without sandboxing. | THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md |
+| `http_proxies_configured` | **NO (today)** | Operational / secrets posture, not remote code execution at tokenizer load. | Redact for public repos; validate against corporate egress policy. | Hugging Face Hub — Secrets scanning — https://huggingface.co/docs/hub/security-secrets |
+| `torchscript_truthy` | **NO (today)** | Different mechanism; complicates reproducibility and review rather than asserting Hub Python execution. | Engineering review: confirm tracing is intentional and supported in your runtime. | OWASP GenAI — LLM Top 10 — https://genai.owasp.org/llm-top-10/ |
 | `policy.gate_violation` | **YES (policy gate)** | Governance and integrity posture, not the same statement as trust_remote_code unless policy explicitly encodes that equivalence. | Artifact/policy mismatch — waive with sign-off or remediate formats. | THREAT_MODEL_TAXONOMY.md (phase0) — https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md \| NIST AI RMF — https://www.nist.gov/itl/ai-risk-management-framework |
 
 ### How to use the score (1–5)

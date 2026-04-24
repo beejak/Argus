@@ -14,6 +14,7 @@ import json
 import sys
 from collections.abc import Iterable
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -209,6 +210,75 @@ def _hub_repo(data: dict[str, Any]) -> str:
     prov = data.get("provenance") or {}
     hub = prov.get("hub") or {}
     return str(hub.get("repo_id") or "(unknown hub)")
+
+
+def _ist_now_iso() -> str:
+    """India Standard Time (IST, UTC+05:30; Asia/Kolkata) for report headers and CSV.
+
+    Kolkata, Delhi, Mumbai, and the rest of India use this offset year-round (no DST).
+    ISO-8601 with ``+05:30`` suffix, second precision.
+    """
+    ist = timezone(timedelta(hours=5, minutes=30), name="IST")
+    return datetime.now(ist).replace(microsecond=0).isoformat()
+
+
+def _model_report_fields(data: dict[str, Any]) -> dict[str, str]:
+    """Name + source + revision + canonical URL from bundle provenance (Hub-first)."""
+    prov = data.get("provenance") if isinstance(data.get("provenance"), dict) else {}
+    hub = prov.get("hub") if isinstance(prov.get("hub"), dict) else {}
+    repo = str(hub.get("repo_id") or "").strip()
+    rev = str(hub.get("revision") or "").strip()
+    if repo and repo != "(unknown hub)":
+        url = f"https://huggingface.co/{repo}"
+        return {
+            "model_display_name": repo,
+            "model_source": "Hugging Face Hub",
+            "model_revision": rev,
+            "model_canonical_url": url,
+        }
+    return {
+        "model_display_name": "(unknown model)",
+        "model_source": "unspecified (no provenance.hub.repo_id in bundle JSON)",
+        "model_revision": rev,
+        "model_canonical_url": "",
+    }
+
+
+def _scan_scope_rows(demos: list[Demo], rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """One row per demo for HTML/MD scan-scope tables (uses EXEC_SUMMARY row fields)."""
+    out: list[dict[str, str]] = []
+    for demo in demos:
+        er = next(
+            (
+                r
+                for r in rows
+                if r.get("demo_id") == demo.demo_id and r.get("row_kind") == "EXEC_SUMMARY"
+            ),
+            None,
+        )
+        if er:
+            out.append(
+                {
+                    "demo_id": demo.demo_id,
+                    "demo_title": demo.title,
+                    "model_display_name": str(er.get("model_display_name") or ""),
+                    "model_source": str(er.get("model_source") or ""),
+                    "model_revision": str(er.get("model_revision") or ""),
+                    "model_canonical_url": str(er.get("model_canonical_url") or ""),
+                }
+            )
+        else:
+            out.append(
+                {
+                    "demo_id": demo.demo_id,
+                    "demo_title": demo.title,
+                    "model_display_name": "",
+                    "model_source": "",
+                    "model_revision": "",
+                    "model_canonical_url": "",
+                }
+            )
+    return out
 
 
 def _meaning_for_finding(rule_id: str | None, detail: str, title: str) -> tuple[str, str]:
@@ -1008,15 +1078,25 @@ def _blast_for_weight_clean(relpath: str) -> dict[str, str]:
     }
 
 
-def iter_rows(demo: Demo, data: dict[str, Any], repo_root: Path) -> Iterable[dict[str, str]]:
+def iter_rows(
+    demo: Demo,
+    data: dict[str, Any],
+    repo_root: Path,
+    *,
+    report_generated_at_iso: str | None = None,
+) -> Iterable[dict[str, str]]:
     hub = _hub_repo(data)
     agg = data.get("aggregate_exit_code")
     policy = str(data.get("policy_path") or "")
     policy_label = _policy_label(policy)
     verdict = _ship_verdict(agg)
     blast_exec = _blast_for_exec_summary(demo, data)
+    ts = (report_generated_at_iso or "").strip() or _ist_now_iso()
+    lineage = _model_report_fields(data)
+    common = {"report_generated_at": ts, **lineage}
 
     yield {
+        **common,
         "demo_id": demo.demo_id,
         "demo_title": demo.title,
         "row_kind": "EXEC_SUMMARY",
@@ -1046,6 +1126,7 @@ def iter_rows(demo: Demo, data: dict[str, Any], repo_root: Path) -> Iterable[dic
         meaning, nxt = _meaning_for_config(rule_id, msg)
         b = _blast_for_config(rule_id)
         yield {
+            **common,
             "demo_id": demo.demo_id,
             "demo_title": demo.title,
             "row_kind": "CONFIG",
@@ -1075,6 +1156,7 @@ def iter_rows(demo: Demo, data: dict[str, Any], repo_root: Path) -> Iterable[dic
         if not findings:
             b = _blast_for_weight_clean(rel)
             yield {
+                **common,
                 "demo_id": demo.demo_id,
                 "demo_title": demo.title,
                 "row_kind": "WEIGHT_FILE",
@@ -1109,6 +1191,7 @@ def iter_rows(demo: Demo, data: dict[str, Any], repo_root: Path) -> Iterable[dic
             meaning, nxt = _meaning_for_finding(rule_id, detail, title)
             b = _blast_for_finding(rule_id, rel)
             yield {
+                **common,
                 "demo_id": demo.demo_id,
                 "demo_title": demo.title,
                 "row_kind": "FINDING",
@@ -1132,6 +1215,11 @@ def iter_rows(demo: Demo, data: dict[str, Any], repo_root: Path) -> Iterable[dic
 
 
 FIELDNAMES = [
+    "report_generated_at",
+    "model_display_name",
+    "model_source",
+    "model_revision",
+    "model_canonical_url",
     "demo_id",
     "demo_title",
     "row_kind",
@@ -1209,8 +1297,65 @@ def _html_table_lines(title: str, cols: list[str], row_dicts: list[dict[str, str
     return lines
 
 
-def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_root: Path) -> None:
+def _html_report_scope_block(
+    demos: list[Demo], rows: list[dict[str, str]], report_ts: str
+) -> list[str]:
+    """Prominent report identity: IST time + per-demo model name, source, revision, Hub URL."""
+    scope = _scan_scope_rows(demos, rows)
+    lines: list[str] = [
+        '  <div class="report-meta">',
+        f'    <p class="muted"><strong>Report generated (IST, Asia/Kolkata):</strong> '
+        f'<code>{html.escape(report_ts)}</code></p>',
+        "    <h2>Scan scope (model identity)</h2>",
+        "    <p class=\"lead\">Each row is one scanned bundle. "
+        "<strong>Model name</strong> is the Hub <code>repo_id</code> when present in bundle provenance; "
+        "<strong>source</strong> names the registry or origin.</p>",
+        "    <table>",
+        "      <thead>",
+        "        <tr>",
+        "          <th>demo_id</th>",
+        "          <th>title (briefing)</th>",
+        "          <th>model name (Hub repo id)</th>",
+        "          <th>source</th>",
+        "          <th>revision</th>",
+        "          <th>canonical URL</th>",
+        "        </tr>",
+        "      </thead>",
+        "      <tbody>",
+    ]
+    for s in scope:
+        url = (s.get("model_canonical_url") or "").strip()
+        rev = (s.get("model_revision") or "").strip()
+        url_cell = (
+            f'<a href="{html.escape(url)}">{html.escape(url)}</a>' if url else "—"
+        )
+        rev_cell = html.escape(rev) if rev else "—"
+        lines.extend(
+            [
+                "        <tr>",
+                f"          <td>{html.escape(s.get('demo_id', ''))}</td>",
+                f"          <td>{html.escape(s.get('demo_title', ''))}</td>",
+                f"          <td>{html.escape(s.get('model_display_name', ''))}</td>",
+                f"          <td>{html.escape(s.get('model_source', ''))}</td>",
+                f"          <td>{rev_cell}</td>",
+                f"          <td>{url_cell}</td>",
+                "        </tr>",
+            ]
+        )
+    lines.extend(["      </tbody>", "    </table>", "  </div>"])
+    return lines
+
+
+def write_html(
+    path: Path,
+    demos: list[Demo],
+    rows: list[dict[str, str]],
+    repo_root: Path,
+    *,
+    report_generated_at_iso: str | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    report_ts = (report_generated_at_iso or "").strip() or _ist_now_iso()
     raw_url = f"{_DEFAULT_HTML_RAW_BASE}/{path.name}"
     githack_url = raw_url.replace(
         "https://raw.githubusercontent.com/",
@@ -1245,11 +1390,18 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_r
         "    code { font-size: 0.88em; }",
         "    details { margin-top: 1rem; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 12px; }",
         "    summary { cursor: pointer; font-weight: 600; }",
+        "    .report-meta { margin: 1rem 0 1.25rem; padding: 12px 14px; border: 1px solid #ddd; "
+        "border-radius: 6px; background: #fafafa; }",
+        "    .report-meta h2 { margin-top: 0; }",
         "    @media print { body { margin: 12px; } a { color: #000; text-decoration: none; } }",
         "  </style>",
         "</head>",
         "<body>",
         "  <h1>Bundle scan — human briefing + blast radius</h1>",
+    ]
+    lines.extend(_html_report_scope_block(demos, rows, report_ts))
+    lines.extend(
+        [
         "  <p class=\"callout\">",
         "    <strong>Seeing raw HTML on github.com?</strong> That is expected — GitHub does not render ",
         "    HTML inside repos. Open this file from your machine (double-click after clone) or use a ",
@@ -1258,8 +1410,8 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_r
         "    More options: ",
         f"    <a href=\"{html.escape(readme_url)}\">actionable/README.md</a>.",
         "  </p>",
-        "  <p class=\"muted\">Generated from committed sample bundle JSON. ",
-        "  For a PDF: use your browser <strong>Print → Save as PDF</strong> on this page.</p>",
+        "  <p class=\"muted\">Inputs are the bundle JSON file(s) behind each demo row in the scan scope table. ",
+        "For a PDF: use your browser <strong>Print → Save as PDF</strong> on this page.</p>",
         "  <p class=\"lead\">",
         "    <strong>For leadership:</strong> start with the <em>Executive dashboard</em> (one row per demo). ",
         "    <strong>Signal</strong> is a traffic light for this static gate only. ",
@@ -1279,7 +1431,8 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_r
         "    <code>trust_remote_code</code> as the reference “worst static loader” story. ",
         "    Citations come from <code>docs/reporting/decision_support_rule_catalog.json</code> when present.",
         "  </p>",
-    ]
+        ]
+    )
     lines.extend(
         _html_table_lines(
             "Config signals vs trust_remote_code (default CI facts)",
@@ -1296,8 +1449,13 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_r
 
     exec_rows = [r for r in rows if r.get("row_kind") == "EXEC_SUMMARY"]
     dash_cols = [
+        "report_generated_at",
         "demo_id",
         "demo_title",
+        "model_display_name",
+        "model_source",
+        "model_revision",
+        "model_canonical_url",
         "signal_light",
         "exec_risk_score_1_to_5",
         "recommended_decision",
@@ -1375,15 +1533,43 @@ def write_html(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_r
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
-def write_blast_radius_md(path: Path, demos: list[Demo], rows: list[dict[str, str]], repo_root: Path) -> None:
+def write_blast_radius_md(
+    path: Path,
+    demos: list[Demo],
+    rows: list[dict[str, str]],
+    repo_root: Path,
+    *,
+    report_generated_at_iso: str | None = None,
+) -> None:
     """Markdown brief for executives: prod impact + blast radius per issue class."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    report_ts = (report_generated_at_iso or "").strip() or _ist_now_iso()
     lines: list[str] = [
         "# Blast radius & leadership brief (sample Hub demos)",
         "",
-        "This document is generated from the same three committed bundle JSON samples as "
-        "[`UNIFIED_ACTION_SHEET.csv`](UNIFIED_ACTION_SHEET.csv). It answers: **if we ignored "
-        "these static signals and deployed, what breaks — and who cares?**",
+        f"**Report generated (IST, Asia/Kolkata):** `{report_ts}`",
+        "",
+        "## Scan scope (model identity)",
+        "",
+        "| demo_id | title (briefing) | model name (Hub repo id) | source | revision | canonical URL |",
+        "| ------- | ---------------- | ------------------------ | ------ | -------- | -------------- |",
+    ]
+    for s in _scan_scope_rows(demos, rows):
+        url = (s.get("model_canonical_url") or "").strip()
+        rev = (s.get("model_revision") or "").strip() or "—"
+        title_esc = (s.get("demo_title") or "").replace("|", "\\|")
+        lines.append(
+            f"| `{s.get('demo_id', '')}` | {title_esc} | `{s.get('model_display_name', '')}` | "
+            f"{(s.get('model_source') or '').replace('|', '\\|')} | "
+            f"{rev.replace('|', '\\|')} | {url.replace('|', '\\|')} |"
+        )
+    lines.extend(
+        [
+            "",
+            "This document is generated from the same inputs as "
+            "[`UNIFIED_ACTION_SHEET.csv`](UNIFIED_ACTION_SHEET.csv) (committed bundle JSON samples "
+            "unless you regenerated rows locally). It answers: **if we ignored "
+            "these static signals and deployed, what breaks — and who cares?**",
         "",
         "> **Scope:** static admission + configlint only. It does **not** cover prompt abuse, "
         "toxicity, full supply-chain pen tests, or runtime guardrails. Treat as **one control "
@@ -1403,7 +1589,8 @@ def write_blast_radius_md(path: Path, demos: list[Demo], rows: list[dict[str, st
         "",
         "| Config rule / topic | Blocks default CI today? | Compared to `trust_remote_code` | Leadership takeaway | Reference citations |",
         "| --------------------- | ------------------------- | ------------------------------ | ------------------- | ------------------- |",
-    ]
+        ],
+    )
     for row in _decision_legend_rows(repo_root):
         cit = (row.get("reference_citations") or "").replace("|", "\\|")
         lines.append(
@@ -1553,6 +1740,22 @@ def main() -> int:
         help="Repository root (default: parent of scripts/)",
     )
     ap.add_argument(
+        "--bundle-json",
+        type=Path,
+        default=None,
+        help="Render HTML (and optional CSV/MD) from a single bundle_report.v2 JSON instead of default demos",
+    )
+    ap.add_argument(
+        "--demo-id",
+        default="ephemeral_hub",
+        help="Demo id label when using --bundle-json (default: ephemeral_hub)",
+    )
+    ap.add_argument(
+        "--demo-title",
+        default=None,
+        help="Title row when using --bundle-json (default: derived from bundle provenance.hub.repo_id)",
+    )
+    ap.add_argument(
         "--csv-out",
         type=Path,
         default=None,
@@ -1572,22 +1775,52 @@ def main() -> int:
     )
     args = ap.parse_args()
     root: Path = args.repo_root.resolve()
+
+    if args.bundle_json is not None:
+        bundle_json = Path(args.bundle_json).resolve()
+        if not bundle_json.is_file():
+            print(f"ERROR: missing bundle JSON: {bundle_json}", file=sys.stderr)
+            return 2
+        data = json.loads(bundle_json.read_text(encoding="utf-8"))
+        demo_id = str(args.demo_id or "ephemeral_hub").strip() or "ephemeral_hub"
+        demo_title = (args.demo_title or "").strip() or f"Hub scan — {_hub_repo(data)}"
+        demo = Demo(demo_id, demo_title, bundle_json)
+        report_ts = _ist_now_iso()
+        rows = list(iter_rows(demo, data, root, report_generated_at_iso=report_ts))
+        html_out = (args.html_out or bundle_json.with_suffix(".html")).resolve()
+        html_out.parent.mkdir(parents=True, exist_ok=True)
+        write_html(html_out, [demo], rows, root, report_generated_at_iso=report_ts)
+        out_obj: dict[str, object] = {"html": str(html_out), "rows": len(rows)}
+        if args.csv_out is not None:
+            csv_out = Path(args.csv_out).resolve()
+            csv_out.parent.mkdir(parents=True, exist_ok=True)
+            write_csv(csv_out, rows)
+            out_obj["csv"] = str(csv_out)
+        if args.md_out is not None:
+            md_out = Path(args.md_out).resolve()
+            md_out.parent.mkdir(parents=True, exist_ok=True)
+            write_blast_radius_md(md_out, [demo], rows, root, report_generated_at_iso=report_ts)
+            out_obj["md"] = str(md_out)
+        print(json.dumps(out_obj, indent=2))
+        return 0
+
     csv_out = (args.csv_out or (root / "docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv")).resolve()
     html_out = (args.html_out or (root / "docs/sample_reports/actionable/SCAN_BRIEFING.html")).resolve()
     md_out = (args.md_out or (root / "docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md")).resolve()
 
     demos = default_demos(root)
+    report_ts = _ist_now_iso()
     rows: list[dict[str, str]] = []
     for d in demos:
         if not d.json_path.is_file():
             print(f"ERROR: missing {d.json_path}", file=sys.stderr)
             return 2
         data = json.loads(d.json_path.read_text(encoding="utf-8"))
-        rows.extend(iter_rows(d, data, root))
+        rows.extend(iter_rows(d, data, root, report_generated_at_iso=report_ts))
 
     write_csv(csv_out, rows)
-    write_html(html_out, demos, rows, root)
-    write_blast_radius_md(md_out, demos, rows, root)
+    write_html(html_out, demos, rows, root, report_generated_at_iso=report_ts)
+    write_blast_radius_md(md_out, demos, rows, root, report_generated_at_iso=report_ts)
     print(
         json.dumps(
             {"csv": str(csv_out), "html": str(html_out), "md": str(md_out), "rows": len(rows)},
