@@ -174,4 +174,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** **`hf_bundle_scanner/configlint.py`** (non-blocking signals: `local_files_only_false`, `remote_pretrained_identifier_url`, `tokenizer_subfolder_path_traversal`, `http_proxies_configured`, `torchscript_truthy`); tests; **`docs/policy/configlint_rule_defaults.json`** + **`docs/reporting/decision_support_rule_catalog.json`**; **`scripts/export_bundle_action_sheet.py`** (catalog drift tuple + legend order); **`scripts/export_plain_english_brief.py`**; **`scripts/hub_find_models_under_size.py`** (**`--probe-configlint`**, **`--probe-trust-remote-code`** as alias); README + LONG_HORIZON harness.
 - **Commands:** `make agent-verify`; bounded Hub: `.venv/bin/python scripts/hub_find_models_under_size.py --queries tiny,distil --per-query 4 --max-mb 200 --probe-configlint --max-probes 2`.
 
+### 2026-04-25 — `git commit` / “trailer requires a value” (WSL + PowerShell)
+
+- **Phase:** harness / developer ergonomics.
+- **Finding:** Not a stray `trailer.*` line in `~/.gitconfig` / repo config. With `set -x`, PowerShell-sourced `wsl -d Ubuntu -- bash -lc "… git commit --allow-empty …"` can arrive in bash as `git commit --trailer` (mangled argv), which triggers `error: option 'trailer' requires a value`.
+- **Mitigation:** From PowerShell, prefer `wsl --% …`, single-quote the whole `bash -lc '…'` script, or run commits inside an interactive WSL shell. **`scripts/git_doctor.py`** documents the pitfall.
+
 ---

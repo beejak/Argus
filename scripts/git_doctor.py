@@ -58,6 +58,17 @@ def main() -> int:
 
     print("\nTip: if `git commit -m ...` fails with `option trailer requires a value`,")
     print("use `git commit -F FILE`, `make commit-msg MSG=...`, or `python3 scripts/git_commit_via_file.py`.")
+
+    print("\n--- WSL from Windows PowerShell (no bad trailer line in ~/.gitconfig) ---")
+    print(
+        "If `bash -lc \"... git commit --allow-empty ...\"` fails and `set -x` shows "
+        "`git commit --trailer`, PowerShell/WSL argument parsing mangled the `-lc` string "
+        "(it is not usually a `trailer.*` git config entry)."
+    )
+    print(
+        "Fix: use `wsl --% ...`, single-quote the entire `bash -lc '...'` script in PowerShell, "
+        "or run the commit from an interactive WSL shell instead of a one-liner from PowerShell."
+    )
     return 0
 
 
