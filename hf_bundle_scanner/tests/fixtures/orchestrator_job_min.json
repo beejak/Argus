@@ -1,0 +1,16 @@
+{
+  "schema": "llm_scanner.orchestrator_job.v1",
+  "run_id": "fixture-min",
+  "steps": [
+    { "id": "bundle_scan", "type": "scan_bundle", "depends_on": [] },
+    { "id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan"] }
+  ],
+  "scan_bundle": {
+    "root": "minimal_tree",
+    "policy": "policy.permissive.json",
+    "out": "/tmp/orchestrator_bundle_out.json",
+    "drivers": "",
+    "timeout": 600,
+    "fail_on": "MEDIUM"
+  }
+}

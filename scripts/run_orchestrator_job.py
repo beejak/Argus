@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""Validate or run a phase-4 orchestrator job document (v1).
+
+``scan_bundle`` execution delegates to ``python -m hf_bundle_scanner scan`` (same CLI as ``scan-bundle``).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import uuid
+from pathlib import Path
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parent.parent
+
+
+def _pick_python() -> Path:
+    env = os.environ.get("HF_BUNDLE_PYTHON")
+    if env:
+        return Path(env)
+    root = _repo_root()
+    for p in (root / ".venv" / "bin" / "python", root / ".venv" / "Scripts" / "python.exe"):
+        if p.is_file():
+            return p
+    return Path(sys.executable)
+
+
+def _resolve(job_dir: Path, p: str) -> Path:
+    pp = Path(p)
+    return pp if pp.is_absolute() else (job_dir / pp).resolve()
+
+
+def _scan_argv(*, py: Path, sb: dict[str, object], root: Path, policy: Path, out: Path) -> list[str]:
+    cmd: list[str] = [str(py), "-m", "hf_bundle_scanner", "scan", "--root", str(root), "--policy", str(policy), "--out", str(out)]
+    drivers = sb.get("drivers", "")
+    if drivers is not None and str(drivers).strip() != "":
+        cmd.extend(["--drivers", str(drivers)])
+    if "timeout" in sb and sb["timeout"] is not None:
+        cmd.extend(["--timeout", str(int(sb["timeout"]))])  # type: ignore[arg-type]
+    if _is_non_empty_str(sb.get("fail_on")):
+        cmd.extend(["--fail-on", str(sb["fail_on"]).strip()])
+    if sb.get("no_manifest") is True:
+        cmd.append("--no-manifest")
+    if _is_non_empty_str(sb.get("hub_repo")):
+        cmd.extend(["--hub-repo", str(sb["hub_repo"]).strip()])
+    if _is_non_empty_str(sb.get("hub_revision")):
+        cmd.extend(["--hub-revision", str(sb["hub_revision"]).strip()])
+    if _is_non_empty_str(sb.get("mirror_allowlist")):
+        cmd.extend(["--mirror-allowlist", str(sb["mirror_allowlist"]).strip()])
+    if _is_non_empty_str(sb.get("sbom_uri")):
+        cmd.extend(["--sbom-uri", str(sb["sbom_uri"]).strip()])
+    return cmd
+
+
+def _is_non_empty_str(v: object) -> bool:
+    return isinstance(v, str) and bool(v.strip())
+
+
+def main(argv: list[str] | None = None) -> int:
+    root = _repo_root()
+    sys.path.insert(0, str(root / "hf_bundle_scanner"))
+    from hf_bundle_scanner.orchestrator_job import (  # noqa: PLC0415
+        build_envelope,
+        load_job,
+        validate_job,
+    )
+
+    ap = argparse.ArgumentParser(description=__doc__)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    pv = sub.add_parser("validate", help="Validate job JSON (no subprocess)")
+    pv.add_argument("--job", type=Path, required=True)
+    pv.add_argument("--no-strict", action="store_true", help="Skip on-disk path checks")
+
+    pr = sub.add_parser("run", help="Validate, run scan_bundle step, write envelope JSON")
+    pr.add_argument("--job", type=Path, required=True)
+    pr.add_argument("--envelope-out", type=Path, required=True)
+    pr.add_argument("--python", type=Path, default=None, help="Override interpreter (default HF_BUNDLE_PYTHON or .venv)")
+
+    args = ap.parse_args(argv)
+    job_path: Path = args.job.resolve()
+    doc = load_job(job_path)
+    strict = not bool(getattr(args, "no_strict", False))
+
+    if args.cmd == "validate":
+        errs = validate_job(doc, job_path=job_path, strict_paths=strict)
+        if errs:
+            print(json.dumps({"errors": errs}, indent=2))
+            return 2
+        print(json.dumps({"ok": True}, indent=2))
+        return 0
+
+    if args.cmd == "run":
+        errs = validate_job(doc, job_path=job_path, strict_paths=True)
+        if errs:
+            print(json.dumps({"errors": errs}, indent=2))
+            return 2
+        sb = doc["scan_bundle"]
+        assert isinstance(sb, dict)
+        job_dir = job_path.parent
+        r = _resolve(job_dir, str(sb["root"]))
+        pol = _resolve(job_dir, str(sb["policy"]))
+        out = _resolve(job_dir, str(sb["out"]))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        py = Path(args.python) if args.python is not None else _pick_python()
+        cmd = _scan_argv(py=py, sb=sb, root=r, policy=pol, out=out)
+        # Match Makefile harness: run the module with CWD at the Python project root.
+        p = subprocess.run(cmd, cwd=str(root / "hf_bundle_scanner"))
+        scan_exit = int(p.returncode)
+        agg = scan_exit
+        if out.is_file():
+            try:
+                rep = json.loads(out.read_text(encoding="utf-8"))
+                if isinstance(rep, dict) and rep.get("aggregate_exit_code") is not None:
+                    agg = int(rep["aggregate_exit_code"])
+            except (OSError, json.JSONDecodeError, TypeError, ValueError):
+                agg = 2
+        scan_id = next(str(s["id"]) for s in doc["steps"] if s.get("type") == "scan_bundle")
+        run_id = str(doc.get("run_id") or "").strip() or str(uuid.uuid4())
+        env = build_envelope(
+            run_id=run_id,
+            scan_step_id=scan_id,
+            bundle_path=out,
+            scan_exit=scan_exit,
+            aggregate_exit=agg,
+        )
+        args.envelope_out.parent.mkdir(parents=True, exist_ok=True)
+        args.envelope_out.write_text(json.dumps(env, indent=2), encoding="utf-8")
+        return int(agg)
+
+    return 4
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

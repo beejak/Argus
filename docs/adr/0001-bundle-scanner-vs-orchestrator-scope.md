@@ -42,3 +42,4 @@ Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. Dynamic pr
 
 - [PRODUCTION_SCANNER_ROADMAP.md](../PRODUCTION_SCANNER_ROADMAP.md)
 - Plain-language sample outputs: [../sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md](../sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md)
+- Runner + validator entrypoint: [`../scripts/run_orchestrator_job.py`](../scripts/run_orchestrator_job.py)

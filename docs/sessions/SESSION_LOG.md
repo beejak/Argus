@@ -186,4 +186,9 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Gate:** `make agent-verify` green (`.agent/pytest-last.exit` **0**).
 - **Changes:** **`docs/PRODUCTION_SCANNER_ROADMAP.md`** — phase 3 marked **shipped** (configlint + policy + catalog + Hub probe); **phase 4** marked **current** with pointers. **`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`** — status **accepted for design**; added job-graph sketch, correlation split (orchestrator envelope vs optional bundle provenance), acceptance criteria for first orchestrator slice.
 
+### 2026-04-25 — Orchestrator job v1 (validate + run)
+
+- **Phase:** `phase4-orchestrator-scope` (code slice).
+- **Changes:** **`hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py`**; **`hf_bundle_scanner/tests/test_orchestrator_job.py`** + fixture **`hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`**; **`scripts/run_orchestrator_job.py`**; **`make orchestrator-validate`**; roadmap line under phase 4.
+
 ---

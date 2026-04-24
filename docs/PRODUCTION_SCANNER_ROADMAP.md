@@ -39,6 +39,7 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 
 - **Goal:** define the **composition layer above** `scan-bundle` — job graph, fan-out/fan-in, budgets, correlation — without turning `hf_bundle_scanner` into an orchestrator (see ADR).
 - **Working artifacts:** [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](adr/0001-bundle-scanner-vs-orchestrator-scope.md) (scope + job-graph sketch + acceptance criteria for the first orchestrator slice).
+- **Shipped (v1 slice):** job document validator (`hf_bundle_scanner.orchestrator_job`), fixture `hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`, runner `scripts/run_orchestrator_job.py`, **`make orchestrator-validate`**.
 - **Next:** refine ADR into implementation tickets; add **`run_id` / correlation** story (orchestrator envelope vs optional bundle `provenance` field); stub or reference external job-runner repo only when execution shape is agreed.
 
 ## Ten capability pillars (summary)
