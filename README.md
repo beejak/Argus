@@ -156,7 +156,21 @@ make ephemeral-hub-scan OUT=/tmp/ephemeral-bundle.json
 
 # Same, but force a configlint “trust_remote_code” hit for demos (JSON-only; not malware)
 make ephemeral-hub-scan OUT=/tmp/ephemeral-risk.json INJECT=1
+
+# Another *benign* internal test snapshot (still has pickle-era ``pytorch_model.bin`` on disk):
+make ephemeral-hub-scan OUT=/tmp/ephemeral-gpt2.json EPHEMERAL_FLAGS="--repo hf-internal-testing/tiny-random-GPT2Model"
+
+# Richer multi-format Bart test weights + injected tokenizer risk → aggregate exit 1:
+make ephemeral-hub-scan OUT=/tmp/ephemeral-bart-risk.json INJECT=1 EPHEMERAL_FLAGS="--repo hf-internal-testing/tiny-random-BartModel"
 ```
+
+Use the venv interpreter for the helper itself when system Python lacks **`huggingface_hub`**:
+
+```bash
+"$(pwd)/.venv/bin/python" scripts/ephemeral_hub_scan.py --out /tmp/x.json --repo hf-internal-testing/tiny-random-GPT2Model
+```
+
+Summarize any written bundle JSON: **`python3 scripts/summarize_bundle_json.py /tmp/ephemeral-gpt2.json`**.
 
 Advanced flags are passed through **`EPHEMERAL_FLAGS`** (see **`make help`**). **Do not** use this path to fetch or execute known-offensive artifacts; for red-team payloads use an **org-approved** lab and separate policy.
 
@@ -401,6 +415,7 @@ scan-bundle scan \
 | [`scripts/export_bundle_action_sheet.py`](scripts/export_bundle_action_sheet.py) | Bundle JSON → **CSV + HTML +** `BLAST_RADIUS_LEADERSHIP.md` (OWASP + board call + catalog citations) | `python3 scripts/export_bundle_action_sheet.py` · optional `--repo-root` / `--csv-out` / `--html-out` / `--md-out` |
 | [`scripts/export_plain_english_brief.py`](scripts/export_plain_english_brief.py) | Same sample JSON → **`PLAIN_ENGLISH_BRIEF.md`** (non-technical approver narrative) | `python3 scripts/export_plain_english_brief.py` · optional `--out` / `--repo-root` |
 | [`scripts/redact_ephemeral_report.py`](scripts/redact_ephemeral_report.py) | Strip ephemeral `/tmp/hf-ephemeral-*` paths before committing a sample | `python3 scripts/redact_ephemeral_report.py /tmp/in.json docs/sample_reports/out.json` |
+| [`scripts/summarize_bundle_json.py`](scripts/summarize_bundle_json.py) | Short stdout summary of a bundle JSON (paths, exits, configlint hits) | `python3 scripts/summarize_bundle_json.py /tmp/ephemeral-gpt2.json` |
 | [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py) | **`make agent-verify`** backend; writes **`.agent/pytest-last.log`** | `make agent-verify` |
 | [`scripts/git_commit_via_file.py`](scripts/git_commit_via_file.py) | Commit when `git commit -m` / trailers misbehave | `python3 scripts/git_commit_via_file.py 'subject line'` |
 | [`scripts/git_doctor.py`](scripts/git_doctor.py) | Diagnose trailer / identity issues | `make git-doctor` |

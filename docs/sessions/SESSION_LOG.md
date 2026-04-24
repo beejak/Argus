@@ -156,4 +156,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** Root `README.md` “plain English” section + maintenance note; **`scripts/export_plain_english_brief.py`** → **`docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md`** (does not modify CSV/HTML/`BLAST_RADIUS_LEADERSHIP.md`); **`make plain-english-brief`**, **`make sample-reports-all`**; actionable README + harness + roadmap link; **`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`**.
 - **Commands:** `make plain-english-brief` or `make sample-reports-all`.
 
+### 2026-04-24 — ephemeral Hub drills (GPT2 + Bart internal test weights)
+
+- **Phase:** harness / ops validation (network).
+- **Commands (WSL, venv python):** ephemeral download → `scan-bundle` → delete tree for **`hf-internal-testing/tiny-random-GPT2Model`** (aggregate **0**, includes `pytorch_model.bin`) and **`hf-internal-testing/tiny-random-BartModel`** with **`--inject-demo-tokenizer-risk`** (aggregate **1**, `trust_remote_code_enabled`). Summarized with **`scripts/summarize_bundle_json.py`**.
+- **Changes:** **`scripts/summarize_bundle_json.py`**; **`ephemeral_hub_scan.py`** docstring (example repos + venv note); README ephemeral section + helper-scripts table.
+
 ---

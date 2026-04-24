@@ -4,6 +4,18 @@
 This is for **manual / opt-in** demos (network + disk). It does **not** ship or execute
 pickle exploits. Use ``--inject-demo-tokenizer-risk`` only to synthesize a **configlint**
 signal (``trust_remote_code``) for teaching — not a supply-chain trojan.
+
+**Interpreter:** run with the repo venv so ``huggingface_hub`` is importable, e.g.
+``"/path/to/LLM Scanner/.venv/bin/python" scripts/ephemeral_hub_scan.py ...``
+(plain ``python3`` on minimal systems may lack the dependency).
+
+**Example repos (benign Hugging Face *test* weights — good for format / policy demos):**
+
+- ``hf-internal-testing/tiny-random-BertModel`` — default; multi-format teaching snapshot.
+- ``hf-internal-testing/tiny-random-GPT2Model`` — smaller alternative; still ships ``pytorch_model.bin``.
+- ``hf-internal-testing/tiny-random-BartModel`` — richer ONNX surface + ``pytorch_model.bin``;
+  pair with ``--inject-demo-tokenizer-risk`` to see **aggregate exit 1** from configlint
+  without downloading known-malicious content.
 """
 
 from __future__ import annotations
