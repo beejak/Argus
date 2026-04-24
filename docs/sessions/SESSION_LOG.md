@@ -180,4 +180,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Finding:** Not a stray `trailer.*` line in `~/.gitconfig` / repo config. With `set -x`, PowerShell-sourced `wsl -d Ubuntu -- bash -lc "… git commit --allow-empty …"` can arrive in bash as `git commit --trailer` (mangled argv), which triggers `error: option 'trailer' requires a value`.
 - **Mitigation:** From PowerShell, prefer `wsl --% …`, single-quote the whole `bash -lc '…'` script, or run commits inside an interactive WSL shell. **`scripts/git_doctor.py`** documents the pitfall.
 
+### 2026-04-25 — Phase 3 OSS slice closed; Phase 4 orchestrator scope opened
+
+- **Phase:** roadmap / ADR (`phase3-configlint-oss` → **`phase4-orchestrator-scope`**).
+- **Gate:** `make agent-verify` green (`.agent/pytest-last.exit` **0**).
+- **Changes:** **`docs/PRODUCTION_SCANNER_ROADMAP.md`** — phase 3 marked **shipped** (configlint + policy + catalog + Hub probe); **phase 4** marked **current** with pointers. **`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`** — status **accepted for design**; added job-graph sketch, correlation split (orchestrator envelope vs optional bundle provenance), acceptance criteria for first orchestrator slice.
+
 ---

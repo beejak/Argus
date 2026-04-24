@@ -24,15 +24,22 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 
 - **Ephemeral Hub demo:** [`scripts/ephemeral_hub_scan.py`](../scripts/ephemeral_hub_scan.py) + **`make ephemeral-hub-scan`** — download a **small** public Hub snapshot, run **`scan-bundle scan`**, write bundle JSON, **delete** the working tree (opt-in / manual; network).
 - **Committed sample reports:** [`docs/sample_reports/`](../docs/sample_reports/) (raw bundle JSON) + **[`docs/sample_reports/actionable/`](../docs/sample_reports/actionable/)** — CSV / HTML / leadership Markdown with **traffic-light**, **1–5 score**, **OWASP LLM touchpoints**, and links to [`THREAT_MODEL_TAXONOMY.md`](THREAT_MODEL_TAXONOMY.md); regenerate via **`make sample-action-sheets`** ([`scripts/export_bundle_action_sheet.py`](../scripts/export_bundle_action_sheet.py)).
-- **Configlint expansion:** tokenizer / loader hints including **`use_fast_tokenizer_truthy`**, **`use_auth_token_present`**, **`trust_remote_code`**, **`auto_map`**, **`use_safetensors`**, invalid JSON — see [`hf_bundle_scanner/configlint.py`](../hf_bundle_scanner/hf_bundle_scanner/configlint.py). Only **`CONFIG_RISK_RULE_IDS`** in [`dispatch.py`](../hf_bundle_scanner/hf_bundle_scanner/dispatch.py) escalates **`aggregate_exit_code`** today (mirrored in [`docs/policy/configlint_rule_defaults.json`](policy/configlint_rule_defaults.json)).
+- **Configlint expansion (phase 2 starter):** tokenizer / loader hints — see [`hf_bundle_scanner/configlint.py`](../hf_bundle_scanner/hf_bundle_scanner/configlint.py); full **`rule_id`** set and policy alignment are tracked under **phase 3** above.
 - **ModelScan / ModelAudit (shipped in `model-admission`):** subprocess drivers **`modelscan`**, **`modelaudit`** registered in [`model_admission/drivers/`](../model-admission/model_admission/drivers/); integration tests skip when binaries are absent. **`scan-bundle scan --drivers modelscan,modelaudit`** is supported; **`make drivers-help`** lists driver names + env overrides; bundle aggregate treats missing tooling as **exit 2** (see `hf_bundle_scanner` README + `tests/test_dispatch.py`).
 - **Next (still phase 2 lane):** optional commercial static adapters behind explicit policy; richer driver output mapping (`rule_id` / taxonomy on every finding row).
 
-### Phase 3 status (`phase3-configlint-oss`, in progress)
+### Phase 3 status (`phase3-configlint-oss`, OSS starter **shipped**)
 
-- **Widen OSS signals:** e.g. **`use_safetensors_disabled`** (explicit `use_safetensors: false`) — see [`configlint.py`](../hf_bundle_scanner/hf_bundle_scanner/configlint.py).
-- **Org policy template:** [`docs/policy/configlint_rule_defaults.json`](policy/configlint_rule_defaults.json) lists every emitted **`rule_id`** with **`default_aggregate_escalates`** aligned to **`CONFIG_RISK_RULE_IDS`** in [`dispatch.py`](../hf_bundle_scanner/hf_bundle_scanner/dispatch.py); drift-tested in **`hf_bundle_scanner/tests/test_configlint_policy_template.py`**. Narrative + citations remain in [`docs/reporting/decision_support_rule_catalog.json`](reporting/decision_support_rule_catalog.json).
-- **Next:** more loader/tokenizer heuristics (careful false-positive budget); optional org overrides consumed by CI (future).
+- **Widen OSS signals:** tokenizer / loader heuristics in [`configlint.py`](../hf_bundle_scanner/hf_bundle_scanner/configlint.py) — including **`trust_remote_code`**, **`auto_map`**, **`use_auth_token`**, **`use_fast_tokenizer`**, **`use_safetensors_disabled`**, **`local_files_only_false`**, **`remote_pretrained_identifier_url`**, **`tokenizer_subfolder_path_traversal`**, **`http_proxies_configured`**, **`torchscript_truthy`**, invalid JSON. Only **`CONFIG_RISK_RULE_IDS`** in [`dispatch.py`](../hf_bundle_scanner/hf_bundle_scanner/dispatch.py) escalates the bundle aggregate today (mirrored in policy JSON below).
+- **Org policy template:** [`docs/policy/configlint_rule_defaults.json`](policy/configlint_rule_defaults.json) lists every emitted **`rule_id`** with **`default_aggregate_escalates`** aligned to **`CONFIG_RISK_RULE_IDS`**; drift-tested in **`hf_bundle_scanner/tests/test_configlint_policy_template.py`**. Narrative + citations in [`docs/reporting/decision_support_rule_catalog.json`](reporting/decision_support_rule_catalog.json); exports + plain-English brief stay aligned.
+- **Hub discovery:** [`scripts/hub_find_models_under_size.py`](../scripts/hub_find_models_under_size.py) optional **`--probe-configlint`** (metadata search → tiny JSON download → `lint_config_file`).
+- **Next (still phase-3 lane / backlog):** optional org overrides consumed by CI; graduate additional `rule_id`s to **`CONFIG_RISK_RULE_IDS`** only with measured false-positive budget; keep widening OSS signals behind the same policy + catalog discipline.
+
+### Phase 4 status (`phase4-orchestrator-scope`, **current**)
+
+- **Goal:** define the **composition layer above** `scan-bundle` — job graph, fan-out/fan-in, budgets, correlation — without turning `hf_bundle_scanner` into an orchestrator (see ADR).
+- **Working artifacts:** [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](adr/0001-bundle-scanner-vs-orchestrator-scope.md) (scope + job-graph sketch + acceptance criteria for the first orchestrator slice).
+- **Next:** refine ADR into implementation tickets; add **`run_id` / correlation** story (orchestrator envelope vs optional bundle `provenance` field); stub or reference external job-runner repo only when execution shape is agreed.
 
 ## Ten capability pillars (summary)
 
@@ -65,7 +72,7 @@ Starter ADR (bundle vs orchestrator): [`docs/adr/0001-bundle-scanner-vs-orchestr
 | 7 | `phase7-runtime-guards` | Integration guides + optional guard adapters |
 | 8 | `phase8-observability` | `scanner_versions`, correlation IDs, ledger/SIEM shape |
 
-**Dependency order:** 0 → (1 ∥ 2 ∥ 3) → 4 → (5 / 6 / 7 as policy-gated) → 8.
+**Dependency order:** 0 → (1 ∥ 2 ∥ 3) → **4 (current)** → (5 / 6 / 7 as policy-gated) → 8.
 
 ## External references (issues)
 
