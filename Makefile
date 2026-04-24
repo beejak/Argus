@@ -3,7 +3,7 @@
 VENVDIR ?= .venv
 PY := $(abspath $(VENVDIR))/bin/python
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets drivers-help
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help
 
 help:
 	@echo "LLM Scanner harness"
@@ -20,6 +20,8 @@ help:
 	@echo "  make slogan-dry-run   - print next README slogan (no file writes)"
 	@echo "  make ephemeral-hub-scan - Hub download → scan → delete (needs OUT=/path.json; optional INJECT=1)"
 	@echo "  make sample-action-sheets - regenerate docs/sample_reports/actionable/* from sample JSON"
+	@echo "  make plain-english-brief  - non-technical PLAIN_ENGLISH_BRIEF.md (same samples; does not touch CSV/HTML/blast MD)"
+	@echo "  make sample-reports-all - action sheets + plain-English brief"
 	@echo "  make drivers-help       - list model-admission scan drivers + env overrides"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
@@ -94,6 +96,11 @@ ephemeral-hub-scan:
 
 sample-action-sheets:
 	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/export_bundle_action_sheet.py"
+
+plain-english-brief:
+	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/export_plain_english_brief.py"
+
+sample-reports-all: sample-action-sheets plain-english-brief
 
 drivers-help:
 	@"$(PY)" -c "from model_admission.drivers import DRIVERS; \

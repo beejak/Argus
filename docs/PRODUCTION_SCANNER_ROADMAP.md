@@ -51,6 +51,8 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 
 ## Phases (non-overlapping todos)
 
+Starter ADR (bundle vs orchestrator): [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](adr/0001-bundle-scanner-vs-orchestrator-scope.md).
+
 | Phase | Todo id | Role |
 | ----- | ------- | ---- |
 | 0 | `phase0-foundations` | Threat model, `rule_id` taxonomy, OWASP mapping, severity→exit contract |

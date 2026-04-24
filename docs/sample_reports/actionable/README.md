@@ -4,6 +4,7 @@ The raw bundle reports are JSON (`hf_bundle_scanner.bundle_report.v2`). If you w
 
 | File | What it is | Best for |
 | ---- | ---------- | -------- |
+| [`PLAIN_ENGLISH_BRIEF.md`](PLAIN_ENGLISH_BRIEF.md) | **Non-technical approver read:** same three demos, **everyday language** (“stop / pass for this check / who to call”). Does **not** replace the detailed sheets. | Exec or legal **first read** before the technical tables. |
 | [`BLAST_RADIUS_LEADERSHIP.md`](BLAST_RADIUS_LEADERSHIP.md) | **Leadership / steering:** prod impact, **blast radius**, and a roll-up of **every** signal per demo (generated from the same JSON as the CSV). | Exec readout, risk committee appendix, Confluence paste. |
 | [`UNIFIED_ACTION_SHEET.csv`](UNIFIED_ACTION_SHEET.csv) | One spreadsheet: **three demos** + columns **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**. | Excel / Sheets: filter by `demo_id`, sort by `risk_rating`. |
 | [`SCAN_BRIEFING.html`](SCAN_BRIEFING.html) | Tables: **leadership blast-radius** section first, then full detail. | Screen readout; **Print → Save as PDF** for a fixed artifact. |
@@ -53,7 +54,19 @@ Dynamic/runtime risks (e.g. **LLM01** prompt injection) are **out of scope** for
 From repo root:
 
 ```bash
+make sample-reports-all
+```
+
+Technical sheets only (CSV / HTML / `BLAST_RADIUS_LEADERSHIP.md`):
+
+```bash
 python3 scripts/export_bundle_action_sheet.py
+```
+
+Plain-language brief only (does **not** overwrite the three technical artifacts above):
+
+```bash
+python3 scripts/export_plain_english_brief.py
 ```
 
 Optional paths:

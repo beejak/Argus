@@ -25,6 +25,23 @@
 
 ---
 
+## What this repo does (plain English)
+
+**Who this is for:** engineering leads, security / risk partners, and executives who need a **yes/no/hold** story without reading JSON or spreadsheets first.
+
+**What we actually do:** we take a **folder of model-related files** (weights, configs, and similar artifacts) and run **automated, offline-friendly checks** on them. Think “a release gate for the **files you are about to trust**,” not “we proved your chatbot will behave.”
+
+**What you get out of it:**
+
+- A **traffic-light style signal** for “did our default static gate object?” — useful in CI and procurement conversations.
+- **Separate outputs:** engineers can use the detailed tables/CSV; approvers can start with a **plain-language brief** of the same sample scans ([`docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md`](docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md)).
+
+**What we do *not* do (yet):** we do **not** replace human judgment, legal review, or full red-teaming. Phases **5–8** on the roadmap add optional dynamic probes, richer supply-chain evidence, runtime guardrails, and observability — see [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md).
+
+**Keeping this section honest:** when a roadmap **phase** lands user-visible behavior, update **this blurb** in the same change when you can, and regenerate **`PLAIN_ENGLISH_BRIEF.md`** with **`make plain-english-brief`** (or **`make sample-reports-all`** after changing sample JSON).
+
+---
+
 ## What this repository does
 
 | Capability | Where | In plain language |
@@ -170,14 +187,15 @@ Snapshot paths are **redacted** to `/tmp/<ephemeral-hub-demo>` for readability. 
 
 If the JSON feels opaque, open the **human briefing pack** first:
 
-- **[`docs/sample_reports/actionable/README.md`](docs/sample_reports/actionable/README.md)** — how to read the columns.
+- **[`docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md`](docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md)** — **non-technical** “what should we do?” narrative for the same three demos (regenerate: **`make plain-english-brief`**).
+- **[`docs/sample_reports/actionable/README.md`](docs/sample_reports/actionable/README.md)** — how to read the **technical** columns.
 - **[`docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md`](docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md)** — **leadership brief**: executive **dashboard** (signal + 1–5 score + **OWASP LLM** touchpoints + board decision), then blast-radius narrative and issue roll-up.
 - **[`docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv`](docs/sample_reports/actionable/UNIFIED_ACTION_SHEET.csv)** — one spreadsheet with **all three demos** (filter on `demo_id`) including **`risk_rating`**, **`prod_impact_if_shipped`**, **`blast_radius`**, **`exec_one_liner`**, plus **decision-support** columns (**`reference_citations`**, **`owasp_genai_catalog_hint`**, **`decision_catalog_version`**) sourced from [`docs/reporting/decision_support_rule_catalog.json`](docs/reporting/decision_support_rule_catalog.json).
 - **[`docs/sample_reports/actionable/SCAN_BRIEFING.html`](docs/sample_reports/actionable/SCAN_BRIEFING.html)** — the same story as tables in a browser (leadership section first). **GitHub’s repo file view shows HTML as source only** — open locally or use the rendered preview link in [`actionable/README.md`](docs/sample_reports/actionable/README.md).
 
 **PDF (no extra tooling):** open `SCAN_BRIEFING.html` in a real browser → **Print** → **Save as PDF**.
 
-Regenerate after changing sample JSON: `python3 scripts/export_bundle_action_sheet.py` (also `make sample-action-sheets`; optional `--repo-root` if not run from the repo root).
+Regenerate after changing sample JSON: `make sample-reports-all` (technical sheets + plain brief), or separately `make sample-action-sheets` / `make plain-english-brief`. The bundle exporter also accepts optional `--repo-root` if not run from the repo root.
 
 | Artifact | One-line meaning |
 | -------- | ---------------- |
@@ -303,6 +321,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | ----- | ----- |
 | Agent entry + commands | [AGENTS.md](AGENTS.md) |
 | Phased roadmap (0–8) | [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) |
+| ADR starter (bundle vs orchestrator, phase 4) | [docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md](docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md) |
 | Threat model & OWASP mapping | [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md) |
 | Pytest & test-case index | [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md) |
 | Hermes / MCP boundaries | [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md) |
@@ -313,6 +332,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Agent pytest artifacts (local) | [`.agent/README.md`](.agent/README.md) |
 | Live Hub sample bundle JSON | [docs/sample_reports/](docs/sample_reports/) |
 | Human briefing + blast radius (CSV / HTML / MD) | [docs/sample_reports/actionable/](docs/sample_reports/actionable/) |
+| Plain-language approver brief (same samples) | [docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md](docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md) |
 | Decision-support rule catalog (exports + citations) | [docs/reporting/](docs/reporting/) |
 | Org **configlint** escalation template (fork for CI/policy) | [docs/policy/](docs/policy/) |
 | Cursor long-horizon skill | [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md) |
@@ -331,6 +351,8 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | `make commit-msg MSG='…'` | Commit via `git commit -F` (safer quoting) |
 | `make ephemeral-hub-scan` | `OUT=/tmp/report.json` — live Hub download → scan → delete tree ([`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py); optional `INJECT=1`) |
 | `make sample-action-sheets` | Regenerate [`docs/sample_reports/actionable/`](docs/sample_reports/actionable/) (CSV, HTML, leadership MD) from committed sample JSON |
+| `make plain-english-brief` | Write [`PLAIN_ENGLISH_BRIEF.md`](docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md) only (does not overwrite CSV/HTML/blast MD) |
+| `make sample-reports-all` | Runs **`sample-action-sheets`** then **`plain-english-brief`** |
 | `make drivers-help` | Print **`model-admission`** scan driver names (`modelscan`, `modelaudit`) and **`MODELSCAN_BIN` / `MODELAUDIT_BIN`** hints (after `make install`) |
 
 You can also run `make` from **`hf_bundle_scanner/`**; that Makefile forwards to the root.
@@ -377,6 +399,7 @@ scan-bundle scan \
 | ------ | ------- | ------- |
 | [`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py) | Hub **`snapshot_download`** → **`scan-bundle`** → delete temp tree | `HF_BUNDLE_PYTHON="$(pwd)/.venv/bin/python" python3 scripts/ephemeral_hub_scan.py --out /tmp/r.json` · optional `--inject-demo-tokenizer-risk` · `--policy` path |
 | [`scripts/export_bundle_action_sheet.py`](scripts/export_bundle_action_sheet.py) | Bundle JSON → **CSV + HTML +** `BLAST_RADIUS_LEADERSHIP.md` (OWASP + board call + catalog citations) | `python3 scripts/export_bundle_action_sheet.py` · optional `--repo-root` / `--csv-out` / `--html-out` / `--md-out` |
+| [`scripts/export_plain_english_brief.py`](scripts/export_plain_english_brief.py) | Same sample JSON → **`PLAIN_ENGLISH_BRIEF.md`** (non-technical approver narrative) | `python3 scripts/export_plain_english_brief.py` · optional `--out` / `--repo-root` |
 | [`scripts/redact_ephemeral_report.py`](scripts/redact_ephemeral_report.py) | Strip ephemeral `/tmp/hf-ephemeral-*` paths before committing a sample | `python3 scripts/redact_ephemeral_report.py /tmp/in.json docs/sample_reports/out.json` |
 | [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py) | **`make agent-verify`** backend; writes **`.agent/pytest-last.log`** | `make agent-verify` |
 | [`scripts/git_commit_via_file.py`](scripts/git_commit_via_file.py) | Commit when `git commit -m` / trailers misbehave | `python3 scripts/git_commit_via_file.py 'subject line'` |
@@ -390,7 +413,7 @@ scan-bundle scan \
 | ------ | ----------- | --------- |
 | **`.agent/pytest-last.log`** | `make agent-verify` | CI debugging, agent session |
 | **`docs/sample_reports/*.json`** | `scripts/ephemeral_hub_scan.py` (then redact paths) | Engineering evidence of bundle schema |
-| **`docs/sample_reports/actionable/*`** | `make sample-action-sheets` | **Leadership / risk**: CSV, printable HTML, `BLAST_RADIUS_LEADERSHIP.md` ([index](docs/sample_reports/actionable/README.md)) |
+| **`docs/sample_reports/actionable/*`** | `make sample-reports-all` (or `make sample-action-sheets` + `make plain-english-brief`) | **Leadership / risk**: CSV, HTML, `BLAST_RADIUS_LEADERSHIP.md` + **`PLAIN_ENGLISH_BRIEF.md`** ([index](docs/sample_reports/actionable/README.md)) |
 
 ---
 

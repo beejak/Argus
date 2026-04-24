@@ -150,4 +150,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 
 - **Changes:** Root `README.md` — reporting / CLI / doc hub / Makefile table aligned with **`CONFIG_RISK_RULE_IDS`**, **`docs/policy/`**, **`docs/reporting/`**, new actionable CSV columns, **`make drivers-help`**, **`MODELSCAN_BIN` / `MODELAUDIT_BIN`**, export **`--repo-root`** note.
 
+### 2026-04-24 — plain-English approver brief + README blurb + phase4 ADR stub
+
+- **Phase:** reporting UX + `phase4-orchestrator-scope` (ADR only).
+- **Changes:** Root `README.md` “plain English” section + maintenance note; **`scripts/export_plain_english_brief.py`** → **`docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md`** (does not modify CSV/HTML/`BLAST_RADIUS_LEADERSHIP.md`); **`make plain-english-brief`**, **`make sample-reports-all`**; actionable README + harness + roadmap link; **`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`**.
+- **Commands:** `make plain-english-brief` or `make sample-reports-all`.
+
 ---
