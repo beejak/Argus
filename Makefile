@@ -3,7 +3,7 @@
 VENVDIR ?= .venv
 PY := $(abspath $(VENVDIR))/bin/python
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size
 
 help:
 	@echo "LLM Scanner harness"
@@ -23,6 +23,7 @@ help:
 	@echo "  make plain-english-brief  - non-technical PLAIN_ENGLISH_BRIEF.md (same samples; does not touch CSV/HTML/blast MD)"
 	@echo "  make sample-reports-all - action sheets + plain-English brief"
 	@echo "  make drivers-help       - list model-admission scan drivers + env overrides"
+	@echo "  make hub-find-models-under-size - Hub metadata search for repos under --max-mb (default 200; needs network)"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
 install:
@@ -107,3 +108,7 @@ drivers-help:
 print('Known admit-model drivers:', ', '.join(sorted(DRIVERS))); \
 print('Env overrides: MODELSCAN_BIN, MODELAUDIT_BIN'); \
 print('Bundle scan: scan-bundle scan ... --drivers modelscan,modelaudit')"
+
+# HF_HUB_FIND_FLAGS="--max-mb 200 --per-query 12" etc. (network)
+hub-find-models-under-size:
+	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/hub_find_models_under_size.py" $(HF_HUB_FIND_FLAGS)

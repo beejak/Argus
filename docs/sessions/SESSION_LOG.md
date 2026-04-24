@@ -162,4 +162,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands (WSL, venv python):** ephemeral download → `scan-bundle` → delete tree for **`hf-internal-testing/tiny-random-GPT2Model`** (aggregate **0**, includes `pytorch_model.bin`) and **`hf-internal-testing/tiny-random-BartModel`** with **`--inject-demo-tokenizer-risk`** (aggregate **1**, `trust_remote_code_enabled`). Summarized with **`scripts/summarize_bundle_json.py`**.
 - **Changes:** **`scripts/summarize_bundle_json.py`**; **`ephemeral_hub_scan.py`** docstring (example repos + venv note); README ephemeral section + helper-scripts table.
 
+### 2026-04-24 — Hub metadata search under 200 MiB
+
+- **Phase:** harness / discovery (network).
+- **Changes:** **`scripts/hub_find_models_under_size.py`** (default **`--max-mb 200`**, broad query set, optional **`--probe-trust-remote-code`**); **`make hub-find-models-under-size`** + **`HF_HUB_FIND_FLAGS`**; README + LONG_HORIZON harness + delegating **`hf_bundle_scanner/Makefile`**.
+- **Commands:** `make hub-find-models-under-size` or `.venv/bin/python scripts/hub_find_models_under_size.py --max-mb 200 --per-query 12`.
+
 ---
