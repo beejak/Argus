@@ -46,3 +46,41 @@ def test_use_safetensors_omitted_no_finding(tmp_path: Path) -> None:
     p.write_text(json.dumps({"model_type": "bert"}), encoding="utf-8")
     fs = lint_config_file(p)
     assert not any(f.rule_id == "use_safetensors_disabled" for f in fs)
+
+
+def test_local_files_only_false_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"local_files_only": False}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "local_files_only_false" for f in fs)
+
+
+def test_remote_pretrained_url_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps({"pretrained_model_name_or_path": "https://example.invalid/model"}),
+        encoding="utf-8",
+    )
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "remote_pretrained_identifier_url" for f in fs)
+
+
+def test_tokenizer_subfolder_traversal_finding(tmp_path: Path) -> None:
+    p = tmp_path / "tokenizer_config.json"
+    p.write_text(json.dumps({"subfolder": "../evil"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "tokenizer_subfolder_path_traversal" for f in fs)
+
+
+def test_http_proxies_configured(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"proxies": {"http": "http://proxy:8080"}}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "http_proxies_configured" for f in fs)
+
+
+def test_torchscript_truthy(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"torchscript": True}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "torchscript_truthy" for f in fs)

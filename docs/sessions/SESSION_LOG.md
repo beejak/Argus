@@ -168,4 +168,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** **`scripts/hub_find_models_under_size.py`** (default **`--max-mb 200`**, broad query set, optional **`--probe-trust-remote-code`**); **`make hub-find-models-under-size`** + **`HF_HUB_FIND_FLAGS`**; README + LONG_HORIZON harness + delegating **`hf_bundle_scanner/Makefile`**.
 - **Commands:** `make hub-find-models-under-size` or `.venv/bin/python scripts/hub_find_models_under_size.py --max-mb 200 --per-query 12`.
 
+### 2026-04-25 — configlint breadth + Hub probe
+
+- **Phase:** configlint / reporting / harness (network optional).
+- **Changes:** **`hf_bundle_scanner/configlint.py`** (non-blocking signals: `local_files_only_false`, `remote_pretrained_identifier_url`, `tokenizer_subfolder_path_traversal`, `http_proxies_configured`, `torchscript_truthy`); tests; **`docs/policy/configlint_rule_defaults.json`** + **`docs/reporting/decision_support_rule_catalog.json`**; **`scripts/export_bundle_action_sheet.py`** (catalog drift tuple + legend order); **`scripts/export_plain_english_brief.py`**; **`scripts/hub_find_models_under_size.py`** (**`--probe-configlint`**, **`--probe-trust-remote-code`** as alias); README + LONG_HORIZON harness.
+- **Commands:** `make agent-verify`; bounded Hub: `.venv/bin/python scripts/hub_find_models_under_size.py --queries tiny,distil --per-query 4 --max-mb 200 --probe-configlint --max-probes 2`.
+
 ---

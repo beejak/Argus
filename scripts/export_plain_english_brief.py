@@ -114,6 +114,31 @@ def _plain_config_message(msg: str) -> str:
             "The config explicitly turns off the safer weights format preference in this file. "
             "Ask whether your org still accepts older weight formats in production."
         )
+    if "local_files_only" in low and "false" in low:
+        return (
+            "The config allows the loader to reach out to the Hub (or mirrors) for files at load time. "
+            "Confirm revision pinning, egress policy, and whether production should stay offline-only."
+        )
+    if "points to a url" in low or "remote dependency" in low:
+        return (
+            "A pretrained pointer in the config is a raw http(s) URL — treat it like any other remote "
+            "dependency for ownership, TLS, and integrity controls."
+        )
+    if "subfolder" in low and ("path escape" in low or ".." in low):
+        return (
+            "Tokenizer packaging references a suspicious subfolder path (traversal or absolute-style). "
+            "Review how archives are extracted and what files could be pulled in."
+        )
+    if "proxies" in low and ("non-empty" in low or "egress" in low):
+        return (
+            "The config embeds proxy settings. Check for accidental credential leakage and that corporate "
+            "egress rules still match what you ship."
+        )
+    if "torchscript" in low and "truthy" in low:
+        return (
+            "TorchScript / tracing is enabled in config. That is usually an engineering and audit-surface "
+            "topic rather than an automatic emergency by itself."
+        )
     if "invalid json" in low:
         return "At least one JSON config file does not parse — treat this as a broken build until fixed."
     return m

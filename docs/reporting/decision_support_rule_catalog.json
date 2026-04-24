@@ -1,5 +1,5 @@
 {
-  "catalog_version": "2026-04-24",
+  "catalog_version": "2026-04-25",
   "maintainer_note": "Keep synchronized with hf_bundle_scanner/hf_bundle_scanner/configlint.py (emitted rule_id values) and hf_bundle_scanner/hf_bundle_scanner/dispatch.py (which configlint rule_ids set config_risk / aggregate exit). Add new rows when configlint grows; cite primary standards (OWASP GenAI / NIST / vendor docs).",
   "global_references": [
     {
@@ -142,6 +142,94 @@
           "title": "Hugging Face Hub — Pickle scanning",
           "url": "https://huggingface.co/docs/hub/security-pickle"
         },
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
+        }
+      ]
+    },
+    {
+      "rule_id": "local_files_only_false",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM03"],
+      "owasp_note": "Supply-chain / egress: explicit permission to fetch remote Hub content at load vs offline-only posture.",
+      "vs_trust_remote_code": "Not the same as arbitrary Hub Python execution; it is a **remote fetch / mirror / integrity** posture signal.",
+      "legend_takeaway": "Confirm mirror allowlists, revision pins, and egress controls; not automatic stop-the-line in default CI today.",
+      "expert_guidance": "Pair with provenance fields: decide whether prod should ever load without local_files_only, and document exceptions.",
+      "references": [
+        {
+          "title": "Hugging Face Hub — Security",
+          "url": "https://huggingface.co/docs/hub/security"
+        },
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
+        }
+      ]
+    },
+    {
+      "rule_id": "remote_pretrained_identifier_url",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM03"],
+      "owasp_note": "Treat http(s) pretrained pointers like remote dependencies with their own integrity and availability risks.",
+      "vs_trust_remote_code": "Remote dependency / supply-chain signal, not the same statement as trust_remote_code execution class.",
+      "legend_takeaway": "Review URL ownership, TLS pinning posture, and whether this belongs in prod configs at all.",
+      "expert_guidance": "Prefer revision-pinned Hub ids over raw URLs where possible; log waivers when URLs are intentional.",
+      "references": [
+        {
+          "title": "OWASP GenAI — LLM Top 10",
+          "url": "https://genai.owasp.org/llm-top-10/"
+        },
+        {
+          "title": "NIST AI RMF",
+          "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+        }
+      ]
+    },
+    {
+      "rule_id": "tokenizer_subfolder_path_traversal",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM03"],
+      "owasp_note": "Path confusion / packaging integrity — can hide unexpected files when combined with naive extraction.",
+      "vs_trust_remote_code": "Integrity / packaging issue class, not Hub RCE semantics by itself.",
+      "legend_takeaway": "Tokenizer packaging review; escalate if archives are extracted without sandboxing.",
+      "expert_guidance": "Reject suspicious subfolders in CI for public-facing bundles unless explicitly approved.",
+      "references": [
+        {
+          "title": "THREAT_MODEL_TAXONOMY.md (phase0)",
+          "url": "https://github.com/beejak/Argus/blob/main/docs/THREAT_MODEL_TAXONOMY.md"
+        }
+      ]
+    },
+    {
+      "rule_id": "http_proxies_configured",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM06"],
+      "owasp_note": "Egress + secret sprawl: proxy tables in configs sometimes carry credentials or reveal internal network topology.",
+      "vs_trust_remote_code": "Operational / secrets posture, not remote code execution at tokenizer load.",
+      "legend_takeaway": "Redact for public repos; validate against corporate egress policy.",
+      "expert_guidance": "Rotate anything that looks like embedded credentials; prefer environment-based proxy config in prod.",
+      "references": [
+        {
+          "title": "Hugging Face Hub — Secrets scanning",
+          "url": "https://huggingface.co/docs/hub/security-secrets"
+        }
+      ]
+    },
+    {
+      "rule_id": "torchscript_truthy",
+      "emitted_by": "configlint",
+      "blocks_default_ci": false,
+      "owasp_llm_codes_hint": ["LLM03"],
+      "owasp_note": "Tracing / serialization surfaces add audit and supply-chain complexity adjacent to deployment risk.",
+      "vs_trust_remote_code": "Different mechanism; complicates reproducibility and review rather than asserting Hub Python execution.",
+      "legend_takeaway": "Engineering review: confirm tracing is intentional and supported in your runtime.",
+      "expert_guidance": "If you standardize on eager-only serving, track this as drift; not a default CI blocker today.",
+      "references": [
         {
           "title": "OWASP GenAI — LLM Top 10",
           "url": "https://genai.owasp.org/llm-top-10/"

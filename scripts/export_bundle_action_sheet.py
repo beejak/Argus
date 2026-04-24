@@ -119,6 +119,11 @@ def _validate_catalog_blocking(cat: dict[str, Any]) -> None:
             "use_fast_tokenizer_truthy",
             "use_auth_token_present",
             "use_safetensors_disabled",
+            "local_files_only_false",
+            "remote_pretrained_identifier_url",
+            "tokenizer_subfolder_path_traversal",
+            "http_proxies_configured",
+            "torchscript_truthy",
         ):
             if flag:
                 print(
@@ -785,6 +790,11 @@ def _decision_legend_rows(repo_root: Path) -> list[dict[str, str]]:
         "use_fast_tokenizer_truthy",
         "use_auth_token_present",
         "use_safetensors_disabled",
+        "local_files_only_false",
+        "remote_pretrained_identifier_url",
+        "tokenizer_subfolder_path_traversal",
+        "http_proxies_configured",
+        "torchscript_truthy",
         "policy.gate_violation",
     ]
     rows: list[dict[str, str]] = []

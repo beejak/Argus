@@ -1,6 +1,6 @@
 {
   "schema": "llm_scanner.configlint_org_policy.v1",
-  "version": "2026-04-24",
+  "version": "2026-04-25",
   "description": "Default classification for configlint rule_id values. default_aggregate_escalates must match hf_bundle_scanner.dispatch.CONFIG_RISK_RULE_IDS (enforced by hf_bundle_scanner/tests/test_configlint_policy_template.py).",
   "code_reference": "hf_bundle_scanner.dispatch.CONFIG_RISK_RULE_IDS",
   "rules": [
@@ -39,6 +39,36 @@
       "default_aggregate_escalates": false,
       "signal_class": "weights_format_posture",
       "notes": "Explicit opt-out of safetensors; pairs with pickle-era weight risk in threat models."
+    },
+    {
+      "rule_id": "local_files_only_false",
+      "default_aggregate_escalates": false,
+      "signal_class": "remote_fetch_posture",
+      "notes": "Explicit opt-out of offline-only loads; supply-chain / mirror / egress story."
+    },
+    {
+      "rule_id": "remote_pretrained_identifier_url",
+      "default_aggregate_escalates": false,
+      "signal_class": "remote_dependency_url",
+      "notes": "Pretrained pointer is an http(s) URL; treat as a remote dependency with integrity controls."
+    },
+    {
+      "rule_id": "tokenizer_subfolder_path_traversal",
+      "default_aggregate_escalates": false,
+      "signal_class": "path_integrity",
+      "notes": "Tokenizer subfolder looks like traversal / absolute escape; packaging / extraction review."
+    },
+    {
+      "rule_id": "http_proxies_configured",
+      "default_aggregate_escalates": false,
+      "signal_class": "egress_and_secrets",
+      "notes": "Non-empty proxies object; watch for embedded credentials and egress policy drift."
+    },
+    {
+      "rule_id": "torchscript_truthy",
+      "default_aggregate_escalates": false,
+      "signal_class": "tracing_surface",
+      "notes": "TorchScript / tracing enabled; complicates audits and supply-chain review vs eager-only loads."
     }
   ]
 }

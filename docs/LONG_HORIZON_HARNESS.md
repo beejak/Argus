@@ -20,7 +20,7 @@ Feedback loop: [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (append mistakes and fix
 | `make drivers-help` | Print `model-admission` scan driver names (`modelscan`, `modelaudit`) + `MODELSCAN_BIN` / `MODELAUDIT_BIN` hints (needs `make install`) |
 | `make plain-english-brief` | Write `docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md` (non-technical; does not overwrite CSV/HTML/blast MD) |
 | `make sample-reports-all` | `sample-action-sheets` + `plain-english-brief` |
-| `make hub-find-models-under-size` | Hub metadata search for repos under **`HF_HUB_FIND_FLAGS`** (default script flags: `--max-mb 200`; needs network) |
+| `make hub-find-models-under-size` | Hub metadata search for repos under **`HF_HUB_FIND_FLAGS`** (default script flags: `--max-mb 200`; optional **`--probe-configlint`**; needs network) |
 
 Delegate from `hf_bundle_scanner/` with `make -C .. <target>` (see that folder’s stub Makefile).
 
