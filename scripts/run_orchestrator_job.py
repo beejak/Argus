@@ -7,7 +7,8 @@
 ``run_id`` (from the job or generated), optional ``parent_run_id``, and ``steps`` for ``scan_bundle``,
 optional ``dynamic_probe`` (see job schema in ``hf_bundle_scanner.orchestrator_job``), and ``aggregate``
 with RFC 3339 UTC timestamps and ``file:`` artifact URIs. When present, ``dynamic_probe`` receives
-``run_id`` and optional budget flags from the job document.
+``run_id`` and optional dynamic settings from the job document (budgets, garak config path,
+model target, required secret env-var names).
 """
 from __future__ import annotations
 
@@ -174,6 +175,14 @@ def main(argv: list[str] | None = None) -> int:
                 probe_cmd.extend(["--budget-max-probes", str(int(dpo["budget_max_probes"]))])
             if dpo.get("budget_timeout_seconds") is not None:
                 probe_cmd.extend(["--budget-timeout-seconds", str(int(dpo["budget_timeout_seconds"]))])
+            if _is_non_empty_str(dpo.get("garak_config")):
+                gcfg = _resolve(job_dir, str(dpo["garak_config"]))
+                probe_cmd.extend(["--garak-config", str(gcfg)])
+            if _is_non_empty_str(dpo.get("model_target")):
+                probe_cmd.extend(["--model-target", str(dpo["model_target"]).strip()])
+            sev = dpo.get("secret_env_vars")
+            if isinstance(sev, list) and sev:
+                probe_cmd.extend(["--secret-env-vars", ",".join(str(x).strip() for x in sev if str(x).strip())])
             t_dp_start = _utc_now()
             probe = subprocess.run(
                 probe_cmd,

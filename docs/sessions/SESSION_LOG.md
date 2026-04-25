@@ -216,4 +216,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `pytest tests/test_dynamic_probe_report.py tests/test_orchestrator_job.py -q`; `make test`; `make lint`; `python3 scripts/run_tests_for_agent.py`.
 - **Next:** define real Garak config surface (beyond `--help`) and secret-handling fields while keeping default CI opt-in.
 
+### 2026-04-25 — Phase 5 config + secret metadata pass
+
+- **Phase:** `phase5-dynamic-staging` (`phase5-garak-config-budgets`, continued).
+- **Changes:** `run_dynamic_probe.py` adds `--garak-config`, `--model-target`, `--secret-env-vars` (names only); enforces missing required secret vars when dynamic lane is enabled; optional `--garak-config` checked as file and used in `garak --config ... --help`; `dynamic_probe_report.v1` includes `garak_config`, `model_target`, `secret_env_vars_required`, `secret_env_vars_missing`; orchestrator validator/runner now validate and forward these fields; fixture + tests expanded.
+- **Commands:** targeted pytest (`test_dynamic_probe_report.py`, `test_orchestrator_job.py`), `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`.
+- **Next:** move from metadata/preflight toward real policy-governed probe execution scenarios while preserving default deterministic CI.
+
 ---

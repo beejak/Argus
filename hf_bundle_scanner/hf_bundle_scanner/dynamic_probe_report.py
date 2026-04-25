@@ -20,6 +20,10 @@ def build_report(
     budget_max_probes: int | None = None,
     budget_timeout_seconds: int | None = None,
     run_id: str | None = None,
+    garak_config: str | None = None,
+    model_target: str | None = None,
+    secret_env_vars_required: list[str] | None = None,
+    secret_env_vars_missing: list[str] | None = None,
     garak_cli: str | None = None,
 ) -> dict[str, Any]:
     """Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
@@ -40,6 +44,14 @@ def build_report(
         out["budget_timeout_seconds"] = int(budget_timeout_seconds)
     if run_id:
         out["run_id"] = str(run_id).strip()
+    if garak_config:
+        out["garak_config"] = str(garak_config).strip()
+    if model_target:
+        out["model_target"] = str(model_target).strip()
+    if secret_env_vars_required:
+        out["secret_env_vars_required"] = [str(x).strip() for x in secret_env_vars_required if str(x).strip()]
+    if secret_env_vars_missing:
+        out["secret_env_vars_missing"] = [str(x).strip() for x in secret_env_vars_missing if str(x).strip()]
     if garak_cli:
         out["garak_cli"] = str(garak_cli).strip()
     return out

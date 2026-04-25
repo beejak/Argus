@@ -1,0 +1,7 @@
+plugins:
+  probes:
+    - always
+generator:
+  name: stub
+reporting:
+  output: jsonl

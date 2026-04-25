@@ -191,6 +191,33 @@ def test_dynamic_probe_budget_fields_must_be_positive_ints() -> None:
     assert any("budget_timeout_seconds" in e for e in errs)
 
 
+def test_dynamic_probe_secret_env_vars_must_be_string_array() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "dyn", "type": "dynamic_probe", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "dyn"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "dynamic_probe": {
+            "out": "dyn.json",
+            "secret_env_vars": "OPENAI_API_KEY",
+        },
+    }
+    errs = validate_job(doc)
+    assert any("secret_env_vars" in e for e in errs)
+
+
+def test_dynamic_probe_garak_config_must_exist_under_strict_paths() -> None:
+    p = _fixture("orchestrator_job_with_dynamic.json")
+    doc = load_job(p)
+    assert isinstance(doc["dynamic_probe"], dict)
+    doc["dynamic_probe"]["garak_config"] = "no-such-garak-config.yaml"
+    errs = validate_job(doc, job_path=p, strict_paths=True)
+    assert any("dynamic_probe.garak_config not a file" in e for e in errs)
+
+
 def test_build_envelope_three_steps(tmp_path: Path) -> None:
     bundle = tmp_path / "bundle.json"
     bundle.write_text("{}", encoding="utf-8")
@@ -255,6 +282,9 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
             "out": str(dp_out),
             "budget_max_probes": 7,
             "budget_timeout_seconds": 120,
+            "garak_config": str(repo / "hf_bundle_scanner/tests/fixtures/garak.dynamic.stub.yaml"),
+            "model_target": "fixture://model",
+            "secret_env_vars": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"],
         },
     }
     job_path = tmp_path / "job.json"
@@ -277,6 +307,9 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
     dp = json.loads(dp_out.read_text(encoding="utf-8"))
     assert dp["run_id"] == job["run_id"]
     assert dp["budget_timeout_seconds"] == 120
+    assert dp["garak_config"].endswith("garak.dynamic.stub.yaml")
+    assert dp["model_target"] == "fixture://model"
+    assert dp["secret_env_vars_required"] == ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
 
 
 def test_build_envelope_parent_run_id(tmp_path: Path) -> None:

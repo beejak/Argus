@@ -17,6 +17,9 @@
   "dynamic_probe": {
     "out": "/tmp/orchestrator_dynamic_out_fixture.json",
     "budget_max_probes": 10,
-    "budget_timeout_seconds": 120
+    "budget_timeout_seconds": 120,
+    "garak_config": "garak.dynamic.stub.yaml",
+    "model_target": "local://fixture-model",
+    "secret_env_vars": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
   }
 }

@@ -162,6 +162,16 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
                         errs.append("dynamic_probe.budget_timeout_seconds must be >= 1 when provided")
                 except (TypeError, ValueError):
                     errs.append("dynamic_probe.budget_timeout_seconds must be an integer when provided")
+            if "garak_config" in dp_obj and dp_obj.get("garak_config") is not None:
+                if not _is_non_empty_str(dp_obj.get("garak_config")):
+                    errs.append("dynamic_probe.garak_config must be a non-empty string when provided")
+            if "model_target" in dp_obj and dp_obj.get("model_target") is not None:
+                if not _is_non_empty_str(dp_obj.get("model_target")):
+                    errs.append("dynamic_probe.model_target must be a non-empty string when provided")
+            if "secret_env_vars" in dp_obj and dp_obj.get("secret_env_vars") is not None:
+                sev = dp_obj.get("secret_env_vars")
+                if not isinstance(sev, list) or not all(_is_non_empty_str(x) for x in sev):
+                    errs.append("dynamic_probe.secret_env_vars must be an array of non-empty strings when provided")
 
     dpr = doc.get("dynamic_probe")
     if isinstance(dpr, dict) and bool(dpr) and dp_id is None:
@@ -194,6 +204,10 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
             if _is_non_empty_str(dpo.get("out")):
                 outp = _rp(str(dpo.get("out", "")))
                 outp.parent.mkdir(parents=True, exist_ok=True)
+            if _is_non_empty_str(dpo.get("garak_config")):
+                gcfg = _rp(str(dpo.get("garak_config", "")))
+                if not gcfg.is_file():
+                    errs.append(f"dynamic_probe.garak_config not a file: {gcfg}")
 
     return errs
 

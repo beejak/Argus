@@ -94,6 +94,16 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 - **Mistake:** Keeping `run_id` only in the orchestrator envelope while downstream probe artifacts lack correlation fields.
 - **Fix:** Forward `run_id` into `run_dynamic_probe.py` and persist it in `dynamic_probe_report.v1`, then assert in tests so cross-artifact joins are stable.
 
+## 2026-04-25 — Secret handling means names-only telemetry
+
+- **Mistake:** Capturing “debug convenience” values from secret env vars in probe outputs or logs.
+- **Fix:** Accept only **secret env-var names** (`secret_env_vars`) in job/script inputs; report required/missing names only and never serialize secret values.
+
+## 2026-04-25 — Validate config path at job time, not when external tooling runs
+
+- **Mistake:** Deferring `garak_config` checks until `garak` execution, which yields late failures after upstream scan steps already consumed time.
+- **Fix:** Under orchestrator `validate` strict paths, require `dynamic_probe.garak_config` to point to an existing file and keep runtime checks in `run_dynamic_probe.py` as defense in depth.
+
 ## Template (copy below)
 
 ```
