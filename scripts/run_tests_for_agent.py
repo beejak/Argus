@@ -141,6 +141,21 @@ def main() -> int:
     if r3b.returncode != 0:
         overall = 1
 
+    log("=== orchestrator job validate (with admit_model fixture) ===")
+    job_admit = root / "hf_bundle_scanner" / "tests" / "fixtures" / "orchestrator_job_with_admit.json"
+    r3c = subprocess.run(
+        [str(py), str(root / "scripts" / "run_orchestrator_job.py"), "validate", "--job", str(job_admit)],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+    )
+    log(r3c.stdout or "")
+    log(r3c.stderr or "")
+    log(f"orchestrator_validate_admit_fixture_exit={r3c.returncode}")
+    if r3c.returncode != 0:
+        overall = 1
+
     log("=== dynamic probe stub (disabled by default) ===")
     dp_out = agent / "dynamic_probe_last.json"
     r4 = subprocess.run(

@@ -1,0 +1,32 @@
+{
+  "schema": "llm_scanner.orchestrator_job.v1",
+  "run_id": "00000000-0000-4000-8000-000000000030",
+  "steps": [
+    { "id": "bundle_scan", "type": "scan_bundle", "depends_on": [] },
+    { "id": "admit_weight", "type": "admit_model", "depends_on": ["bundle_scan"] },
+    { "id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "admit_weight"] }
+  ],
+  "scan_bundle": {
+    "root": "minimal_tree",
+    "policy": "policy.permissive.json",
+    "out": "/tmp/orchestrator_bundle_out_admit_fixture.json",
+    "drivers": "",
+    "timeout": 600,
+    "fail_on": "MEDIUM"
+  },
+  "admit_model": {
+    "defaults": {
+      "policy": "policy.permissive.json",
+      "drivers": "",
+      "timeout": 120,
+      "fail_on": "MEDIUM"
+    },
+    "jobs": [
+      {
+        "step_id": "admit_weight",
+        "artifact": "minimal_tree/weights.safetensors",
+        "out": "/tmp/orchestrator_admit_weight_fixture.json"
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # ADR 0001 — Bundle scanner vs future orchestrator scope
 
-- **Status:** accepted. **Implemented (repo, 2026-04-25):** job document `llm_scanner.orchestrator_job.v1` validation + `run` / `validate` in [`scripts/run_orchestrator_job.py`](../scripts/run_orchestrator_job.py); envelope `llm_scanner.orchestrator_envelope.v2` with UUID `run_id` / optional `parent_run_id` and per-step wall times; **optional** `dynamic_probe` step (at most one) after `scan_bundle`, merged exit in `aggregate`, middle envelope row — see [`docs/PHASE5_DYNAMIC_PROBES.md`](../PHASE5_DYNAMIC_PROBES.md). **Not implemented yet:** `admit_model` fan-out nodes, YAML job format, non-subprocess backends.
+- **Status:** accepted. **Implemented (repo, 2026-04-25):** job document `llm_scanner.orchestrator_job.v1` validation + `run` / `validate` in [`scripts/run_orchestrator_job.py`](../scripts/run_orchestrator_job.py); envelope `llm_scanner.orchestrator_envelope.v2` with UUID `run_id` / optional `parent_run_id` and per-step wall times; **optional** `admit_model` fan-out nodes (subprocess `python -m model_admission scan`), plus optional `dynamic_probe` step (at most one) after `scan_bundle` — all merged in `aggregate`. See [`docs/PHASE5_DYNAMIC_PROBES.md`](../PHASE5_DYNAMIC_PROBES.md). **Not implemented yet:** YAML job format, non-subprocess backends.
 - **Date:** 2026-04-24 (phase 4 kickoff notes: 2026-04-25)
 
 ## Context
@@ -25,7 +25,7 @@ Minimal **directed acyclic** graph for the **first shipped** orchestrator slice 
 2. **`admit_model` (optional fan-out)** — one job per heavyweight file already supported by `model-admission` when policy demands it; artifacts: admit-model JSON paths referenced from bundle or orchestrator index.
 3. **`aggregate`** — deterministic reducer: worst exit across children + attach `run_id`, wall-clock, and input digests in an **orchestrator envelope** (separate JSON or sidecar) so bundle schema stays backward compatible.
 
-Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. **Shipped subset:** optional `dynamic_probe` with edges `bundle_scan` → `dynamic_probe` → `aggregate` (job validator enforces DAG + `depends_on`). Full **budget + secret** gates on the job document are still **future** work; default `scan-bundle` must stay free of implicit dynamic dependencies.
+Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. **Shipped subset:** optional `admit_model` fan-out (`bundle_scan` → each `admit_model` → `aggregate`) and optional `dynamic_probe` (`bundle_scan` → `dynamic_probe` → `aggregate`) with validator-enforced DAG / `depends_on`.
 
 ## Phase 4 — correlation & provenance
 
@@ -38,7 +38,7 @@ Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. **Shipped 
 2. **Done:** running `run` on the fixture tree produces bundle JSON + envelope JSON; process exit follows bundle **`aggregate_exit_code`** when readable (else tooling-style failure).
 3. **Done:** no new **required** fields on `hf_bundle_scanner.bundle_report.v2`.
 
-**Still open (later slices):** YAML jobs; `admit_model` / multi-scan fan-out; optional echo of `run_id` into bundle `provenance` (separate ADR if pursued); HTTP/MCP job backends; richer dynamic-probe job fields (budgets, secrets) beyond the v1 `dynamic_probe.out` hook.
+**Still open (later slices):** YAML jobs; broader multi-scan graph composition beyond current `scan_bundle` + `admit_model*` + optional `dynamic_probe`; optional echo of `run_id` into bundle `provenance` (separate ADR if pursued); HTTP/MCP job backends.
 
 ## Links
 

@@ -223,4 +223,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** targeted pytest (`test_dynamic_probe_report.py`, `test_orchestrator_job.py`), `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`.
 - **Next:** move from metadata/preflight toward real policy-governed probe execution scenarios while preserving default deterministic CI.
 
+### 2026-04-25 — Phase 4 admit_model fan-out slice
+
+- **Phase:** `phase4-orchestrator-scope` (breadth).
+- **Changes:** orchestrator supports `admit_model` fan-out steps (`bundle_scan -> admit_model* -> aggregate`); top-level `admit_model.defaults` + `admit_model.jobs[]` mapping validated; strict path checks for admit artifacts/policies/report outputs; runner executes `python -m model_admission scan` per admit step and emits admit rows in envelope v2. Added fixture `orchestrator_job_with_admit.json` and `garak.dynamic.stub.yaml`; expanded orchestrator tests + agent-verify / make orchestrator-validate to include admit fixture.
+- **Commands:** `pytest tests/test_orchestrator_job.py -q`, `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`, `make graphify-update`.
+- **Next:** optional run_id echo into bundle provenance, YAML orchestrator jobs, and broader multi-scan graph composition policies.
+
 ---

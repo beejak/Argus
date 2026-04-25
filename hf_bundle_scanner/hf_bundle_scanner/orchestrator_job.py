@@ -74,9 +74,10 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
         if sid in by_id:
             errs.append(f"duplicate step id: {sid!r}")
         typ = raw.get("type")
-        if typ not in ("scan_bundle", "dynamic_probe", "aggregate"):
+        if typ not in ("scan_bundle", "admit_model", "dynamic_probe", "aggregate"):
             errs.append(
-                f"steps[{i}].type must be 'scan_bundle', 'dynamic_probe', or 'aggregate' (got {typ!r})"
+                f"steps[{i}].type must be 'scan_bundle', 'admit_model', "
+                f"'dynamic_probe', or 'aggregate' (got {typ!r})"
             )
         dep = raw.get("depends_on", [])
         if dep is None:
@@ -90,6 +91,7 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
         return errs
 
     scan_ids = [s for s, v in by_id.items() if v.get("type") == "scan_bundle"]
+    am_ids = [s for s, v in by_id.items() if v.get("type") == "admit_model"]
     dp_ids = [s for s, v in by_id.items() if v.get("type") == "dynamic_probe"]
     agg_ids = [s for s, v in by_id.items() if v.get("type") == "aggregate"]
     if len(scan_ids) != 1:
@@ -129,11 +131,22 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
 
     scan_id = scan_ids[0]
     agg_id = agg_ids[0]
+    am_id_set = set(am_ids)
     dp_id = dp_ids[0] if dp_ids else None
     agg_deps = list(by_id[agg_id].get("depends_on", []) or [])
     agg_dep_set = {str(x) for x in agg_deps}
     if scan_id not in agg_dep_set:
         errs.append("aggregate step depends_on must include the scan_bundle step id")
+    for am_id in am_ids:
+        am_raw = by_id[am_id]
+        am_dep = [str(x) for x in (am_raw.get("depends_on") or [])]
+        if am_dep != [scan_id]:
+            errs.append(
+                "admit_model step depends_on must be exactly [scan_bundle step id] "
+                f"(step {am_id!r}, expected [{scan_id!r}], got {am_dep!r})"
+            )
+        if am_id not in agg_dep_set:
+            errs.append(f"aggregate step depends_on must include admit_model step id {am_id!r}")
     if dp_id is not None:
         dp_raw = by_id[dp_id]
         dp_dep = [str(x) for x in (dp_raw.get("depends_on") or [])]
@@ -177,6 +190,77 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
     if isinstance(dpr, dict) and bool(dpr) and dp_id is None:
         errs.append("dynamic_probe settings are present but no dynamic_probe step was defined")
 
+    am_obj = doc.get("admit_model")
+    if am_ids:
+        if not isinstance(am_obj, dict):
+            errs.append("admit_model must be an object when admit_model steps are present")
+        else:
+            defaults = am_obj.get("defaults", {})
+            if defaults is None:
+                defaults = {}
+            if not isinstance(defaults, dict):
+                errs.append("admit_model.defaults must be an object when provided")
+                defaults = {}
+            jobs = am_obj.get("jobs")
+            if not isinstance(jobs, list) or not jobs:
+                errs.append("admit_model.jobs must be a non-empty array when admit_model steps are present")
+            else:
+                seen_step_ids: set[str] = set()
+                for i, raw in enumerate(jobs):
+                    if not isinstance(raw, dict):
+                        errs.append(f"admit_model.jobs[{i}] must be an object")
+                        continue
+                    sid = raw.get("step_id")
+                    if not _is_non_empty_str(sid):
+                        errs.append(f"admit_model.jobs[{i}].step_id must be a non-empty string")
+                        continue
+                    step_id = str(sid)
+                    if step_id not in am_id_set:
+                        errs.append(
+                            f"admit_model.jobs[{i}].step_id must reference an admit_model step id "
+                            f"(got {step_id!r})"
+                        )
+                    if step_id in seen_step_ids:
+                        errs.append(f"duplicate admit_model.jobs step_id: {step_id!r}")
+                    seen_step_ids.add(step_id)
+
+                    if not _is_non_empty_str(raw.get("artifact")):
+                        errs.append(f"admit_model.jobs[{i}].artifact must be a non-empty string")
+                    if not _is_non_empty_str(raw.get("out")):
+                        errs.append(f"admit_model.jobs[{i}].out must be a non-empty string")
+
+                    pol = raw.get("policy", defaults.get("policy"))
+                    if not _is_non_empty_str(pol):
+                        errs.append(
+                            f"admit_model.jobs[{i}] requires policy (job policy or admit_model.defaults.policy)"
+                        )
+                    tmo = raw.get("timeout", defaults.get("timeout"))
+                    if tmo is not None:
+                        try:
+                            if int(tmo) <= 0:
+                                errs.append(f"admit_model.jobs[{i}].timeout must be >= 1 when provided")
+                        except (TypeError, ValueError):
+                            errs.append(f"admit_model.jobs[{i}].timeout must be an integer when provided")
+                    fo = raw.get("fail_on", defaults.get("fail_on"))
+                    if fo is not None and not _is_non_empty_str(fo):
+                        errs.append(f"admit_model.jobs[{i}].fail_on must be a non-empty string when provided")
+
+                if seen_step_ids != am_id_set:
+                    missing = sorted(am_id_set - seen_step_ids)
+                    extra = sorted(seen_step_ids - am_id_set)
+                    if missing:
+                        errs.append(
+                            "admit_model.jobs missing entries for step ids: "
+                            + ", ".join(repr(x) for x in missing)
+                        )
+                    if extra:
+                        errs.append(
+                            "admit_model.jobs has unknown step ids: "
+                            + ", ".join(repr(x) for x in extra)
+                        )
+    elif isinstance(am_obj, dict) and bool(am_obj):
+        errs.append("admit_model settings are present but no admit_model step was defined")
+
     sb = doc.get("scan_bundle")
     if not isinstance(sb, dict):
         errs.append("scan_bundle must be an object")
@@ -208,6 +292,33 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
                 gcfg = _rp(str(dpo.get("garak_config", "")))
                 if not gcfg.is_file():
                     errs.append(f"dynamic_probe.garak_config not a file: {gcfg}")
+        if am_ids and isinstance(doc.get("admit_model"), dict):
+            amo = doc["admit_model"]
+            assert isinstance(amo, dict)
+            defaults = amo.get("defaults", {})
+            if defaults is None:
+                defaults = {}
+            if not isinstance(defaults, dict):
+                defaults = {}
+            jobs = amo.get("jobs", [])
+            if isinstance(jobs, list):
+                for raw in jobs:
+                    if not isinstance(raw, dict):
+                        continue
+                    art = raw.get("artifact")
+                    if _is_non_empty_str(art):
+                        ap = _rp(str(art))
+                        if not ap.is_file():
+                            errs.append(f"admit_model artifact not a file: {ap}")
+                    outv = raw.get("out")
+                    if _is_non_empty_str(outv):
+                        op = _rp(str(outv))
+                        op.parent.mkdir(parents=True, exist_ok=True)
+                    polv = raw.get("policy", defaults.get("policy"))
+                    if _is_non_empty_str(polv):
+                        pp = _rp(str(polv))
+                        if not pp.is_file():
+                            errs.append(f"admit_model policy not a file: {pp}")
 
     return errs
 
@@ -230,6 +341,7 @@ def build_envelope(
     scan_ended_at: str,
     aggregate_started_at: str,
     aggregate_ended_at: str,
+    admit_model_steps: list[dict[str, Any]] | None = None,
     dynamic_probe_step: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build orchestrator envelope JSON (v2).
@@ -238,8 +350,8 @@ def build_envelope(
     ``artifact_uri`` (file URI when possible), ``started_at`` / ``ended_at``
     (RFC 3339 UTC with ``Z`` suffix, caller-supplied).
 
-    When ``dynamic_probe_step`` is set, it is inserted **between** the scan row and the
-    aggregate row (same envelope schema).
+    When ``admit_model_steps`` and/or ``dynamic_probe_step`` are set, they are inserted
+    between the scan row and the aggregate row (same envelope schema).
     """
     bundle_uri = bundle_path.expanduser().resolve().as_uri()
     env_uri = ""
@@ -265,6 +377,8 @@ def build_envelope(
         "ended_at": aggregate_ended_at,
     }
     steps: list[dict[str, Any]] = [scan_row]
+    if admit_model_steps:
+        steps.extend(dict(x) for x in admit_model_steps)
     if dynamic_probe_step is not None:
         steps.append(dict(dynamic_probe_step))
     steps.append(agg_row)

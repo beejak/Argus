@@ -115,6 +115,12 @@ def test_fixture_with_dynamic_validates() -> None:
     assert validate_job(doc, job_path=p, strict_paths=True) == []
 
 
+def test_fixture_with_admit_validates() -> None:
+    p = _fixture("orchestrator_job_with_admit.json")
+    doc = load_job(p)
+    assert validate_job(doc, job_path=p, strict_paths=True) == []
+
+
 def test_aggregate_must_depend_on_dynamic_when_present() -> None:
     doc = {
         "schema": JOB_SCHEMA_V1,
@@ -191,6 +197,53 @@ def test_dynamic_probe_budget_fields_must_be_positive_ints() -> None:
     assert any("budget_timeout_seconds" in e for e in errs)
 
 
+def test_admit_model_settings_without_step() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "admit_model": {
+            "jobs": [
+                {
+                    "step_id": "admit_1",
+                    "artifact": "x.bin",
+                    "policy": "p.json",
+                    "out": "o.json",
+                }
+            ]
+        },
+    }
+    errs = validate_job(doc)
+    assert any("admit_model settings are present" in e for e in errs)
+
+
+def test_admit_model_step_requires_job_and_aggregate_dep() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "am1", "type": "admit_model", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "admit_model": {
+            "jobs": [
+                {
+                    "step_id": "am1",
+                    "artifact": "x.bin",
+                    "policy": "p.json",
+                    "out": "o.json",
+                }
+            ]
+        },
+    }
+    errs = validate_job(doc)
+    assert any("include admit_model step id" in e for e in errs)
+
+
 def test_dynamic_probe_secret_env_vars_must_be_string_array() -> None:
     doc = {
         "schema": JOB_SCHEMA_V1,
@@ -216,6 +269,30 @@ def test_dynamic_probe_garak_config_must_exist_under_strict_paths() -> None:
     doc["dynamic_probe"]["garak_config"] = "no-such-garak-config.yaml"
     errs = validate_job(doc, job_path=p, strict_paths=True)
     assert any("dynamic_probe.garak_config not a file" in e for e in errs)
+
+
+def test_admit_model_depends_on_must_be_scan_only() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "am1", "type": "admit_model", "depends_on": []},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "am1"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "admit_model": {
+            "jobs": [
+                {
+                    "step_id": "am1",
+                    "artifact": "x.bin",
+                    "policy": "p.json",
+                    "out": "o.json",
+                }
+            ]
+        },
+    }
+    errs = validate_job(doc)
+    assert any("admit_model step depends_on must be exactly" in e for e in errs)
 
 
 def test_build_envelope_three_steps(tmp_path: Path) -> None:
@@ -310,6 +387,62 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
     assert dp["garak_config"].endswith("garak.dynamic.stub.yaml")
     assert dp["model_target"] == "fixture://model"
     assert dp["secret_env_vars_required"] == ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
+
+
+def test_run_orchestrator_job_with_admit_writes_envelope(tmp_path: Path) -> None:
+    repo = Path(__file__).resolve().parents[2]
+    bundle_out = tmp_path / "bundle_report.json"
+    admit_out = tmp_path / "admit_weight.json"
+    env_out = tmp_path / "envelope.json"
+    job = {
+        "schema": JOB_SCHEMA_V1,
+        "run_id": "00000000-0000-4000-8000-000000000021",
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "am1", "type": "admit_model", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "am1"]},
+        ],
+        "scan_bundle": {
+            "root": str(repo / "hf_bundle_scanner/tests/fixtures/minimal_tree"),
+            "policy": str(repo / "hf_bundle_scanner/tests/fixtures/policy.permissive.json"),
+            "out": str(bundle_out),
+            "drivers": "",
+            "timeout": 600,
+            "fail_on": "MEDIUM",
+        },
+        "admit_model": {
+            "defaults": {
+                "policy": str(repo / "hf_bundle_scanner/tests/fixtures/policy.permissive.json"),
+                "drivers": "",
+                "timeout": 120,
+                "fail_on": "MEDIUM",
+            },
+            "jobs": [
+                {
+                    "step_id": "am1",
+                    "artifact": str(repo / "hf_bundle_scanner/tests/fixtures/minimal_tree/weights.safetensors"),
+                    "out": str(admit_out),
+                }
+            ],
+        },
+    }
+    job_path = tmp_path / "job_admit.json"
+    job_path.write_text(json.dumps(job), encoding="utf-8")
+    script = repo / "scripts" / "run_orchestrator_job.py"
+    r = subprocess.run(
+        [sys.executable, str(script), "run", "--job", str(job_path), "--envelope-out", str(env_out)],
+        cwd=str(repo),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 0, (r.stdout, r.stderr)
+    env = json.loads(env_out.read_text(encoding="utf-8"))
+    assert env["schema"] == ENVELOPE_SCHEMA_V2
+    assert len(env["steps"]) == 3
+    assert env["steps"][1]["type"] == "admit_model"
+    assert env["steps"][1]["id"] == "am1"
+    assert admit_out.is_file()
 
 
 def test_build_envelope_parent_run_id(tmp_path: Path) -> None:

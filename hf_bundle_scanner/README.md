@@ -48,7 +48,7 @@ See [docs/hermes-mcp.md](docs/hermes-mcp.md) for MCP and optional HTTP.
 - **Python API:** `hf_bundle_scanner.orchestrator_job` — `validate_job`, `load_job`, `build_envelope`
 - **CLI:** from repo root, `python3 scripts/run_orchestrator_job.py validate|run --job …` (see script docstring). **`make orchestrator-validate`** runs `validate` on the committed fixture.
 
-Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes written by `run` use **`llm_scanner.orchestrator_envelope.v2`** (`run_id`, optional `parent_run_id`, per-step timestamps and `artifact_uri` values). Jobs may declare **one** optional **`dynamic_probe`** step between **`scan_bundle`** and **`aggregate`** (see [PHASE5 doc](../docs/PHASE5_DYNAMIC_PROBES.md)); `run` invokes [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py), forwards `run_id` + optional dynamic settings (budgets, `garak_config`, `model_target`, `secret_env_vars`), and merges exits into **`aggregate_exit_code`**.
+Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes written by `run` use **`llm_scanner.orchestrator_envelope.v2`** (`run_id`, optional `parent_run_id`, per-step timestamps and `artifact_uri` values). Jobs may declare optional **`admit_model`** fan-out steps and **one** optional **`dynamic_probe`** step between **`scan_bundle`** and **`aggregate`**. `run` invokes `python -m model_admission scan` for each admit step and [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) for dynamic step, forwarding `run_id` + dynamic settings (budgets, `garak_config`, `model_target`, `secret_env_vars`) and merging exits into **`aggregate_exit_code`**.
 
 ## Phase-5 dynamic probes (stub)
 

@@ -2,10 +2,12 @@
 """Validate or run a phase-4 orchestrator job document (v1).
 
 ``scan_bundle`` execution delegates to ``python -m hf_bundle_scanner scan`` (same CLI as ``scan-bundle``).
+Optional ``admit_model`` fan-out nodes delegate to ``python -m model_admission scan``.
 
 ``run`` writes an orchestrator envelope JSON (schema ``llm_scanner.orchestrator_envelope.v2``): UUID
 ``run_id`` (from the job or generated), optional ``parent_run_id``, and ``steps`` for ``scan_bundle``,
-optional ``dynamic_probe`` (see job schema in ``hf_bundle_scanner.orchestrator_job``), and ``aggregate``
+optional ``admit_model`` fan-out and ``dynamic_probe`` (see job schema in
+``hf_bundle_scanner.orchestrator_job``), and ``aggregate``
 with RFC 3339 UTC timestamps and ``file:`` artifact URIs. When present, ``dynamic_probe`` receives
 ``run_id`` and optional dynamic settings from the job document (budgets, garak config path,
 model target, required secret env-var names).
@@ -61,6 +63,37 @@ def _scan_argv(*, py: Path, sb: dict[str, object], root: Path, policy: Path, out
         cmd.extend(["--mirror-allowlist", str(sb["mirror_allowlist"]).strip()])
     if _is_non_empty_str(sb.get("sbom_uri")):
         cmd.extend(["--sbom-uri", str(sb["sbom_uri"]).strip()])
+    return cmd
+
+
+def _admit_argv(
+    *,
+    py: Path,
+    artifact: Path,
+    policy: Path,
+    out: Path,
+    drivers: str | None,
+    timeout: int | None,
+    fail_on: str | None,
+) -> list[str]:
+    cmd: list[str] = [
+        str(py),
+        "-m",
+        "model_admission",
+        "scan",
+        "--artifact",
+        str(artifact),
+        "--policy",
+        str(policy),
+        "--report",
+        str(out),
+    ]
+    if drivers is not None:
+        cmd.extend(["--drivers", str(drivers)])
+    if timeout is not None:
+        cmd.extend(["--timeout", str(int(timeout))])
+    if fail_on is not None and str(fail_on).strip():
+        cmd.extend(["--fail-on", str(fail_on).strip()])
     return cmd
 
 
@@ -131,6 +164,7 @@ def main(argv: list[str] | None = None) -> int:
         py = Path(args.python) if args.python is not None else _pick_python()
         cmd = _scan_argv(py=py, sb=sb, root=r, policy=pol, out=out)
         scan_id = next(str(s["id"]) for s in doc["steps"] if s.get("type") == "scan_bundle")
+        admit_ids = [str(s["id"]) for s in doc["steps"] if s.get("type") == "admit_model"]
         agg_id = next(str(s["id"]) for s in doc["steps"] if s.get("type") == "aggregate")
         run_id = str(doc.get("run_id") or "").strip() or str(uuid.uuid4())
         parent_raw = doc.get("parent_run_id")
@@ -154,9 +188,82 @@ def main(argv: list[str] | None = None) -> int:
             except (OSError, json.JSONDecodeError, TypeError, ValueError):
                 bundle_agg = 2
 
+        admit_model_steps: list[dict[str, object]] = []
+        admit_exit = 0
+        t_after_scan = t_scan_end
+        if admit_ids:
+            amo = doc.get("admit_model")
+            if not isinstance(amo, dict):
+                print(json.dumps({"errors": ["admit_model settings missing for admit_model steps"]}, indent=2))
+                return 2
+            defaults = amo.get("defaults", {})
+            if defaults is None:
+                defaults = {}
+            if not isinstance(defaults, dict):
+                print(json.dumps({"errors": ["admit_model.defaults must be an object when provided"]}, indent=2))
+                return 2
+            jobs = amo.get("jobs")
+            if not isinstance(jobs, list):
+                print(json.dumps({"errors": ["admit_model.jobs must be an array"]}, indent=2))
+                return 2
+            jobs_by_step: dict[str, dict[str, object]] = {}
+            for raw in jobs:
+                if isinstance(raw, dict) and _is_non_empty_str(raw.get("step_id")):
+                    jobs_by_step[str(raw["step_id"]).strip()] = raw
+            for step_id in admit_ids:
+                job = jobs_by_step.get(step_id)
+                if job is None:
+                    print(json.dumps({"errors": [f"admit_model.jobs missing step_id {step_id!r}"]}, indent=2))
+                    return 2
+                artifact = _resolve(job_dir, str(job["artifact"]))
+                report_out = _resolve(job_dir, str(job["out"]))
+                report_out.parent.mkdir(parents=True, exist_ok=True)
+                policy_raw = job.get("policy", defaults.get("policy"))
+                if not _is_non_empty_str(policy_raw):
+                    print(
+                        json.dumps(
+                            {"errors": [f"admit_model job {step_id!r} missing policy/defaults.policy"]},
+                            indent=2,
+                        )
+                    )
+                    return 2
+                policy = _resolve(job_dir, str(policy_raw))
+                drivers = job.get("drivers", defaults.get("drivers"))
+                timeout_raw = job.get("timeout", defaults.get("timeout"))
+                fail_on = job.get("fail_on", defaults.get("fail_on"))
+                timeout: int | None = int(timeout_raw) if timeout_raw is not None else None
+                admit_cmd = _admit_argv(
+                    py=py,
+                    artifact=artifact,
+                    policy=policy,
+                    out=report_out,
+                    drivers=None if drivers is None else str(drivers),
+                    timeout=timeout,
+                    fail_on=None if fail_on is None else str(fail_on),
+                )
+                t_am_start = _utc_now()
+                ap = subprocess.run(admit_cmd, cwd=str(root / "model-admission"))
+                t_am_end = _utc_now()
+                if t_am_end < t_am_start:
+                    t_am_end = t_am_start
+                rc = int(ap.returncode)
+                admit_exit = worst_exit_code(admit_exit, rc)
+                if t_am_end > t_after_scan:
+                    t_after_scan = t_am_end
+                admit_model_steps.append(
+                    {
+                        "id": step_id,
+                        "name": "admit_model",
+                        "type": "admit_model",
+                        "exit_code": rc,
+                        "artifact_uri": report_out.expanduser().resolve().as_uri(),
+                        "started_at": _utc_iso_z(t_am_start),
+                        "ended_at": _utc_iso_z(t_am_end),
+                    }
+                )
+
         dynamic_probe_step: dict[str, object] | None = None
         probe_exit = 0
-        t_after_scan = t_scan_end
         if dp_id is not None:
             dpo = doc.get("dynamic_probe")
             if not isinstance(dpo, dict) or not _is_non_empty_str(dpo.get("out")):
@@ -216,7 +323,9 @@ def main(argv: list[str] | None = None) -> int:
             }
             t_after_scan = t_dp_end if t_dp_end > t_scan_end else t_scan_end
 
-        agg = worst_exit_code(bundle_agg, probe_exit) if dp_id is not None else bundle_agg
+        agg = worst_exit_code(bundle_agg, admit_exit, probe_exit) if dp_id is not None else worst_exit_code(
+            bundle_agg, admit_exit
+        )
 
         t_agg_start = t_after_scan
         t_agg_end = _utc_now()
@@ -235,6 +344,7 @@ def main(argv: list[str] | None = None) -> int:
             scan_ended_at=_utc_iso_z(t_scan_end),
             aggregate_started_at=_utc_iso_z(t_agg_start),
             aggregate_ended_at=_utc_iso_z(t_agg_end),
+            admit_model_steps=admit_model_steps,
             dynamic_probe_step=dynamic_probe_step,
         )
         args.envelope_out.parent.mkdir(parents=True, exist_ok=True)

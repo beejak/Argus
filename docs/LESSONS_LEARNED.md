@@ -104,6 +104,11 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 - **Mistake:** Deferring `garak_config` checks until `garak` execution, which yields late failures after upstream scan steps already consumed time.
 - **Fix:** Under orchestrator `validate` strict paths, require `dynamic_probe.garak_config` to point to an existing file and keep runtime checks in `run_dynamic_probe.py` as defense in depth.
 
+## 2026-04-25 — Fan-out steps need explicit top-level mapping, not implicit inference
+
+- **Mistake:** Assuming multiple `admit_model` step ids can be resolved from step list alone; runner then guesses per-step policy/artifact/report and fails inconsistently.
+- **Fix:** Require explicit `admit_model.jobs[]` with `step_id` mapping and validate one-to-one coverage against `admit_model` step ids, plus strict path checks for artifact/policy/report targets.
+
 ## Template (copy below)
 
 ```
