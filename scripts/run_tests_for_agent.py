@@ -111,6 +111,50 @@ def main() -> int:
     if r2.returncode != 0:
         overall = 1
 
+    log("=== orchestrator job validate ===")
+    job = root / "hf_bundle_scanner" / "tests" / "fixtures" / "orchestrator_job_min.json"
+    r3 = subprocess.run(
+        [str(py), str(root / "scripts" / "run_orchestrator_job.py"), "validate", "--job", str(job)],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+    )
+    log(r3.stdout or "")
+    log(r3.stderr or "")
+    log(f"orchestrator_validate_exit={r3.returncode}")
+    if r3.returncode != 0:
+        overall = 1
+
+    log("=== dynamic probe stub (disabled by default) ===")
+    dp_out = agent / "dynamic_probe_last.json"
+    r4 = subprocess.run(
+        [str(py), str(root / "scripts" / "run_dynamic_probe.py"), "--out", str(dp_out)],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+    )
+    log(r4.stdout or "")
+    log(r4.stderr or "")
+    log(f"dynamic_probe_stub_exit={r4.returncode}")
+    if r4.returncode != 0:
+        overall = 1
+
+    log("=== ruff (hf_bundle_scanner) ===")
+    r5 = subprocess.run(
+        [str(py), "-m", "ruff", "check", "hf_bundle_scanner", "tests"],
+        cwd=str(root / "hf_bundle_scanner"),
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONUNBUFFERED": "1"},
+    )
+    log(r5.stdout or "")
+    log(r5.stderr or "")
+    log(f"ruff_exit={r5.returncode}")
+    if r5.returncode != 0:
+        overall = 1
+
     log(f"overall_exit={overall}")
     exit_path.write_text(str(overall), encoding="utf-8", newline="\n")
     log_path.write_text(buf.getvalue(), encoding="utf-8", newline="\n")

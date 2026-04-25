@@ -50,6 +50,12 @@ See [docs/hermes-mcp.md](docs/hermes-mcp.md) for MCP and optional HTTP.
 
 Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes written by `run` use **`llm_scanner.orchestrator_envelope.v2`** (`run_id`, optional `parent_run_id`, per-step timestamps and `artifact_uri` values).
 
+## Phase-5 dynamic probes (stub)
+
+- **Doc:** [../docs/PHASE5_DYNAMIC_PROBES.md](../docs/PHASE5_DYNAMIC_PROBES.md)
+- **Report builder:** `hf_bundle_scanner.dynamic_probe_report`
+- **CLI:** [`../scripts/run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) — from repo root, **`make dynamic-probe-stub`** writes `.agent/dynamic_probe_last.json` (disabled unless **`LLM_SCANNER_DYNAMIC_PROBE=1`**).
+
 ### Optional: scan a small file from the “uncensored-models” collection
 
 The curated list [uncensored-models](https://huggingface.co/collections/chwoo/uncensored-models) mostly hosts **multi‑GiB** full weights. One repo in that list has a **under 1 GiB** weight-like artifact we can use for a real download + scan check: **`mradermacher/gemma3-4b-it-abliterated-GGUF`** file **`gemma3-4b-it-abliterated.mmproj-Q8_0.gguf`** (~561 MiB, vision projector tensors—not the full chat stack).

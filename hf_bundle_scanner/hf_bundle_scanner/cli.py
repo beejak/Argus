@@ -9,7 +9,7 @@ from pathlib import Path
 
 from hf_bundle_scanner import __version__
 from hf_bundle_scanner.dispatch import scan_bundle
-from hf_bundle_scanner.snapshot import build_manifest, snapshot_download, write_manifest
+from hf_bundle_scanner.snapshot import snapshot_download, write_manifest
 
 
 def _cmd_manifest(args: argparse.Namespace) -> int:

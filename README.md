@@ -13,7 +13,7 @@
 [![LLM Scanner CI](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml/badge.svg?branch=main)](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml?query=branch%3Amain)
 ![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-101624?logo=python&logoColor=white)
 
-**Production-minded scanning** for Hugging Face–style model bundles — static admission, config risk, and a staged path toward dynamic probes and runtime guardrails.
+**Production-minded scanning** for Hugging Face–style model bundles — static admission, config risk, a **phase-4 orchestrator** (job JSON + envelope), and a **phase-5 opt-in dynamic probe stub** (contract + `garak --help` check when enabled).
 
 [**Argus** (GitHub mirror)](https://github.com/beejak/Argus) · [Publish notes](docs/PUBLISH_ARGUS.md)
 
@@ -36,7 +36,7 @@
 - A **traffic-light style signal** for “did our default static gate object?” — useful in CI and procurement conversations.
 - **Separate outputs:** engineers can use the detailed tables/CSV; approvers can start with a **plain-language brief** of the same sample scans ([`docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md`](docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md)).
 
-**What we do *not* do (yet):** we do **not** replace human judgment, legal review, or full red-teaming. Phases **5–8** on the roadmap add optional dynamic probes, richer supply-chain evidence, runtime guardrails, and observability — see [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md).
+**What we do *not* do (yet):** we do **not** replace human judgment, legal review, or full red-teaming. **Phase 5** ships a **stub + JSON report only** (no default Garak runs); phases **6–8** add supply-chain appendices, runtime guardrails, and observability — see [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) and [docs/PHASE5_DYNAMIC_PROBES.md](docs/PHASE5_DYNAMIC_PROBES.md).
 
 **Keeping this section honest:** when a roadmap **phase** lands user-visible behavior, update **this blurb** in the same change when you can, and regenerate **`PLAIN_ENGLISH_BRIEF.md`** with **`make plain-english-brief`** (or **`make sample-reports-all`** after changing sample JSON).
 
@@ -50,7 +50,9 @@
 | **Bundle orchestration** | [`hf_bundle_scanner/`](hf_bundle_scanner/README.md) | Walks a snapshot tree: **manifest** (hashes), **discovery**, **configlint** (static JSON hints), **dispatch** to model-admission per weight-like file, **aggregate JSON** report (**`hf_bundle_scanner.bundle_report.v2`** + **provenance**). |
 | **Taxonomy & findings** | [`model_admission/taxonomy.py`](model-admission/model_admission/taxonomy.py) | Normalized **`RiskCategory`**, OWASP LLM01–10 mapping, **risk register** ids, optional **`rule_id` / `category`** on findings. |
 | **Test catalog** | [`llm_security_test_cases/catalog.json`](llm_security_test_cases/catalog.json) | Machine-readable catalog (pytest fixture + CI harness); see [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md). |
-| **Agent / CI harness** | [`Makefile`](Makefile), [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py), [`.github/workflows/llm-scanner.yml`](.github/workflows/llm-scanner.yml) | One command runs both packages and writes **`.agent/pytest-last.log`**; GitHub Actions runs the same script. |
+| **Agent / CI harness** | [`Makefile`](Makefile), [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py), [`.github/workflows/llm-scanner.yml`](.github/workflows/llm-scanner.yml) | One command runs both packages, **ruff**, orchestrator **validate**, dynamic-probe **stub**, and writes **`.agent/pytest-last.log`**; GitHub Actions runs the same script. |
+| **Orchestrator (phase 4)** | [`scripts/run_orchestrator_job.py`](scripts/run_orchestrator_job.py), [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md) | Declarative job JSON → `scan-bundle` + **envelope v2** (`run_id`, per-step timestamps). **`make orchestrator-validate`**. |
+| **Dynamic probe stub (phase 5)** | [`scripts/run_dynamic_probe.py`](scripts/run_dynamic_probe.py), [`docs/PHASE5_DYNAMIC_PROBES.md`](docs/PHASE5_DYNAMIC_PROBES.md) | Opt-in via **`LLM_SCANNER_DYNAMIC_PROBE=1`**; writes **`llm_scanner.dynamic_probe_report.v1`**. **`make dynamic-probe-stub`**. |
 | **Optional surfaces** | MCP + HTTP | Bounded tools for agents; see [hf_bundle_scanner/docs/hermes-mcp.md](hf_bundle_scanner/docs/hermes-mcp.md). |
 
 ---
@@ -58,7 +60,7 @@
 ## What this repository does **not** do
 
 - **It is not a full application or RAG pentest.** Phase 8 and the roadmap describe broader evals; today the default path is **artifact + config static** analysis inside a bundle directory.
-- **It does not run Garak-class dynamic red teaming in default CI.** Dynamic probes stay **opt-in** (markers, env gates) so air-gapped CI stays deterministic.
+- **It does not run real Garak harnesses in default CI.** The phase-5 entrypoint defaults to **`status: disabled`**; set **`LLM_SCANNER_DYNAMIC_PROBE=1`** only when you intend to check tooling (`garak --help` today, real probes later).
 - **It does not replace legal, compliance, or vendor attestation.** Findings are **technical signals**; severity and policy live in **your** policy JSON and process.
 - **It is not a hosted scanner SaaS.** You run CLI, Makefile, MCP, or HTTP **on your infrastructure**.
 - **It does not silently “fix” models.** The gate **reports** and exits; it does not rewrite weights or auto-remediate Hub repos.
@@ -71,7 +73,7 @@
 2. **Deterministic CI first** — Default tests avoid network and multi‑GiB downloads. Anything slow or flaky is **marked** and **env-gated**.
 3. **OSS-by-default, commercial optional** — Static lanes prefer open tooling; commercial adapters stay behind explicit configuration (roadmap).
 4. **Agents orchestrate, they do not replace judgment** — Hermes / MCP should call **bounded** tools; humans (or your org) own severity floors and ship decisions. See [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md).
-5. **Phased honesty** — [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) names what exists today vs **phase 5–8** backlog (dynamic probes, runtime guards, observability).
+5. **Phased honesty** — [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) names what exists today vs **phase 6–8** backlog (supply extras, runtime guards, observability); **phase 5** is the dynamic lane (stub now, real probes next).
 6. **Provenance as a first-class column** — Bundle JSON **v2** carries **`provenance`** (Hub hints, mirror allowlist, SBOM pointer, manifest digest summary) so downstream SIEMs and auditors can tie a report to **what** was scanned and **from where** ([`provenance.py`](hf_bundle_scanner/hf_bundle_scanner/provenance.py)).
 
 ---

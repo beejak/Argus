@@ -191,4 +191,10 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Phase:** `phase4-orchestrator-scope` (code slice).
 - **Changes:** **`hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py`**; **`hf_bundle_scanner/tests/test_orchestrator_job.py`** + fixture **`hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`**; **`scripts/run_orchestrator_job.py`**; **`make orchestrator-validate`**; roadmap line under phase 4.
 
+### 2026-04-25 — Phase 4 envelope tighten + Phase 5 stub + CI harness
+
+- **Phase:** `phase4-orchestrator-scope` (tighten) → **`phase5-dynamic-staging`** (v1 stub).
+- **Changes:** UUID **`run_id` / `parent_run_id`** validation; envelope **`llm_scanner.orchestrator_envelope.v2`** (two steps, `artifact_uri`, monotonic UTC timestamps); ADR + roadmap updates; **`hf_bundle_scanner/dynamic_probe_report.py`**, **`scripts/run_dynamic_probe.py`**, **`docs/PHASE5_DYNAMIC_PROBES.md`**; **`scripts/run_tests_for_agent.py`** now runs **orchestrator validate**, **dynamic probe stub**, and **ruff**; **`make dynamic-probe-stub`**; README / hf_bundle_scanner README / `.gitignore` for `.agent/dynamic_probe_last.json`.
+- **Commands:** `make test`; `make lint`; `python3 scripts/run_tests_for_agent.py`; `make orchestrator-validate`; `make dynamic-probe-stub`.
+
 ---

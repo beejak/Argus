@@ -3,7 +3,7 @@
 VENVDIR ?= .venv
 PY := $(abspath $(VENVDIR))/bin/python
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size orchestrator-validate
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size orchestrator-validate dynamic-probe-stub
 
 help:
 	@echo "LLM Scanner harness"
@@ -14,7 +14,7 @@ help:
 	@echo "  make roadmap          - pointer to docs/PRODUCTION_SCANNER_ROADMAP.md"
 	@echo "  make graphify-update  - refresh graphify-out/ if graphify is installed"
 	@echo "  make memory-open      - path to docs/sessions/SESSION_LOG.md"
-	@echo "  make agent-verify     - run both pytest suites; write .agent/pytest-last.log"
+	@echo "  make agent-verify     - model-admission + hf_bundle_scanner pytest, orchestrator validate, dynamic-probe stub, ruff; write .agent/pytest-last.log"
 	@echo "  make git-doctor       - print trailer-related git config + env hints"
 	@echo "  make commit-msg       - git commit via -F (usage: make commit-msg MSG='subject')"
 	@echo "  make slogan-dry-run   - print next README slogan (no file writes)"
@@ -25,6 +25,7 @@ help:
 	@echo "  make drivers-help       - list model-admission scan drivers + env overrides"
 	@echo "  make hub-find-models-under-size - Hub metadata search for repos under --max-mb (default 200; needs network)"
 	@echo "  make orchestrator-validate - validate phase-4 orchestrator job fixture (no scan)"
+	@echo "  make dynamic-probe-stub - write .agent/dynamic_probe_last.json (disabled unless LLM_SCANNER_DYNAMIC_PROBE=1)"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
 install:
@@ -116,3 +117,7 @@ hub-find-models-under-size:
 
 orchestrator-validate:
 	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_orchestrator_job.py" validate --job "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json"
+
+dynamic-probe-stub:
+	@mkdir -p .agent
+	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_dynamic_probe.py" --out "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/.agent/dynamic_probe_last.json"
