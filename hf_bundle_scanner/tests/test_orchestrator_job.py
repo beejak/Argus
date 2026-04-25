@@ -381,6 +381,8 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
     assert env["steps"][1]["type"] == "dynamic_probe"
     assert env["steps"][1]["exit_code"] == 0
     assert dp_out.is_file()
+    bundle = json.loads(bundle_out.read_text(encoding="utf-8"))
+    assert bundle["provenance"]["orchestrator"]["run_id"] == job["run_id"]
     dp = json.loads(dp_out.read_text(encoding="utf-8"))
     assert dp["run_id"] == job["run_id"]
     assert dp["budget_timeout_seconds"] == 120
@@ -443,6 +445,8 @@ def test_run_orchestrator_job_with_admit_writes_envelope(tmp_path: Path) -> None
     assert env["steps"][1]["type"] == "admit_model"
     assert env["steps"][1]["id"] == "am1"
     assert admit_out.is_file()
+    bundle = json.loads(bundle_out.read_text(encoding="utf-8"))
+    assert bundle["provenance"]["orchestrator"]["run_id"] == job["run_id"]
 
 
 def test_build_envelope_parent_run_id(tmp_path: Path) -> None:

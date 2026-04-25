@@ -230,4 +230,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `pytest tests/test_orchestrator_job.py -q`, `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`, `make graphify-update`.
 - **Next:** optional run_id echo into bundle provenance, YAML orchestrator jobs, and broader multi-scan graph composition policies.
 
+### 2026-04-25 — Phase 4 optional provenance echo (run_id in bundle JSON)
+
+- **Phase:** `phase4-orchestrator-scope` (correlation).
+- **Changes:** `scripts/run_orchestrator_job.py run` now echoes orchestrator identity into bundle output as `provenance.orchestrator.{run_id,parent_run_id}` when bundle JSON is readable; tests assert this in dynamic and admit orchestrator run paths; roadmap + ADR + lessons updated.
+- **Commands:** `pytest tests/test_orchestrator_job.py -q`, `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`.
+- **Next:** YAML orchestrator job format + richer graph composition, while keeping current subprocess contracts deterministic.
+
 ---

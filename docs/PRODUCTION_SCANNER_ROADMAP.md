@@ -53,7 +53,8 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Shipped (v1 slice):** job document validator (`hf_bundle_scanner.orchestrator_job`), fixture `hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`, runner `scripts/run_orchestrator_job.py`, **`make orchestrator-validate`**.
 - **Shipped (2026-04-25 tighten):** job-level **`run_id`** / optional **`parent_run_id`** validated as RFC 4122 UUIDs when non-empty; orchestrator envelope schema **`llm_scanner.orchestrator_envelope.v2`** with per-step **`artifact_uri`** + UTC **`started_at` / `ended_at`**; runner enforces monotonic step times.
 - **Shipped (fan-out slice):** optional **`admit_model`** steps in job graph (`bundle_scan` → `admit_model*` → `aggregate`) with strict validation (`admit_model.jobs` mapping, policy/artifact/report paths) and runner execution via `python -m model_admission scan`.
-- **Next (phase-4 backlog):** optional **echo** of `run_id` into bundle `provenance` (requires separate ADR — must stay optional on `bundle_report.v2`); YAML job documents; external runner repo reference only if execution model needs it.
+- **Shipped (optional provenance echo):** orchestrator `run` injects `provenance.orchestrator.run_id` (and optional `parent_run_id`) into the emitted bundle report JSON without changing required `bundle_report.v2` fields.
+- **Next (phase-4 backlog):** YAML job documents; external runner repo reference only if execution model needs it.
 
 ### Phase 5 status (`phase5-dynamic-staging`, **current**)
 

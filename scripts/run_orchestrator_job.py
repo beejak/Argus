@@ -183,8 +183,18 @@ def main(argv: list[str] | None = None) -> int:
         if out.is_file():
             try:
                 rep = json.loads(out.read_text(encoding="utf-8"))
-                if isinstance(rep, dict) and rep.get("aggregate_exit_code") is not None:
-                    bundle_agg = int(rep["aggregate_exit_code"])
+                if isinstance(rep, dict):
+                    prov = rep.get("provenance")
+                    if not isinstance(prov, dict):
+                        prov = {}
+                    orch = {"run_id": run_id}
+                    if parent_run_id is not None:
+                        orch["parent_run_id"] = parent_run_id
+                    prov["orchestrator"] = orch
+                    rep["provenance"] = prov
+                    out.write_text(json.dumps(rep, indent=2), encoding="utf-8")
+                    if rep.get("aggregate_exit_code") is not None:
+                        bundle_agg = int(rep["aggregate_exit_code"])
             except (OSError, json.JSONDecodeError, TypeError, ValueError):
                 bundle_agg = 2
 

@@ -30,7 +30,7 @@ Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. **Shipped 
 ## Phase 4 — correlation & provenance
 
 - **Orchestrator-owned (envelope v2):** `run_id` (RFC 4122 UUID string; optional in job doc — runner generates one if absent), optional `parent_run_id` (UUID when present). `steps[]` entries include **`id`** and **`type`** (mirror job document) plus **`name`**, **`artifact_uri`** (`file:` URI for bundle output and envelope path), **`exit_code`**, **`started_at` / `ended_at`** (RFC 3339 UTC with `Z`). Job documents must use UUID `run_id` / `parent_run_id` when those keys are non-empty.
-- **Bundle-owned (optional extension later):** mirror today’s `provenance` object; if a correlation field is added, it must be **optional** so existing consumers and fixtures keep working.
+- **Bundle-owned (optional extension, shipped in runner):** orchestrator `run` may echo `run_id` / `parent_run_id` under `bundle_report.v2.provenance.orchestrator` as **optional** fields so existing consumers and fixtures keep working.
 
 ## Phase 4 — acceptance criteria (first implementation slice)
 
@@ -38,7 +38,7 @@ Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. **Shipped 
 2. **Done:** running `run` on the fixture tree produces bundle JSON + envelope JSON; process exit follows bundle **`aggregate_exit_code`** when readable (else tooling-style failure).
 3. **Done:** no new **required** fields on `hf_bundle_scanner.bundle_report.v2`.
 
-**Still open (later slices):** YAML jobs; broader multi-scan graph composition beyond current `scan_bundle` + `admit_model*` + optional `dynamic_probe`; optional echo of `run_id` into bundle `provenance` (separate ADR if pursued); HTTP/MCP job backends.
+**Still open (later slices):** YAML jobs; broader multi-scan graph composition beyond current `scan_bundle` + `admit_model*` + optional `dynamic_probe`; HTTP/MCP job backends.
 
 ## Links
 

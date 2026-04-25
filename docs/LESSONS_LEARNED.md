@@ -109,6 +109,11 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 - **Mistake:** Assuming multiple `admit_model` step ids can be resolved from step list alone; runner then guesses per-step policy/artifact/report and fails inconsistently.
 - **Fix:** Require explicit `admit_model.jobs[]` with `step_id` mapping and validate one-to-one coverage against `admit_model` step ids, plus strict path checks for artifact/policy/report targets.
 
+## 2026-04-25 — Correlation should live in both envelope and bundle artifact
+
+- **Mistake:** Keeping orchestrator identity only in envelope JSON forces downstream tools that only receive bundle report to lose run correlation.
+- **Fix:** During orchestrator `run`, echo `run_id` / `parent_run_id` into `bundle_report.v2.provenance.orchestrator` as optional fields; keep schema backward-compatible by not making them required.
+
 ## Template (copy below)
 
 ```
