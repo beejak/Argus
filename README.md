@@ -210,7 +210,7 @@ Machine-readable reports include a paired timestamp for audit and human parity:
 | **`report_generated_at_utc`** | Scan/report completion instant in **UTC**, RFC 3339 with **`Z`**. |
 | **`report_generated_at_ist`** | Same instant in **Asia/Kolkata** (`+05:30`). |
 
-Present on **bundle** (`hf_bundle_scanner.bundle_report.v2`), **admit-model** JSON, **dynamic_probe_report.v1**, and the optional **`live_e2e_compare`** summary. Values are fixed when the report is **completed**, so orchestrator rewrites (for example provenance echo) do not roll the clock. **HTML** exports show generation time at **HTML build**; reopening old HTML does not change the stamp — regenerate if needed. Full contract table: [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).
+Present on **bundle** (`hf_bundle_scanner.bundle_report.v2`), **admit-model** JSON, **dynamic_probe_report.v1**, and the optional **`live_e2e_compare`** summary. Values are fixed when the report is **completed**, so orchestrator rewrites (for example provenance echo) do not roll the clock. **HTML / CSV / blast MD** from [`scripts/export_bundle_action_sheet.py`](scripts/export_bundle_action_sheet.py) prefer **`report_generated_at_ist`** from the bundle JSON when present (otherwise export-time IST). Reopening an old HTML file still shows the stamp it was written with. Full contract table: [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).
 
 ---
 

@@ -244,4 +244,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `make docs-map`, `make agent-verify` (recommended after doc-only edits when Makefile changes).
 - **Next:** keep **one hub** (`DOCUMENTATION.md`) authoritative for deep tables; README stays the front door + quick links.
 
+### 2026-04-26 — HTML/CSV briefing stamps follow bundle JSON when present
+
+- **Phase:** reporting / UX (post-documentation hub).
+- **Changes:** `scripts/export_bundle_action_sheet.py` now prefers each bundle’s **`report_generated_at_ist`** for `iter_rows` / `--bundle-json` flows; HTML + blast MD headers derive from the first exec row (or explicit override) so re-exporting frozen JSON does not silently roll the clock. Default multi-demo export uses per-bundle stamps when fields exist, else export-time IST. Updated `docs/DOCUMENTATION.md` + root `README.md` reporting paragraph to match.
+- **Commands:** `make agent-verify`; smoke `python scripts/export_bundle_action_sheet.py --bundle-json /tmp/hf-bundle-fixture-report.json --html-out /tmp/test-export.html`.
+- **Next:** optional refresh of committed `docs/sample_reports/*.json` to embed timestamps for prettier static HTML regeneration.
+
 ---

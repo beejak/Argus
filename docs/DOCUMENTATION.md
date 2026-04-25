@@ -40,7 +40,7 @@ Bundle, admit-model, and dynamic-probe JSON reports include:
 
 **Semantics:** timestamps are set when the scan **finishes producing** that report object (bundle dispatch completion, admit CLI assembly, dynamic probe emission), not on incidental re-reads of the dataclass. Orchestrator post-processing that rewrites bundle JSON (e.g. provenance echo) does **not** roll the report clock forward.
 
-**HTML:** exported HTML (e.g. ephemeral scan briefing) shows the time **at HTML generation**; reopening an old HTML file does not auto-refresh the stamp. Regenerate HTML from JSON if you need a new header time.
+**HTML / CSV / leadership MD:** [`scripts/export_bundle_action_sheet.py`](../scripts/export_bundle_action_sheet.py) prefers **`report_generated_at_ist`** from the bundle JSON when present (so re-exporting a committed bundle aligns the briefing header with the scan). If those fields are absent (older samples), the exporter falls back to **export-time** IST. Reopening a previously written HTML file still shows whatever stamp was baked in at generation.
 
 Helpers live in:
 

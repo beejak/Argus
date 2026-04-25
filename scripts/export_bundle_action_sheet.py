@@ -3,6 +3,11 @@
 
 Also writes a leadership-oriented blast-radius Markdown brief (prod impact, scope).
 
+When bundle JSON includes ``report_generated_at_ist`` (paired with ``report_generated_at_utc``
+from the scanner), CSV rows and HTML/MD headers prefer that **scan completion** IST stamp so
+re-exporting a frozen bundle does not silently “refresh” the clock. Legacy samples without
+those fields still use the export-time IST clock.
+
 No third-party deps. Intended for committed samples under docs/sample_reports/actionable/.
 """
 from __future__ import annotations
@@ -220,6 +225,28 @@ def _ist_now_iso() -> str:
     """
     ist = timezone(timedelta(hours=5, minutes=30), name="IST")
     return datetime.now(ist).replace(microsecond=0).isoformat()
+
+
+def _bundle_report_stamp_ist(data: dict[str, Any]) -> str | None:
+    """Return bundle JSON ``report_generated_at_ist`` when present (scan completion time).
+
+    Falls back to :func:`_ist_now_iso` at call sites when this returns ``None`` (legacy samples
+    or pre-timestamp bundle JSON).
+    """
+    v = data.get("report_generated_at_ist")
+    if isinstance(v, str) and v.strip():
+        return v.strip()
+    return None
+
+
+def _first_exec_report_generated_at(rows: list[dict[str, str]]) -> str:
+    """First executive-summary row timestamp (per-demo exports may differ)."""
+    for r in rows:
+        if r.get("row_kind") == "EXEC_SUMMARY":
+            v = (r.get("report_generated_at") or "").strip()
+            if v:
+                return v
+    return ""
 
 
 def _model_report_fields(data: dict[str, Any]) -> dict[str, str]:
@@ -1355,7 +1382,11 @@ def write_html(
     report_generated_at_iso: str | None = None,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    report_ts = (report_generated_at_iso or "").strip() or _ist_now_iso()
+    report_ts = (
+        (report_generated_at_iso or "").strip()
+        or _first_exec_report_generated_at(rows)
+        or _ist_now_iso()
+    )
     raw_url = f"{_DEFAULT_HTML_RAW_BASE}/{path.name}"
     githack_url = raw_url.replace(
         "https://raw.githubusercontent.com/",
@@ -1543,7 +1574,11 @@ def write_blast_radius_md(
 ) -> None:
     """Markdown brief for executives: prod impact + blast radius per issue class."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    report_ts = (report_generated_at_iso or "").strip() or _ist_now_iso()
+    report_ts = (
+        (report_generated_at_iso or "").strip()
+        or _first_exec_report_generated_at(rows)
+        or _ist_now_iso()
+    )
     lines: list[str] = [
         "# Blast radius & leadership brief (sample Hub demos)",
         "",
@@ -1785,7 +1820,7 @@ def main() -> int:
         demo_id = str(args.demo_id or "ephemeral_hub").strip() or "ephemeral_hub"
         demo_title = (args.demo_title or "").strip() or f"Hub scan — {_hub_repo(data)}"
         demo = Demo(demo_id, demo_title, bundle_json)
-        report_ts = _ist_now_iso()
+        report_ts = _bundle_report_stamp_ist(data) or _ist_now_iso()
         rows = list(iter_rows(demo, data, root, report_generated_at_iso=report_ts))
         html_out = (args.html_out or bundle_json.with_suffix(".html")).resolve()
         html_out.parent.mkdir(parents=True, exist_ok=True)
@@ -1809,18 +1844,18 @@ def main() -> int:
     md_out = (args.md_out or (root / "docs/sample_reports/actionable/BLAST_RADIUS_LEADERSHIP.md")).resolve()
 
     demos = default_demos(root)
-    report_ts = _ist_now_iso()
     rows: list[dict[str, str]] = []
     for d in demos:
         if not d.json_path.is_file():
             print(f"ERROR: missing {d.json_path}", file=sys.stderr)
             return 2
         data = json.loads(d.json_path.read_text(encoding="utf-8"))
-        rows.extend(iter_rows(d, data, root, report_generated_at_iso=report_ts))
+        demo_ts = _bundle_report_stamp_ist(data) or _ist_now_iso()
+        rows.extend(iter_rows(d, data, root, report_generated_at_iso=demo_ts))
 
     write_csv(csv_out, rows)
-    write_html(html_out, demos, rows, root, report_generated_at_iso=report_ts)
-    write_blast_radius_md(md_out, demos, rows, root, report_generated_at_iso=report_ts)
+    write_html(html_out, demos, rows, root, report_generated_at_iso=None)
+    write_blast_radius_md(md_out, demos, rows, root, report_generated_at_iso=None)
     print(
         json.dumps(
             {"csv": str(csv_out), "html": str(html_out), "md": str(md_out), "rows": len(rows)},
