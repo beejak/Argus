@@ -204,4 +204,9 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`.
 - **Next:** implement `phase5-garak-config-budgets` or schedule `phase4-admit-model-fanout` per roadmap table.
 
+### 2026-04-25 — Lessons propagation + README vs test matrix
+
+- **Phase:** harness / docs only.
+- **Changes:** **`docs/LESSONS_LEARNED.md`** (2026-04-25 lessons: Make colon + commit-msg, choice capture, README vs pytest matrix, missing probe JSON); **`docs/LONG_HORIZON_HARNESS.md`** Makefile rows + **Propagating sanitized lessons** section; **`docs/HERMES_AGENTS.md`** test-inventory + lessons pointer; **`.cursor/skills/llm-scanner-long-horizon/SKILL.md`** checklist; **`README.md`** test row clarifies README is not the full scenario list; **`AGENTS.md`** cross-link for mirroring hints.
+
 ---

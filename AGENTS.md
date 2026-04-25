@@ -12,7 +12,7 @@ This monorepo contains:
 - [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) — phased long-horizon plan.
 - [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md) — phase 0 threat model, OWASP mapping, `rule_id` / categories.
 - [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md) — index of LLM security test cases and where they live.
-- [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) — mistakes + fixes (feedback loop).
+- [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md) — mistakes + fixes (feedback loop). After a durable lesson, consider mirroring a **short** hint into [LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) (propagation table), [HERMES_AGENTS.md](docs/HERMES_AGENTS.md), or the long-horizon Cursor skill — not a full README rewrite.
 - [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md) — Hermes / MCP boundaries.
 - [docs/LONG_HORIZON_HARNESS.md](docs/LONG_HORIZON_HARNESS.md) — Makefile, session log, graphify.
 - [hf_bundle_scanner/docs/hermes-mcp.md](hf_bundle_scanner/docs/hermes-mcp.md) — MCP + HTTP + `HF_BUNDLE_PYTHON`.

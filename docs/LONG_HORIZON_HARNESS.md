@@ -21,8 +21,24 @@ Feedback loop: [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (append mistakes and fix
 | `make plain-english-brief` | Write `docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md` (non-technical; does not overwrite CSV/HTML/blast MD) |
 | `make sample-reports-all` | `sample-action-sheets` + `plain-english-brief` |
 | `make hub-find-models-under-size` | Hub metadata search for repos under **`HF_HUB_FIND_FLAGS`** (default script flags: `--max-mb 200`; optional **`--probe-configlint`**; needs network) |
+| `make orchestrator-validate` | **`run_orchestrator_job.py validate`** on **`orchestrator_job_min.json`** and **`orchestrator_job_with_dynamic.json`** (no scan) |
+| `make dynamic-probe-stub` | Writes **`.agent/dynamic_probe_last.json`** via **`run_dynamic_probe.py`** (disabled unless **`LLM_SCANNER_DYNAMIC_PROBE=1`**) |
 
 Delegate from `hf_bundle_scanner/` with `make -C .. <target>` (see that folder’s stub Makefile).
+
+## Propagating sanitized lessons (skills, Makefile, Hermes)
+
+When you append a **durable** lesson to [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md), consider whether it should also appear in:
+
+| Surface | Purpose |
+| ------- | ------- |
+| **This harness doc** | Add or adjust a **Makefile** table row, “superpowers” bullet, or session reminder so **WSL / agents** see it without opening every lesson. |
+| **`.cursor/skills/llm-scanner-long-horizon/SKILL.md`** | Short **judgement / discipline** bullets (no secrets); keeps Cursor agents aligned on phases, Hermes bounds, and harness commands. |
+| **Root `Makefile` `help`** | One-line **operational** hints (e.g. commit message pitfall) when a lesson is “how to run a command safely.” |
+| **[`docs/HERMES_AGENTS.md`](HERMES_AGENTS.md)** | Boundaries and **env** reminders for tools agents call (MCP, HTTP, `make …`). |
+| **`README.md`** | **Map only** — link to test docs and harness; do **not** mirror the full pytest matrix (see lesson **2026-04-25 — Mirroring every pytest scenario in the README**). |
+
+**Sanitize before copying:** strip customer names, paths, tokens, and one-off host quirks unless the fix is reusable. Prefer **pattern + fix** over raw logs.
 
 ## Session memory (“claude-mem” compatible)
 

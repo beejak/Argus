@@ -44,3 +44,14 @@ At **end of each agent session**, append a short entry to [`docs/sessions/SESSIO
 ## Hermes reminder
 
 MCP tools expose **bounded** scan operations — see [`hf_bundle_scanner/docs/hermes-mcp.md`](../../../hf_bundle_scanner/docs/hermes-mcp.md). Long-horizon dynamic red-team (Garak-class) belongs in **phase 5** and must stay **opt-in** (env / policy), not default CI.
+
+## Lessons learned → harness (checklist)
+
+When you add a **sanitized** lesson to [`docs/LESSONS_LEARNED.md`](../../../docs/LESSONS_LEARNED.md), decide if it also belongs in:
+
+1. **[`docs/LONG_HORIZON_HARNESS.md`](../../../docs/LONG_HORIZON_HARNESS.md)** — Makefile table row, superpowers bullet, or **Propagating sanitized lessons** table.
+2. **This skill** — one or two **judgement** bullets if it changes agent behavior (phases, Hermes, commits, WSL).
+3. **[`docs/HERMES_AGENTS.md`](../../../docs/HERMES_AGENTS.md)** — if it bounds what Hermes / MCP may call or which env vars matter.
+4. **Root `Makefile` `help`** — only for **operator**-level gotchas (e.g. commit message quoting).
+
+**Do not** paste full pytest matrices into **README**; keep **`hf_bundle_scanner/tests/`** + [TEST_CASES_LLM_SECURITY_SCANNER.md](../../../docs/TEST_CASES_LLM_SECURITY_SCANNER.md) canonical. README stays a **map**.

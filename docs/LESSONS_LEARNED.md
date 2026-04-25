@@ -64,6 +64,26 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 - **Likely causes:** (1) **Shell / nested host quoting** dropped the `-m` value so a later token was parsed as **`--trailer`** with no value. (2) A broken **`trailer.*`** entry or **`alias.commit=… --trailer …`** in some Git config (`git config --list --show-origin | grep -i trailer`). (3) Rare **environment pollution**; compare against a minimal env (`env -i HOME="$HOME" XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}" PATH="/usr/bin:/bin:$PATH" git …`).
 - **Fix:** Prefer **`git commit -F msg.txt`**, **`python3 scripts/git_commit_via_file.py 'subject line'`**, or **`make commit-msg MSG='subject line'`**. Inspect config with **`python3 scripts/git_doctor.py`** or **`make git-doctor`**.
 
+## 2026-04-25 — `make commit-msg MSG='chore: …'` truncates at the colon
+
+- **Mistake:** Passing a conventional-commit subject through **`make commit-msg MSG='chore: orchestrator hygiene'`**. **GNU Make** treats **`:`** as special (target/rule syntax), so the variable often ends at **`chore`** and the rest is lost → useless one-word commits.
+- **Fix:** Use **`python3 scripts/git_commit_via_file.py "chore: full subject"`** (or **`git commit -F`** with a message file). For **`make commit-msg`**, use **`MSG=one-line-subject-without-colons`** or see the note printed by **`make commit-msg`** with an empty **`MSG`**. Root **`Makefile`** `help` documents this pitfall.
+
+## 2026-04-25 — Multi-option “next steps” only one gets coded
+
+- **Mistake:** Proposing two or three valid follow-ups (e.g. phase-5 depth vs phase-4 fan-out), shipping one, and letting the others live only in chat → later sessions **re-litigate** or **forget** backlog.
+- **Fix:** Record non-chosen options in **[`docs/PRODUCTION_SCANNER_ROADMAP.md`](PRODUCTION_SCANNER_ROADMAP.md)** under **Choice capture** (same PR or immediate follow-up). **`AGENTS.md`** reminds agents to do this. Optional: one line in **[`docs/sessions/SESSION_LOG.md`](sessions/SESSION_LOG.md)**.
+
+## 2026-04-25 — Mirroring every pytest scenario in the README
+
+- **Mistake:** Trying to keep **README** in sync with every **`pytest`** case name, marker, and edge path → duplicate maintenance, drift, and noise for humans.
+- **Fix:** Treat **pytest + `hf_bundle_scanner/tests/`** and **[`docs/TEST_CASES_LLM_SECURITY_SCANNER.md`](TEST_CASES_LLM_SECURITY_SCANNER.md)** (+ **`llm_security_test_cases/catalog.json`**) as the **canonical test story**. README should **map** where verification lives (**`make test`**, **`make agent-verify`**, CI workflow), not clone the matrix. Summaries belong in roadmap / phase docs when they help prioritization.
+
+## 2026-04-25 — Orchestrator dynamic probe: missing JSON on disk
+
+- **Mistake:** Assuming **`run_dynamic_probe.py`** always writes **`--out`** when the subprocess exits `0` (crash, disk full, or killed mid-write).
+- **Fix:** Runner treats **missing output file** like a tooling failure: merge with **`worst_exit_code(..., 2)`** so aggregate exit stays honest; same pattern when the report JSON is **unreadable**.
+
 ## Template (copy below)
 
 ```
