@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-"""Phase-5 dynamic probe stub (v1): opt-in Garak presence check + JSON report.
+"""Phase-5 dynamic probe lane (v1): opt-in Garak preflight/execute-once + JSON report.
 
 Default (no env): writes ``llm_scanner.dynamic_probe_report.v1`` with ``status: disabled`` and
 exits ``0`` so CI can call this script without enabling probes.
 
-Set ``LLM_SCANNER_DYNAMIC_PROBE=1`` to attempt a trivial ``garak`` CLI check (``--help``,
-timeout-bounded). If ``garak`` is missing, exits ``2`` and writes ``status: skipped`` with a
-clear message (tooling lane, aligned with absent ModelScan/ModelAudit semantics).
+Set ``LLM_SCANNER_DYNAMIC_PROBE=1`` to run either:
+
+- ``execution_mode=preflight`` (default): bounded ``garak --help`` availability check
+- ``execution_mode=execute_once``: one explicit garak argv payload via ``--execute-args``
+
+If ``garak`` is missing, exits ``2`` and writes ``status: skipped`` with a clear message
+(tooling lane, aligned with absent ModelScan/ModelAudit semantics).
 """
 from __future__ import annotations
 
@@ -14,6 +18,7 @@ import argparse
 import json
 import os
 import shutil
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -72,6 +77,18 @@ def main(argv: list[str] | None = None) -> int:
         default="",
         help="Comma-separated required secret env-var names (values are never recorded)",
     )
+    ap.add_argument(
+        "--execution-mode",
+        choices=("preflight", "execute_once"),
+        default="preflight",
+        help="preflight=garak availability check; execute_once=run one explicit garak argv payload",
+    )
+    ap.add_argument(
+        "--execute-args",
+        type=str,
+        default="",
+        help="Argument string appended to garak for execute_once mode (no shell). Example: '--help'",
+    )
     args = ap.parse_args(argv)
     out = Path(args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -105,6 +122,7 @@ def main(argv: list[str] | None = None) -> int:
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
@@ -120,6 +138,7 @@ def main(argv: list[str] | None = None) -> int:
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
@@ -137,6 +156,7 @@ def main(argv: list[str] | None = None) -> int:
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
@@ -153,8 +173,27 @@ def main(argv: list[str] | None = None) -> int:
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
             secret_env_vars_missing=missing_secret_vars,
+        )
+        out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
+        return 2
+
+    exec_args = shlex.split(args.execute_args) if str(args.execute_args).strip() else []
+    if args.execution_mode == "execute_once" and not exec_args:
+        doc = build_report(
+            status="error",
+            probe_backend="garak",
+            message="execution_mode=execute_once requires non-empty --execute-args.",
+            exit_code=2,
+            budget_max_probes=args.budget_max_probes,
+            budget_timeout_seconds=args.budget_timeout_seconds,
+            run_id=args.run_id,
+            garak_config=str(garak_config) if garak_config is not None else None,
+            model_target=args.model_target,
+            execution_mode=args.execution_mode,
+            secret_env_vars_required=required_secret_vars,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
@@ -171,14 +210,17 @@ def main(argv: list[str] | None = None) -> int:
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
+    executed_argv = [garak, *exec_args] if args.execution_mode == "execute_once" else []
+    preflight_argv = [garak, "--help"] if garak_config is None else [garak, "--config", str(garak_config), "--help"]
     try:
         p = subprocess.run(
-            [garak, "--help"] if garak_config is None else [garak, "--config", str(garak_config), "--help"],
+            preflight_argv if args.execution_mode == "preflight" else executed_argv,
             capture_output=True,
             text=True,
             timeout=int(args.budget_timeout_seconds),
@@ -195,6 +237,8 @@ def main(argv: list[str] | None = None) -> int:
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
+            executed_argv=executed_argv if args.execution_mode == "execute_once" else preflight_argv,
             secret_env_vars_required=required_secret_vars,
             garak_cli=garak,
         )
@@ -203,16 +247,19 @@ def main(argv: list[str] | None = None) -> int:
 
     if p.returncode != 0:
         tail = (p.stderr or p.stdout or "").strip()[-2000:]
+        cmd_label = "--help preflight" if args.execution_mode == "preflight" else "execute_once command"
         doc = build_report(
             status="error",
             probe_backend="garak",
-            message=f"garak --help failed (exit {p.returncode}). stderr/stdout tail: {tail!r}",
+            message=f"garak {cmd_label} failed (exit {p.returncode}). stderr/stdout tail: {tail!r}",
             exit_code=2,
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
+            execution_mode=args.execution_mode,
+            executed_argv=executed_argv if args.execution_mode == "execute_once" else preflight_argv,
             secret_env_vars_required=required_secret_vars,
             garak_cli=garak,
         )
@@ -222,13 +269,19 @@ def main(argv: list[str] | None = None) -> int:
     doc = build_report(
         status="ok",
         probe_backend="garak",
-        message="garak CLI responds to --help (probe harness not run in this stub).",
+        message=(
+            "garak CLI preflight ok (--help)."
+            if args.execution_mode == "preflight"
+            else "garak execute_once command completed successfully."
+        ),
         exit_code=0,
         budget_max_probes=args.budget_max_probes,
         budget_timeout_seconds=args.budget_timeout_seconds,
         run_id=args.run_id,
         garak_config=str(garak_config) if garak_config is not None else None,
         model_target=args.model_target,
+        execution_mode=args.execution_mode,
+        executed_argv=executed_argv if args.execution_mode == "execute_once" else preflight_argv,
         secret_env_vars_required=required_secret_vars,
         garak_cli=garak,
     )

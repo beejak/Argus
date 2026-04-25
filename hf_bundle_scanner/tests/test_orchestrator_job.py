@@ -271,6 +271,24 @@ def test_dynamic_probe_garak_config_must_exist_under_strict_paths() -> None:
     assert any("dynamic_probe.garak_config not a file" in e for e in errs)
 
 
+def test_dynamic_probe_execute_once_requires_execute_args() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "dyn", "type": "dynamic_probe", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "dyn"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "dynamic_probe": {
+            "out": "dyn.json",
+            "execution_mode": "execute_once",
+        },
+    }
+    errs = validate_job(doc)
+    assert any("execute_args" in e for e in errs)
+
+
 def test_admit_model_depends_on_must_be_scan_only() -> None:
     doc = {
         "schema": JOB_SCHEMA_V1,
@@ -362,6 +380,7 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
             "garak_config": str(repo / "hf_bundle_scanner/tests/fixtures/garak.dynamic.stub.yaml"),
             "model_target": "fixture://model",
             "secret_env_vars": ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"],
+            "execution_mode": "preflight",
         },
     }
     job_path = tmp_path / "job.json"
@@ -389,6 +408,7 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
     assert dp["garak_config"].endswith("garak.dynamic.stub.yaml")
     assert dp["model_target"] == "fixture://model"
     assert dp["secret_env_vars_required"] == ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
+    assert dp["execution_mode"] == "preflight"
 
 
 def test_run_orchestrator_job_with_admit_writes_envelope(tmp_path: Path) -> None:

@@ -38,6 +38,8 @@ def test_build_report_with_budget_and_cli() -> None:
         run_id="00000000-0000-4000-8000-00000000abcd",
         garak_config="/tmp/garak.yaml",
         model_target="openai:gpt-4.1-mini",
+        execution_mode="preflight",
+        executed_argv=["/usr/bin/garak", "--help"],
         secret_env_vars_required=["OPENAI_API_KEY"],
         secret_env_vars_missing=["OPENAI_API_KEY"],
         garak_cli="/usr/bin/garak",
@@ -47,6 +49,8 @@ def test_build_report_with_budget_and_cli() -> None:
     assert r["run_id"] == "00000000-0000-4000-8000-00000000abcd"
     assert r["garak_config"] == "/tmp/garak.yaml"
     assert r["model_target"] == "openai:gpt-4.1-mini"
+    assert r["execution_mode"] == "preflight"
+    assert r["executed_argv"] == ["/usr/bin/garak", "--help"]
     assert r["secret_env_vars_required"] == ["OPENAI_API_KEY"]
     assert r["secret_env_vars_missing"] == ["OPENAI_API_KEY"]
     assert r["garak_cli"] == "/usr/bin/garak"
@@ -95,6 +99,7 @@ def test_run_dynamic_probe_script_disabled(tmp_path: Path, monkeypatch: pytest.M
     assert data["garak_config"] == str(gcfg.resolve())
     assert data["model_target"] == "fixture://model"
     assert data["secret_env_vars_required"] == ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
+    assert data["execution_mode"] == "preflight"
 
 
 def test_run_dynamic_probe_script_rejects_invalid_budget(tmp_path: Path) -> None:
@@ -137,3 +142,25 @@ def test_run_dynamic_probe_script_rejects_missing_secret_env_vars(
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["status"] == "error"
     assert data["secret_env_vars_missing"] == ["OPENAI_API_KEY"]
+
+
+def test_run_dynamic_probe_script_rejects_execute_once_without_args(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("LLM_SCANNER_DYNAMIC_PROBE", "1")
+    root = _repo_root()
+    script = root / "scripts" / "run_dynamic_probe.py"
+    if not script.is_file():
+        pytest.skip("monorepo scripts/ not present")
+    out = tmp_path / "dp_exec_missing_args.json"
+    r = subprocess.run(
+        [sys.executable, str(script), "--out", str(out), "--execution-mode", "execute_once"],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 2, r.stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["status"] == "error"
+    assert "execute_once" in data["message"]

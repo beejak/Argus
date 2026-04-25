@@ -185,6 +185,22 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
                 sev = dp_obj.get("secret_env_vars")
                 if not isinstance(sev, list) or not all(_is_non_empty_str(x) for x in sev):
                     errs.append("dynamic_probe.secret_env_vars must be an array of non-empty strings when provided")
+            mode = dp_obj.get("execution_mode")
+            if mode is not None:
+                if not _is_non_empty_str(mode):
+                    errs.append("dynamic_probe.execution_mode must be a non-empty string when provided")
+                else:
+                    mv = str(mode).strip()
+                    if mv not in ("preflight", "execute_once"):
+                        errs.append("dynamic_probe.execution_mode must be 'preflight' or 'execute_once'")
+                    if mv == "execute_once":
+                        if not _is_non_empty_str(dp_obj.get("execute_args")):
+                            errs.append(
+                                "dynamic_probe.execute_args must be a non-empty string when execution_mode=execute_once"
+                            )
+            if "execute_args" in dp_obj and dp_obj.get("execute_args") is not None:
+                if not _is_non_empty_str(dp_obj.get("execute_args")):
+                    errs.append("dynamic_probe.execute_args must be a non-empty string when provided")
 
     dpr = doc.get("dynamic_probe")
     if isinstance(dpr, dict) and bool(dpr) and dp_id is None:

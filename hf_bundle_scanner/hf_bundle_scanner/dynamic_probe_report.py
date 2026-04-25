@@ -22,6 +22,8 @@ def build_report(
     run_id: str | None = None,
     garak_config: str | None = None,
     model_target: str | None = None,
+    execution_mode: str | None = None,
+    executed_argv: list[str] | None = None,
     secret_env_vars_required: list[str] | None = None,
     secret_env_vars_missing: list[str] | None = None,
     garak_cli: str | None = None,
@@ -48,6 +50,10 @@ def build_report(
         out["garak_config"] = str(garak_config).strip()
     if model_target:
         out["model_target"] = str(model_target).strip()
+    if execution_mode:
+        out["execution_mode"] = str(execution_mode).strip()
+    if executed_argv:
+        out["executed_argv"] = [str(x).strip() for x in executed_argv if str(x).strip()]
     if secret_env_vars_required:
         out["secret_env_vars_required"] = [str(x).strip() for x in secret_env_vars_required if str(x).strip()]
     if secret_env_vars_missing:

@@ -300,6 +300,10 @@ def main(argv: list[str] | None = None) -> int:
             sev = dpo.get("secret_env_vars")
             if isinstance(sev, list) and sev:
                 probe_cmd.extend(["--secret-env-vars", ",".join(str(x).strip() for x in sev if str(x).strip())])
+            if _is_non_empty_str(dpo.get("execution_mode")):
+                probe_cmd.extend(["--execution-mode", str(dpo["execution_mode"]).strip()])
+            if _is_non_empty_str(dpo.get("execute_args")):
+                probe_cmd.extend(["--execute-args", str(dpo["execute_args"]).strip()])
             t_dp_start = _utc_now()
             probe = subprocess.run(
                 probe_cmd,

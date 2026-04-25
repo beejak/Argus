@@ -45,7 +45,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_driver_faults_py",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_driver_faults.py"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L19",
       "id": "test_driver_faults_fake_modelscan_run",
-      "community": 0,
+      "community": 3,
       "norm_label": "_fake_modelscan_run()"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L26",
       "id": "test_driver_faults_test_modelscan_driver_malformed_json_is_error",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelscan_driver_malformed_json_is_error()"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L38",
       "id": "test_driver_faults_test_modelscan_driver_tool_exit_2",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelscan_driver_tool_exit_2()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L50",
       "id": "test_driver_faults_test_modelscan_driver_subprocess_timeout_returncode",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelscan_driver_subprocess_timeout_returncode()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L62",
       "id": "test_driver_faults_fake_modelaudit_run",
-      "community": 0,
+      "community": 3,
       "norm_label": "_fake_modelaudit_run()"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L69",
       "id": "test_driver_faults_test_modelaudit_driver_malformed_json_is_error",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelaudit_driver_malformed_json_is_error()"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L81",
       "id": "test_driver_faults_test_modelaudit_driver_tool_exit_2",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelaudit_driver_tool_exit_2()"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L93",
       "id": "test_driver_faults_test_modelaudit_driver_subprocess_timeout_returncode",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelaudit_driver_subprocess_timeout_returncode()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L105",
       "id": "test_driver_faults_write_posix_executable",
-      "community": 0,
+      "community": 3,
       "norm_label": "_write_posix_executable()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L111",
       "id": "test_driver_faults_test_cli_scan_driver_error_yields_exit_2",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_cli_scan_driver_error_yields_exit_2()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L151",
       "id": "test_driver_faults_test_cli_scan_driver_timeout_yields_exit_2",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_cli_scan_driver_timeout_yields_exit_2()"
     },
     {
@@ -152,7 +152,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_driver_faults.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 3,
       "norm_label": "driver and cli behavior for tool errors (exit 2) and timeouts \u2014 no real scanners",
       "id": "test_driver_faults_rationale_1"
     },
@@ -162,7 +162,7 @@
       "source_file": "model-admission/tests/test_integration_drivers.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_integration_drivers_py",
-      "community": 1,
+      "community": 15,
       "norm_label": "test_integration_drivers.py"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "model-admission/tests/test_integration_drivers.py",
       "source_location": "L14",
       "id": "test_integration_drivers_minimal_safetensors",
-      "community": 1,
+      "community": 15,
       "norm_label": "_minimal_safetensors()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "model-admission/tests/test_integration_drivers.py",
       "source_location": "L22",
       "id": "test_integration_drivers_test_modelscan_on_minimal_safetensors",
-      "community": 1,
+      "community": 15,
       "norm_label": "test_modelscan_on_minimal_safetensors()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "model-admission/tests/test_integration_drivers.py",
       "source_location": "L56",
       "id": "test_integration_drivers_test_modelaudit_on_minimal_safetensors",
-      "community": 1,
+      "community": 15,
       "norm_label": "test_modelaudit_on_minimal_safetensors()"
     },
     {
@@ -197,7 +197,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_integration_drivers.py",
       "source_location": "L1",
-      "community": 1,
+      "community": 15,
       "norm_label": "optional: run when modelscan / modelaudit are on path.",
       "id": "test_integration_drivers_rationale_1"
     },
@@ -206,7 +206,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_integration_drivers.py",
       "source_location": "L15",
-      "community": 1,
+      "community": 15,
       "norm_label": "tiny valid safetensors payload (empty tensor map).",
       "id": "test_integration_drivers_rationale_15"
     },
@@ -216,7 +216,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_drivers_py",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_drivers.py"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L13",
       "id": "test_drivers_test_get_driver_known",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_get_driver_known()"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L18",
       "id": "test_drivers_test_get_driver_unknown",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_get_driver_unknown()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L23",
       "id": "test_drivers_test_drivers_registry_contains_expected_keys",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_drivers_registry_contains_expected_keys()"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L27",
       "id": "test_drivers_test_modelscan_parse_json_issues_list",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelscan_parse_json_issues_list()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L40",
       "id": "test_drivers_test_modelscan_parse_nested_all_issues",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelscan_parse_nested_all_issues()"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L48",
       "id": "test_drivers_test_modelaudit_parse_findings_list",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelaudit_parse_findings_list()"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L57",
       "id": "test_drivers_test_modelaudit_parse_summary_fallback",
-      "community": 0,
+      "community": 3,
       "norm_label": "test_modelaudit_parse_summary_fallback()"
     },
     {
@@ -287,7 +287,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_drivers.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 3,
       "norm_label": "driver registry and json parsing without invoking external binaries.",
       "id": "test_drivers_rationale_1"
     },
@@ -342,7 +342,7 @@
       "source_file": "model-admission/tests/test_cli_exit_logic.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_cli_exit_logic_py",
-      "community": 2,
+      "community": 9,
       "norm_label": "test_cli_exit_logic.py"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "model-admission/tests/test_cli_exit_logic.py",
       "source_location": "L13",
       "id": "test_cli_exit_logic_test_min_severity_parsing",
-      "community": 2,
+      "community": 9,
       "norm_label": "test_min_severity_parsing()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "model-admission/tests/test_cli_exit_logic.py",
       "source_location": "L20",
       "id": "test_cli_exit_logic_test_any_finding_at_or_above_respects_floor",
-      "community": 2,
+      "community": 9,
       "norm_label": "test_any_finding_at_or_above_respects_floor()"
     },
     {
@@ -368,7 +368,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_cli_exit_logic.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 9,
       "norm_label": "exit logic for --fail-on (imports private helpers \u2014 stable contract tests).",
       "id": "test_cli_exit_logic_rationale_1"
     },
@@ -378,7 +378,7 @@
       "source_file": "model-admission/tests/test_policy.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_policy_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_policy.py"
     },
     {
@@ -387,7 +387,7 @@
       "source_file": "model-admission/tests/test_policy.py",
       "source_location": "L6",
       "id": "test_policy_test_sha256_file",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_sha256_file()"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "model-admission/tests/test_policy.py",
       "source_location": "L12",
       "id": "test_policy_test_policy_forbidden_extension",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_policy_forbidden_extension()"
     },
     {
@@ -405,7 +405,7 @@
       "source_file": "model-admission/tests/test_policy.py",
       "source_location": "L22",
       "id": "test_policy_test_policy_allowlist",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_policy_allowlist()"
     },
     {
@@ -414,7 +414,7 @@
       "source_file": "model-admission/tests/test_policy.py",
       "source_location": "L32",
       "id": "test_policy_test_policy_sha256_allowlist",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_policy_sha256_allowlist()"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "model-admission/tests/test_policy.py",
       "source_location": "L42",
       "id": "test_policy_test_policy_load_roundtrip",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_policy_load_roundtrip()"
     },
     {
@@ -477,7 +477,7 @@
       "source_file": "model-admission/tests/test_llm_security_catalog.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_llm_security_catalog_py",
-      "community": 16,
+      "community": 17,
       "norm_label": "test_llm_security_catalog.py"
     },
     {
@@ -486,7 +486,7 @@
       "source_file": "model-admission/tests/test_llm_security_catalog.py",
       "source_location": "L4",
       "id": "test_llm_security_catalog_test_llm_security_test_catalog_fixture",
-      "community": 16,
+      "community": 17,
       "norm_label": "test_llm_security_test_catalog_fixture()"
     },
     {
@@ -494,7 +494,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_llm_security_catalog.py",
       "source_location": "L1",
-      "community": 16,
+      "community": 17,
       "norm_label": "ensure the shared llm security test catalog loads in this package's pytest sessi",
       "id": "test_llm_security_catalog_rationale_1"
     },
@@ -504,7 +504,7 @@
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_report_py",
-      "community": 0,
+      "community": 9,
       "norm_label": "test_report.py"
     },
     {
@@ -513,7 +513,7 @@
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L11",
       "id": "test_report_test_finding_to_dict_severity_is_string",
-      "community": 0,
+      "community": 9,
       "norm_label": "test_finding_to_dict_severity_is_string()"
     },
     {
@@ -522,7 +522,7 @@
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L20",
       "id": "test_report_test_finding_to_dict_includes_rule_id_when_set",
-      "community": 0,
+      "community": 9,
       "norm_label": "test_finding_to_dict_includes_rule_id_when_set()"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L33",
       "id": "test_report_test_scan_report_highest_severity",
-      "community": 0,
+      "community": 9,
       "norm_label": "test_scan_report_highest_severity()"
     },
     {
@@ -540,7 +540,7 @@
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L48",
       "id": "test_report_test_scan_report_highest_none_when_empty",
-      "community": 0,
+      "community": 9,
       "norm_label": "test_scan_report_highest_none_when_empty()"
     },
     {
@@ -549,7 +549,7 @@
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L59",
       "id": "test_report_test_scan_report_write_json_roundtrip",
-      "community": 0,
+      "community": 9,
       "norm_label": "test_scan_report_write_json_roundtrip()"
     },
     {
@@ -557,7 +557,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_report.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 9,
       "norm_label": "scanreport / finding serialization and severity aggregation.",
       "id": "test_report_rationale_1"
     },
@@ -648,7 +648,7 @@
       "source_file": "model-admission/tests/test_ledger.py",
       "source_location": "L1",
       "id": "model_admission_tests_test_ledger_py",
-      "community": 14,
+      "community": 0,
       "norm_label": "test_ledger.py"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "model-admission/tests/test_ledger.py",
       "source_location": "L11",
       "id": "test_ledger_test_append_ledger_writes_one_json_line",
-      "community": 14,
+      "community": 0,
       "norm_label": "test_append_ledger_writes_one_json_line()"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "model-admission/tests/test_ledger.py",
       "source_location": "L22",
       "id": "test_ledger_test_append_ledger_appends_second_line",
-      "community": 14,
+      "community": 0,
       "norm_label": "test_append_ledger_appends_second_line()"
     },
     {
@@ -674,7 +674,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/tests/test_ledger.py",
       "source_location": "L1",
-      "community": 14,
+      "community": 0,
       "norm_label": "ledger append-only jsonl.",
       "id": "test_ledger_rationale_1"
     },
@@ -747,7 +747,7 @@
       "source_file": "model-admission/model_admission/ledger.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_ledger_py",
-      "community": 14,
+      "community": 0,
       "norm_label": "ledger.py"
     },
     {
@@ -756,7 +756,7 @@
       "source_file": "model-admission/model_admission/ledger.py",
       "source_location": "L10",
       "id": "ledger_append_ledger",
-      "community": 14,
+      "community": 0,
       "norm_label": "append_ledger()"
     },
     {
@@ -765,7 +765,7 @@
       "source_file": "model-admission/model_admission/__init__.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_init_py",
-      "community": 17,
+      "community": 18,
       "norm_label": "__init__.py"
     },
     {
@@ -773,7 +773,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/__init__.py",
       "source_location": "L1",
-      "community": 17,
+      "community": 18,
       "norm_label": "hf bundle scanner: snapshot manifest, discovery, dispatch to model-admission, co",
       "id": "init_rationale_1"
     },
@@ -783,7 +783,7 @@
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_policy_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "policy.py"
     },
     {
@@ -792,7 +792,7 @@
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L10",
       "id": "policy_policyconfig",
-      "community": 2,
+      "community": 0,
       "norm_label": "policyconfig"
     },
     {
@@ -801,7 +801,7 @@
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L19",
       "id": "policy_load",
-      "community": 2,
+      "community": 0,
       "norm_label": "load()"
     },
     {
@@ -810,7 +810,7 @@
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L29",
       "id": "policy_policyconfig_content_hash",
-      "community": 2,
+      "community": 0,
       "norm_label": ".content_hash()"
     },
     {
@@ -819,7 +819,7 @@
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L43",
       "id": "policy_sha256_file",
-      "community": 2,
+      "community": 0,
       "norm_label": "sha256_file()"
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L54",
       "id": "policy_evaluate_policy",
-      "community": 2,
+      "community": 0,
       "norm_label": "evaluate_policy()"
     },
     {
@@ -836,7 +836,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L11",
-      "community": 2,
+      "community": 0,
       "norm_label": "json policy file. unknown keys are ignored for forward compatibility.",
       "id": "policy_rationale_11"
     },
@@ -845,7 +845,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L30",
-      "community": 2,
+      "community": 0,
       "norm_label": "stable hash of normalized policy for ledger.",
       "id": "policy_rationale_30"
     },
@@ -854,7 +854,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/model_admission/policy.py",
       "source_location": "L55",
-      "community": 2,
+      "community": 0,
       "norm_label": "return list of human-readable violations (empty => pass).",
       "id": "policy_rationale_55"
     },
@@ -864,7 +864,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_report_py",
-      "community": 0,
+      "community": 9,
       "norm_label": "report.py"
     },
     {
@@ -873,7 +873,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L10",
       "id": "report_severity",
-      "community": 0,
+      "community": 9,
       "norm_label": "severity"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "",
       "source_location": "",
       "id": "enum",
-      "community": 0,
+      "community": 9,
       "norm_label": "enum"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L19",
       "id": "report_finding",
-      "community": 0,
+      "community": 9,
       "norm_label": "finding"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L28",
       "id": "report_finding_to_dict",
-      "community": 0,
+      "community": 9,
       "norm_label": ".to_dict()"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L45",
       "id": "report_scanreport",
-      "community": 0,
+      "community": 9,
       "norm_label": "scanreport"
     },
     {
@@ -927,7 +927,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L53",
       "id": "report_scanreport_highest_severity",
-      "community": 0,
+      "community": 9,
       "norm_label": ".highest_severity()"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L67",
       "id": "report_scanreport_to_dict",
-      "community": 0,
+      "community": 9,
       "norm_label": ".to_dict()"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "model-admission/model_admission/report.py",
       "source_location": "L77",
       "id": "report_scanreport_write_json",
-      "community": 0,
+      "community": 9,
       "norm_label": ".write_json()"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "model-admission/model_admission/cli.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_cli_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "cli.py"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "model-admission/model_admission/cli.py",
       "source_location": "L24",
       "id": "cli_min_severity",
-      "community": 2,
+      "community": 9,
       "norm_label": "_min_severity()"
     },
     {
@@ -972,7 +972,7 @@
       "source_file": "model-admission/model_admission/cli.py",
       "source_location": "L32",
       "id": "cli_any_finding_at_or_above",
-      "community": 2,
+      "community": 0,
       "norm_label": "_any_finding_at_or_above()"
     },
     {
@@ -981,7 +981,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L28",
       "id": "cli_cmd_scan",
-      "community": 2,
+      "community": 0,
       "norm_label": "_cmd_scan()"
     },
     {
@@ -990,7 +990,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L64",
       "id": "cli_build_parser",
-      "community": 2,
+      "community": 0,
       "norm_label": "build_parser()"
     },
     {
@@ -999,7 +999,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L133",
       "id": "cli_main",
-      "community": 2,
+      "community": 0,
       "norm_label": "main()"
     },
     {
@@ -1008,7 +1008,7 @@
       "source_file": "model-admission/model_admission/__main__.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_main_py",
-      "community": 22,
+      "community": 23,
       "norm_label": "__main__.py"
     },
     {
@@ -1107,7 +1107,7 @@
       "source_file": "model-admission/model_admission/drivers/modelscan.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_drivers_modelscan_py",
-      "community": 0,
+      "community": 3,
       "norm_label": "modelscan.py"
     },
     {
@@ -1116,7 +1116,7 @@
       "source_file": "model-admission/model_admission/drivers/modelscan.py",
       "source_location": "L12",
       "id": "modelscan_modelscandriver",
-      "community": 0,
+      "community": 3,
       "norm_label": "modelscandriver"
     },
     {
@@ -1125,7 +1125,7 @@
       "source_file": "",
       "source_location": "",
       "id": "scandriver",
-      "community": 0,
+      "community": 3,
       "norm_label": "scandriver"
     },
     {
@@ -1134,7 +1134,7 @@
       "source_file": "model-admission/model_admission/drivers/modelscan.py",
       "source_location": "L15",
       "id": "modelscan_modelscandriver_scan",
-      "community": 0,
+      "community": 3,
       "norm_label": ".scan()"
     },
     {
@@ -1143,7 +1143,7 @@
       "source_file": "model-admission/model_admission/drivers/modelscan.py",
       "source_location": "L74",
       "id": "modelscan_modelscandriver_parse_json_report",
-      "community": 0,
+      "community": 3,
       "norm_label": "._parse_json_report()"
     },
     {
@@ -1152,7 +1152,7 @@
       "source_file": "model-admission/model_admission/drivers/modelaudit.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_drivers_modelaudit_py",
-      "community": 0,
+      "community": 3,
       "norm_label": "modelaudit.py"
     },
     {
@@ -1161,7 +1161,7 @@
       "source_file": "model-admission/model_admission/drivers/modelaudit.py",
       "source_location": "L12",
       "id": "modelaudit_modelauditdriver",
-      "community": 0,
+      "community": 3,
       "norm_label": "modelauditdriver"
     },
     {
@@ -1170,7 +1170,7 @@
       "source_file": "model-admission/model_admission/drivers/modelaudit.py",
       "source_location": "L15",
       "id": "modelaudit_modelauditdriver_scan",
-      "community": 0,
+      "community": 3,
       "norm_label": ".scan()"
     },
     {
@@ -1179,7 +1179,7 @@
       "source_file": "model-admission/model_admission/drivers/modelaudit.py",
       "source_location": "L64",
       "id": "modelaudit_modelauditdriver_parse_json",
-      "community": 0,
+      "community": 3,
       "norm_label": "._parse_json()"
     },
     {
@@ -1188,7 +1188,7 @@
       "source_file": "model-admission/model_admission/drivers/__init__.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_drivers_init_py",
-      "community": 0,
+      "community": 3,
       "norm_label": "__init__.py"
     },
     {
@@ -1197,7 +1197,7 @@
       "source_file": "model-admission/model_admission/drivers/__init__.py",
       "source_location": "L11",
       "id": "init_get_driver",
-      "community": 0,
+      "community": 3,
       "norm_label": "get_driver()"
     },
     {
@@ -1206,7 +1206,7 @@
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L1",
       "id": "model_admission_model_admission_drivers_base_py",
-      "community": 0,
+      "community": 3,
       "norm_label": "base.py"
     },
     {
@@ -1215,7 +1215,7 @@
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L13",
       "id": "base_scandriver",
-      "community": 0,
+      "community": 3,
       "norm_label": "scandriver"
     },
     {
@@ -1224,7 +1224,7 @@
       "source_file": "",
       "source_location": "",
       "id": "abc",
-      "community": 0,
+      "community": 3,
       "norm_label": "abc"
     },
     {
@@ -1233,7 +1233,7 @@
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L17",
       "id": "base_scan",
-      "community": 0,
+      "community": 3,
       "norm_label": "scan()"
     },
     {
@@ -1242,7 +1242,7 @@
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L20",
       "id": "base_scandriver_which",
-      "community": 0,
+      "community": 3,
       "norm_label": "._which()"
     },
     {
@@ -1251,7 +1251,7 @@
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L23",
       "id": "base_scandriver_run",
-      "community": 0,
+      "community": 3,
       "norm_label": "._run()"
     },
     {
@@ -1260,7 +1260,7 @@
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L60",
       "id": "base_finding_from_severity",
-      "community": 0,
+      "community": 3,
       "norm_label": "finding_from_severity()"
     },
     {
@@ -1268,7 +1268,7 @@
       "file_type": "rationale",
       "source_file": "model-admission/model_admission/drivers/base.py",
       "source_location": "L18",
-      "community": 0,
+      "community": 9,
       "norm_label": "run scan. returns (findings, error_message_or_none).",
       "id": "base_rationale_18"
     },
@@ -1278,7 +1278,7 @@
       "source_file": "scripts/ephemeral_hub_scan.py",
       "source_location": "L1",
       "id": "scripts_ephemeral_hub_scan_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "ephemeral_hub_scan.py"
     },
     {
@@ -1287,7 +1287,7 @@
       "source_file": "scripts/ephemeral_hub_scan.py",
       "source_location": "L37",
       "id": "ephemeral_hub_scan_repo_root",
-      "community": 2,
+      "community": 0,
       "norm_label": "_repo_root()"
     },
     {
@@ -1296,7 +1296,7 @@
       "source_file": "scripts/ephemeral_hub_scan.py",
       "source_location": "L41",
       "id": "ephemeral_hub_scan_main",
-      "community": 2,
+      "community": 0,
       "norm_label": "main()"
     },
     {
@@ -1305,7 +1305,7 @@
       "source_file": "scripts/redact_ephemeral_report.py",
       "source_location": "L1",
       "id": "scripts_redact_ephemeral_report_py",
-      "community": 18,
+      "community": 19,
       "norm_label": "redact_ephemeral_report.py"
     },
     {
@@ -1314,7 +1314,7 @@
       "source_file": "scripts/redact_ephemeral_report.py",
       "source_location": "L10",
       "id": "redact_ephemeral_report_main",
-      "community": 18,
+      "community": 19,
       "norm_label": "main()"
     },
     {
@@ -1323,7 +1323,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L1",
       "id": "scripts_run_orchestrator_job_py",
-      "community": 12,
+      "community": 13,
       "norm_label": "run_orchestrator_job.py"
     },
     {
@@ -1332,7 +1332,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L27",
       "id": "run_orchestrator_job_repo_root",
-      "community": 12,
+      "community": 13,
       "norm_label": "_repo_root()"
     },
     {
@@ -1341,7 +1341,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L31",
       "id": "run_orchestrator_job_pick_python",
-      "community": 12,
+      "community": 13,
       "norm_label": "_pick_python()"
     },
     {
@@ -1350,7 +1350,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L42",
       "id": "run_orchestrator_job_resolve",
-      "community": 12,
+      "community": 13,
       "norm_label": "_resolve()"
     },
     {
@@ -1359,7 +1359,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L47",
       "id": "run_orchestrator_job_scan_argv",
-      "community": 12,
+      "community": 13,
       "norm_label": "_scan_argv()"
     },
     {
@@ -1368,7 +1368,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L69",
       "id": "run_orchestrator_job_admit_argv",
-      "community": 12,
+      "community": 13,
       "norm_label": "_admit_argv()"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L100",
       "id": "run_orchestrator_job_is_non_empty_str",
-      "community": 12,
+      "community": 13,
       "norm_label": "_is_non_empty_str()"
     },
     {
@@ -1386,7 +1386,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L104",
       "id": "run_orchestrator_job_utc_iso_z",
-      "community": 12,
+      "community": 13,
       "norm_label": "_utc_iso_z()"
     },
     {
@@ -1395,7 +1395,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L108",
       "id": "run_orchestrator_job_utc_now",
-      "community": 12,
+      "community": 13,
       "norm_label": "_utc_now()"
     },
     {
@@ -1404,7 +1404,7 @@
       "source_file": "scripts/run_orchestrator_job.py",
       "source_location": "L112",
       "id": "run_orchestrator_job_main",
-      "community": 12,
+      "community": 13,
       "norm_label": "main()"
     },
     {
@@ -1879,7 +1879,7 @@
       "label": "_repo_root()",
       "file_type": "code",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L22",
+      "source_location": "L27",
       "id": "run_dynamic_probe_repo_root",
       "community": 1,
       "norm_label": "_repo_root()"
@@ -1888,7 +1888,7 @@
       "label": "_csv_names()",
       "file_type": "code",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L26",
+      "source_location": "L31",
       "id": "run_dynamic_probe_csv_names",
       "community": 1,
       "norm_label": "_csv_names()"
@@ -1897,7 +1897,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L30",
+      "source_location": "L35",
       "id": "run_dynamic_probe_main",
       "community": 1,
       "norm_label": "main()"
@@ -1908,7 +1908,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L1",
       "id": "scripts_export_plain_english_brief_py",
-      "community": 11,
+      "community": 12,
       "norm_label": "export_plain_english_brief.py"
     },
     {
@@ -1917,7 +1917,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L20",
       "id": "export_plain_english_brief_demo",
-      "community": 11,
+      "community": 12,
       "norm_label": "demo"
     },
     {
@@ -1926,7 +1926,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L26",
       "id": "export_plain_english_brief_default_demos",
-      "community": 11,
+      "community": 12,
       "norm_label": "default_demos()"
     },
     {
@@ -1935,7 +1935,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L48",
       "id": "export_plain_english_brief_hub_label",
-      "community": 11,
+      "community": 12,
       "norm_label": "_hub_label()"
     },
     {
@@ -1944,7 +1944,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L60",
       "id": "export_plain_english_brief_exit_story",
-      "community": 11,
+      "community": 12,
       "norm_label": "_exit_story()"
     },
     {
@@ -1953,7 +1953,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L89",
       "id": "export_plain_english_brief_plain_config_message",
-      "community": 11,
+      "community": 12,
       "norm_label": "_plain_config_message()"
     },
     {
@@ -1962,7 +1962,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L147",
       "id": "export_plain_english_brief_config_plain_lines",
-      "community": 11,
+      "community": 12,
       "norm_label": "_config_plain_lines()"
     },
     {
@@ -1971,7 +1971,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L160",
       "id": "export_plain_english_brief_policy_hits",
-      "community": 11,
+      "community": 12,
       "norm_label": "_policy_hits()"
     },
     {
@@ -1980,7 +1980,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L182",
       "id": "export_plain_english_brief_build_markdown",
-      "community": 11,
+      "community": 12,
       "norm_label": "build_markdown()"
     },
     {
@@ -1989,7 +1989,7 @@
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L289",
       "id": "export_plain_english_brief_main",
-      "community": 11,
+      "community": 12,
       "norm_label": "main()"
     },
     {
@@ -1997,7 +1997,7 @@
       "file_type": "rationale",
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L27",
-      "community": 11,
+      "community": 12,
       "norm_label": "keep in sync with scripts/export_bundle_action_sheet.py default_demos().",
       "id": "export_plain_english_brief_rationale_27"
     },
@@ -2006,7 +2006,7 @@
       "file_type": "rationale",
       "source_file": "scripts/export_plain_english_brief.py",
       "source_location": "L61",
-      "community": 11,
+      "community": 12,
       "norm_label": "return (headline, what_to_do) in plain language.",
       "id": "export_plain_english_brief_rationale_61"
     },
@@ -2034,7 +2034,7 @@
       "source_file": "scripts/summarize_bundle_json.py",
       "source_location": "L1",
       "id": "scripts_summarize_bundle_json_py",
-      "community": 19,
+      "community": 20,
       "norm_label": "summarize_bundle_json.py"
     },
     {
@@ -2043,7 +2043,7 @@
       "source_file": "scripts/summarize_bundle_json.py",
       "source_location": "L10",
       "id": "summarize_bundle_json_main",
-      "community": 19,
+      "community": 20,
       "norm_label": "main()"
     },
     {
@@ -2052,7 +2052,7 @@
       "source_file": "scripts/git_doctor.py",
       "source_location": "L1",
       "id": "scripts_git_doctor_py",
-      "community": 20,
+      "community": 21,
       "norm_label": "git_doctor.py"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "scripts/git_doctor.py",
       "source_location": "L13",
       "id": "git_doctor_main",
-      "community": 20,
+      "community": 21,
       "norm_label": "main()"
     },
     {
@@ -2187,7 +2187,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L1",
       "id": "scripts_rotate_readme_slogan_py",
-      "community": 9,
+      "community": 10,
       "norm_label": "rotate_readme_slogan.py"
     },
     {
@@ -2196,7 +2196,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L21",
       "id": "rotate_readme_slogan_load_pool",
-      "community": 9,
+      "community": 10,
       "norm_label": "_load_pool()"
     },
     {
@@ -2205,7 +2205,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L31",
       "id": "rotate_readme_slogan_load_state",
-      "community": 9,
+      "community": 10,
       "norm_label": "_load_state()"
     },
     {
@@ -2214,7 +2214,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L37",
       "id": "rotate_readme_slogan_save_state",
-      "community": 9,
+      "community": 10,
       "norm_label": "_save_state()"
     },
     {
@@ -2223,7 +2223,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L42",
       "id": "rotate_readme_slogan_format_block",
-      "community": 9,
+      "community": 10,
       "norm_label": "format_block()"
     },
     {
@@ -2232,7 +2232,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L48",
       "id": "rotate_readme_slogan_replace_slogan_region",
-      "community": 9,
+      "community": 10,
       "norm_label": "replace_slogan_region()"
     },
     {
@@ -2241,7 +2241,7 @@
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L61",
       "id": "rotate_readme_slogan_main",
-      "community": 9,
+      "community": 10,
       "norm_label": "main()"
     },
     {
@@ -2249,7 +2249,7 @@
       "file_type": "rationale",
       "source_file": "scripts/rotate_readme_slogan.py",
       "source_location": "L43",
-      "community": 9,
+      "community": 10,
       "norm_label": "github strips most inline css; centered html still renders cleanly.",
       "id": "rotate_readme_slogan_rationale_43"
     },
@@ -2286,7 +2286,7 @@
       "source_file": "hf_bundle_scanner/tests/test_snapshot.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_snapshot_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_snapshot.py"
     },
     {
@@ -2295,7 +2295,7 @@
       "source_file": "hf_bundle_scanner/tests/test_snapshot.py",
       "source_location": "L9",
       "id": "test_snapshot_test_sha256_file",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_sha256_file()"
     },
     {
@@ -2304,7 +2304,7 @@
       "source_file": "hf_bundle_scanner/tests/test_snapshot.py",
       "source_location": "L15",
       "id": "test_snapshot_test_build_manifest_sorted",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_build_manifest_sorted()"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "hf_bundle_scanner/tests/test_snapshot.py",
       "source_location": "L24",
       "id": "test_snapshot_test_write_manifest_roundtrip",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_write_manifest_roundtrip()"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "hf_bundle_scanner/tests/test_rotate_readme_slogan.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_rotate_readme_slogan_py",
-      "community": 9,
+      "community": 10,
       "norm_label": "test_rotate_readme_slogan.py"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "hf_bundle_scanner/tests/test_rotate_readme_slogan.py",
       "source_location": "L9",
       "id": "test_rotate_readme_slogan_load_rotate_module",
-      "community": 9,
+      "community": 10,
       "norm_label": "_load_rotate_module()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "hf_bundle_scanner/tests/test_rotate_readme_slogan.py",
       "source_location": "L19",
       "id": "test_rotate_readme_slogan_test_format_block_contains_markers",
-      "community": 9,
+      "community": 10,
       "norm_label": "test_format_block_contains_markers()"
     },
     {
@@ -2349,7 +2349,7 @@
       "source_file": "hf_bundle_scanner/tests/test_rotate_readme_slogan.py",
       "source_location": "L28",
       "id": "test_rotate_readme_slogan_test_replace_slogan_region_updates_text",
-      "community": 9,
+      "community": 10,
       "norm_label": "test_replace_slogan_region_updates_text()"
     },
     {
@@ -2357,7 +2357,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/tests/test_rotate_readme_slogan.py",
       "source_location": "L1",
-      "community": 9,
+      "community": 10,
       "norm_label": "unit tests for readme slogan rotation (loads script from repo root).",
       "id": "test_rotate_readme_slogan_rationale_1"
     },
@@ -2367,7 +2367,7 @@
       "source_file": "hf_bundle_scanner/tests/test_discovery.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_discovery_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_discovery.py"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_file": "hf_bundle_scanner/tests/test_discovery.py",
       "source_location": "L13",
       "id": "test_discovery_test_iter_files_respects_exclude",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_iter_files_respects_exclude()"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "hf_bundle_scanner/tests/test_discovery.py",
       "source_location": "L24",
       "id": "test_discovery_test_discover_scan_artifacts_by_suffix",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_discover_scan_artifacts_by_suffix()"
     },
     {
@@ -2394,7 +2394,7 @@
       "source_file": "hf_bundle_scanner/tests/test_discovery.py",
       "source_location": "L32",
       "id": "test_discovery_test_discover_config_files",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_discover_config_files()"
     },
     {
@@ -2403,7 +2403,7 @@
       "source_file": "hf_bundle_scanner/tests/test_http.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_http_py",
-      "community": 13,
+      "community": 14,
       "norm_label": "test_http.py"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_file": "hf_bundle_scanner/tests/test_http.py",
       "source_location": "L12",
       "id": "test_http_test_healthz",
-      "community": 13,
+      "community": 14,
       "norm_label": "test_healthz()"
     },
     {
@@ -2421,7 +2421,7 @@
       "source_file": "hf_bundle_scanner/tests/test_http.py",
       "source_location": "L19",
       "id": "test_http_test_scan_endpoint",
-      "community": 13,
+      "community": 14,
       "norm_label": "test_scan_endpoint()"
     },
     {
@@ -2614,10 +2614,19 @@
       "norm_label": "test_dynamic_probe_garak_config_must_exist_under_strict_paths()"
     },
     {
-      "label": "test_admit_model_depends_on_must_be_scan_only()",
+      "label": "test_dynamic_probe_execute_once_requires_execute_args()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
       "source_location": "L274",
+      "id": "test_orchestrator_job_test_dynamic_probe_execute_once_requires_execute_args",
+      "community": 5,
+      "norm_label": "test_dynamic_probe_execute_once_requires_execute_args()"
+    },
+    {
+      "label": "test_admit_model_depends_on_must_be_scan_only()",
+      "file_type": "code",
+      "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
+      "source_location": "L292",
       "id": "test_orchestrator_job_test_admit_model_depends_on_must_be_scan_only",
       "community": 5,
       "norm_label": "test_admit_model_depends_on_must_be_scan_only()"
@@ -2626,7 +2635,7 @@
       "label": "test_build_envelope_three_steps()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L298",
+      "source_location": "L316",
       "id": "test_orchestrator_job_test_build_envelope_three_steps",
       "community": 5,
       "norm_label": "test_build_envelope_three_steps()"
@@ -2635,25 +2644,25 @@
       "label": "test_run_orchestrator_job_with_dynamic_writes_envelope()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L334",
+      "source_location": "L352",
       "id": "test_orchestrator_job_test_run_orchestrator_job_with_dynamic_writes_envelope",
-      "community": 1,
+      "community": 5,
       "norm_label": "test_run_orchestrator_job_with_dynamic_writes_envelope()"
     },
     {
       "label": "test_run_orchestrator_job_with_admit_writes_envelope()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L394",
+      "source_location": "L414",
       "id": "test_orchestrator_job_test_run_orchestrator_job_with_admit_writes_envelope",
-      "community": 1,
+      "community": 5,
       "norm_label": "test_run_orchestrator_job_with_admit_writes_envelope()"
     },
     {
       "label": "test_build_envelope_parent_run_id()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L452",
+      "source_location": "L472",
       "id": "test_orchestrator_job_test_build_envelope_parent_run_id",
       "community": 5,
       "norm_label": "test_build_envelope_parent_run_id()"
@@ -2664,7 +2673,7 @@
       "source_file": "hf_bundle_scanner/tests/test_integration_snapshot.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_integration_snapshot_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_integration_snapshot.py"
     },
     {
@@ -2673,7 +2682,7 @@
       "source_file": "hf_bundle_scanner/tests/test_integration_snapshot.py",
       "source_location": "L13",
       "id": "test_integration_snapshot_test_snapshot_download_smoke",
-      "community": 2,
+      "community": 0,
       "norm_label": "test_snapshot_download_smoke()"
     },
     {
@@ -2681,7 +2690,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/tests/test_integration_snapshot.py",
       "source_location": "L1",
-      "community": 2,
+      "community": 0,
       "norm_label": "network integration (skipped by default).",
       "id": "test_integration_snapshot_rationale_1"
     },
@@ -2727,7 +2736,7 @@
       "source_file": "hf_bundle_scanner/tests/test_mcp_import.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_mcp_import_py",
-      "community": 21,
+      "community": 22,
       "norm_label": "test_mcp_import.py"
     },
     {
@@ -2736,7 +2745,7 @@
       "source_file": "hf_bundle_scanner/tests/test_mcp_import.py",
       "source_location": "L4",
       "id": "test_mcp_import_test_fastmcp_import",
-      "community": 21,
+      "community": 22,
       "norm_label": "test_fastmcp_import()"
     },
     {
@@ -2835,7 +2844,7 @@
       "source_file": "hf_bundle_scanner/tests/test_configlint_policy_template.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_configlint_policy_template_py",
-      "community": 15,
+      "community": 16,
       "norm_label": "test_configlint_policy_template.py"
     },
     {
@@ -2844,7 +2853,7 @@
       "source_file": "hf_bundle_scanner/tests/test_configlint_policy_template.py",
       "source_location": "L12",
       "id": "test_configlint_policy_template_repo_root",
-      "community": 15,
+      "community": 16,
       "norm_label": "_repo_root()"
     },
     {
@@ -2853,7 +2862,7 @@
       "source_file": "hf_bundle_scanner/tests/test_configlint_policy_template.py",
       "source_location": "L16",
       "id": "test_configlint_policy_template_test_configlint_policy_template_matches_dispatch",
-      "community": 15,
+      "community": 16,
       "norm_label": "test_configlint_policy_template_matches_dispatch()"
     },
     {
@@ -2861,7 +2870,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/tests/test_configlint_policy_template.py",
       "source_location": "L1",
-      "community": 15,
+      "community": 16,
       "norm_label": "org policy template stays aligned with configlint + dispatch.",
       "id": "test_configlint_policy_template_rationale_1"
     },
@@ -2905,7 +2914,7 @@
       "label": "test_run_dynamic_probe_script_disabled()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L55",
+      "source_location": "L59",
       "id": "test_dynamic_probe_report_test_run_dynamic_probe_script_disabled",
       "community": 1,
       "norm_label": "test_run_dynamic_probe_script_disabled()"
@@ -2914,7 +2923,7 @@
       "label": "test_run_dynamic_probe_script_rejects_invalid_budget()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L100",
+      "source_location": "L105",
       "id": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_invalid_budget",
       "community": 1,
       "norm_label": "test_run_dynamic_probe_script_rejects_invalid_budget()"
@@ -2923,10 +2932,19 @@
       "label": "test_run_dynamic_probe_script_rejects_missing_secret_env_vars()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L119",
+      "source_location": "L124",
       "id": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_missing_secret_env_vars",
       "community": 1,
       "norm_label": "test_run_dynamic_probe_script_rejects_missing_secret_env_vars()"
+    },
+    {
+      "label": "test_run_dynamic_probe_script_rejects_execute_once_without_args()",
+      "file_type": "code",
+      "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
+      "source_location": "L147",
+      "id": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args",
+      "community": 1,
+      "norm_label": "test_run_dynamic_probe_script_rejects_execute_once_without_args()"
     },
     {
       "label": "test_report.py",
@@ -2934,7 +2952,7 @@
       "source_file": "hf_bundle_scanner/tests/test_report.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_report_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_report.py"
     },
     {
@@ -2943,7 +2961,7 @@
       "source_file": "hf_bundle_scanner/tests/test_report.py",
       "source_location": "L6",
       "id": "test_report_test_compute_aggregate_exit_priority",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_compute_aggregate_exit_priority()"
     },
     {
@@ -2952,7 +2970,7 @@
       "source_file": "hf_bundle_scanner/tests/test_report.py",
       "source_location": "L13",
       "id": "test_report_test_merge_aggregate_exit_config_escalates",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_merge_aggregate_exit_config_escalates()"
     },
     {
@@ -2961,7 +2979,7 @@
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_provenance_py",
-      "community": 10,
+      "community": 11,
       "norm_label": "test_provenance.py"
     },
     {
@@ -2970,7 +2988,7 @@
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L9",
       "id": "test_provenance_test_bundle_schema_constant",
-      "community": 10,
+      "community": 11,
       "norm_label": "test_bundle_schema_constant()"
     },
     {
@@ -2979,7 +2997,7 @@
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L13",
       "id": "test_provenance_test_build_provenance_minimal",
-      "community": 10,
+      "community": 11,
       "norm_label": "test_build_provenance_minimal()"
     },
     {
@@ -2988,7 +3006,7 @@
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L20",
       "id": "test_provenance_test_build_provenance_hub_and_sbom",
-      "community": 10,
+      "community": 11,
       "norm_label": "test_build_provenance_hub_and_sbom()"
     },
     {
@@ -2997,7 +3015,7 @@
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L32",
       "id": "test_provenance_test_build_provenance_env_mirrors_merged",
-      "community": 10,
+      "community": 11,
       "norm_label": "test_build_provenance_env_mirrors_merged()"
     },
     {
@@ -3006,7 +3024,7 @@
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L41",
       "id": "test_provenance_test_build_provenance_manifest_summary",
-      "community": 10,
+      "community": 11,
       "norm_label": "test_build_provenance_manifest_summary()"
     },
     {
@@ -3014,7 +3032,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/tests/test_provenance.py",
       "source_location": "L1",
-      "community": 10,
+      "community": 11,
       "norm_label": "tests for bundle report provenance (phase 1).",
       "id": "test_provenance_rationale_1"
     },
@@ -3024,7 +3042,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_dispatch_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_dispatch.py"
     },
     {
@@ -3033,7 +3051,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L11",
       "id": "test_dispatch_write_minimal_safetensors",
-      "community": 3,
+      "community": 2,
       "norm_label": "_write_minimal_safetensors()"
     },
     {
@@ -3042,7 +3060,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L17",
       "id": "test_dispatch_policy",
-      "community": 3,
+      "community": 2,
       "norm_label": "_policy()"
     },
     {
@@ -3051,7 +3069,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L26",
       "id": "test_dispatch_patch_admit_env",
-      "community": 3,
+      "community": 2,
       "norm_label": "_patch_admit_env()"
     },
     {
@@ -3060,7 +3078,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L31",
       "id": "test_dispatch_test_run_admit_scan_no_drivers",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_run_admit_scan_no_drivers()"
     },
     {
@@ -3069,7 +3087,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L42",
       "id": "test_dispatch_test_scan_bundle_empty_tree",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_scan_bundle_empty_tree()"
     },
     {
@@ -3078,7 +3096,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L50",
       "id": "test_dispatch_test_scan_bundle_with_weight",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_scan_bundle_with_weight()"
     },
     {
@@ -3087,7 +3105,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L76",
       "id": "test_dispatch_test_scan_bundle_modelscan_missing_binary_is_driver_error",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_scan_bundle_modelscan_missing_binary_is_driver_error()"
     },
     {
@@ -3096,7 +3114,7 @@
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L91",
       "id": "test_dispatch_test_scan_bundle_trust_remote_raises_exit",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_scan_bundle_trust_remote_raises_exit()"
     },
     {
@@ -3104,7 +3122,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L79",
-      "community": 3,
+      "community": 2,
       "norm_label": "phase2 static drivers: missing modelscan binary \u2192 admit exit 2 \u2192 bundle aggregat",
       "id": "test_dispatch_rationale_79"
     },
@@ -3114,7 +3132,7 @@
       "source_file": "hf_bundle_scanner/tests/test_integration_chwoo_collection.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_tests_test_integration_chwoo_collection_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_integration_chwoo_collection.py"
     },
     {
@@ -3123,7 +3141,7 @@
       "source_file": "hf_bundle_scanner/tests/test_integration_chwoo_collection.py",
       "source_location": "L33",
       "id": "test_integration_chwoo_collection_test_chwoo_collection_small_mmproj_download_and_scan",
-      "community": 3,
+      "community": 2,
       "norm_label": "test_chwoo_collection_small_mmproj_download_and_scan()"
     },
     {
@@ -3131,7 +3149,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/tests/test_integration_chwoo_collection.py",
       "source_location": "L1",
-      "community": 3,
+      "community": 2,
       "norm_label": "optional: download a single <1gib artifact from a repo listed in the chwoo colle",
       "id": "test_integration_chwoo_collection_rationale_1"
     },
@@ -3249,7 +3267,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_dispatch_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "dispatch.py"
     },
     {
@@ -3258,7 +3276,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L33",
       "id": "dispatch_admit_argv",
-      "community": 3,
+      "community": 2,
       "norm_label": "admit_argv()"
     },
     {
@@ -3267,7 +3285,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L54",
       "id": "dispatch_run_admit_scan",
-      "community": 3,
+      "community": 2,
       "norm_label": "run_admit_scan()"
     },
     {
@@ -3276,7 +3294,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L104",
       "id": "dispatch_scan_bundle",
-      "community": 3,
+      "community": 2,
       "norm_label": "scan_bundle()"
     },
     {
@@ -3284,7 +3302,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L1",
-      "community": 3,
+      "community": 2,
       "norm_label": "run model-admission per artifact and collect results.",
       "id": "dispatch_rationale_1"
     },
@@ -3293,7 +3311,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L34",
-      "community": 3,
+      "community": 2,
       "norm_label": "command prefix to invoke model-admission (``python -m model_admission`` or ``adm",
       "id": "dispatch_rationale_34"
     },
@@ -3302,7 +3320,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L62",
-      "community": 3,
+      "community": 2,
       "norm_label": "run admit-model scan; return (exit_code, report_dict_or_none, stderr_snippet).",
       "id": "dispatch_rationale_62"
     },
@@ -3311,7 +3329,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dispatch.py",
       "source_location": "L118",
-      "community": 3,
+      "community": 2,
       "norm_label": "discover artifacts, lint configs, run admit-model per file, aggregate.",
       "id": "dispatch_rationale_118"
     },
@@ -3364,7 +3382,7 @@
       "label": "load_job()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L326",
+      "source_location": "L342",
       "id": "orchestrator_job_load_job",
       "community": 5,
       "norm_label": "load_job()"
@@ -3373,7 +3391,7 @@
       "label": "build_envelope()",
       "file_type": "code",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L330",
+      "source_location": "L346",
       "id": "orchestrator_job_build_envelope",
       "community": 5,
       "norm_label": "build_envelope()"
@@ -3418,10 +3436,10 @@
       "label": "Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `",
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L347",
+      "source_location": "L363",
+      "id": "orchestrator_job_rationale_363",
       "community": 5,
-      "norm_label": "build orchestrator envelope json (v2).      ``steps`` follow adr 0001: ``id``, `",
-      "id": "orchestrator_job_rationale_347"
+      "norm_label": "build orchestrator envelope json (v2).      ``steps`` follow adr 0001: ``id``, `"
     },
     {
       "label": "dynamic_probe_report.py",
@@ -3454,10 +3472,10 @@
       "label": "Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).",
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py",
-      "source_location": "L29",
+      "source_location": "L31",
+      "id": "dynamic_probe_report_rationale_31",
       "community": 1,
-      "norm_label": "return a ``dynamic_probe_report.v1`` object (plain dict, json-serializable).",
-      "id": "dynamic_probe_report_rationale_29"
+      "norm_label": "return a ``dynamic_probe_report.v1`` object (plain dict, json-serializable)."
     },
     {
       "label": "__init__.py",
@@ -3465,7 +3483,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/__init__.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_init_py",
-      "community": 17,
+      "community": 18,
       "norm_label": "__init__.py"
     },
     {
@@ -3474,7 +3492,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/http_job.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_http_job_py",
-      "community": 13,
+      "community": 14,
       "norm_label": "http_job.py"
     },
     {
@@ -3483,7 +3501,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/http_job.py",
       "source_location": "L14",
       "id": "http_job_scanbody",
-      "community": 13,
+      "community": 14,
       "norm_label": "scanbody"
     },
     {
@@ -3492,7 +3510,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basemodel",
-      "community": 13,
+      "community": 14,
       "norm_label": "basemodel"
     },
     {
@@ -3501,7 +3519,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/http_job.py",
       "source_location": "L35",
       "id": "http_job_create_app",
-      "community": 13,
+      "community": 14,
       "norm_label": "create_app()"
     },
     {
@@ -3510,7 +3528,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/http_job.py",
       "source_location": "L74",
       "id": "http_job_run_uvicorn",
-      "community": 13,
+      "community": 14,
       "norm_label": "run_uvicorn()"
     },
     {
@@ -3518,7 +3536,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/http_job.py",
       "source_location": "L1",
-      "community": 13,
+      "community": 14,
       "norm_label": "optional thin http api for bundle scan (bind localhost in production).",
       "id": "http_job_rationale_1"
     },
@@ -3527,7 +3545,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/http_job.py",
       "source_location": "L15",
-      "community": 13,
+      "community": 14,
       "norm_label": "request body for post /v1/scan (module-level model for reliable openapi / valida",
       "id": "http_job_rationale_15"
     },
@@ -3537,7 +3555,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_report_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "report.py"
     },
     {
@@ -3546,7 +3564,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L12",
       "id": "report_filescanrecord",
-      "community": 3,
+      "community": 2,
       "norm_label": "filescanrecord"
     },
     {
@@ -3555,7 +3573,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L19",
       "id": "report_filescanrecord_to_dict",
-      "community": 3,
+      "community": 2,
       "norm_label": ".to_dict()"
     },
     {
@@ -3564,7 +3582,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L35",
       "id": "report_bundlereport",
-      "community": 3,
+      "community": 2,
       "norm_label": "bundlereport"
     },
     {
@@ -3573,7 +3591,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L45",
       "id": "report_bundlereport_to_dict",
-      "community": 0,
+      "community": 2,
       "norm_label": ".to_dict()"
     },
     {
@@ -3582,7 +3600,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L59",
       "id": "report_bundlereport_write_json",
-      "community": 0,
+      "community": 2,
       "norm_label": ".write_json()"
     },
     {
@@ -3591,7 +3609,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L64",
       "id": "report_compute_aggregate_exit",
-      "community": 3,
+      "community": 2,
       "norm_label": "compute_aggregate_exit()"
     },
     {
@@ -3600,7 +3618,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L75",
       "id": "report_merge_aggregate_exit",
-      "community": 3,
+      "community": 2,
       "norm_label": "merge_aggregate_exit()"
     },
     {
@@ -3608,7 +3626,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L1",
-      "community": 3,
+      "community": 2,
       "norm_label": "aggregate per-file scan reports into a single bundle document.",
       "id": "report_rationale_1"
     },
@@ -3617,7 +3635,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L65",
-      "community": 3,
+      "community": 2,
       "norm_label": "priority: any 4 (usage) > 2 (driver) > 1 (policy/findings) > 0.",
       "id": "report_rationale_65"
     },
@@ -3626,7 +3644,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/report.py",
       "source_location": "L76",
-      "community": 3,
+      "community": 2,
       "norm_label": "if configlint reports risky settings, treat as exit 1 unless bundle already wors",
       "id": "report_rationale_76"
     },
@@ -3636,7 +3654,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/mcp_server.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_mcp_server_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "mcp_server.py"
     },
     {
@@ -3645,7 +3663,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/mcp_server.py",
       "source_location": "L12",
       "id": "mcp_server_scan_path_tool",
-      "community": 2,
+      "community": 0,
       "norm_label": "_scan_path_tool()"
     },
     {
@@ -3654,7 +3672,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/mcp_server.py",
       "source_location": "L36",
       "id": "mcp_server_manifest_tool",
-      "community": 2,
+      "community": 0,
       "norm_label": "_manifest_tool()"
     },
     {
@@ -3663,7 +3681,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/mcp_server.py",
       "source_location": "L41",
       "id": "mcp_server_main",
-      "community": 2,
+      "community": 0,
       "norm_label": "main()"
     },
     {
@@ -3671,7 +3689,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/mcp_server.py",
       "source_location": "L1",
-      "community": 2,
+      "community": 0,
       "norm_label": "stdio mcp server exposing bounded scan tools (optional dependency: mcp).",
       "id": "mcp_server_rationale_1"
     },
@@ -3681,7 +3699,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_cli_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "cli.py"
     },
     {
@@ -3690,7 +3708,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L15",
       "id": "cli_cmd_manifest",
-      "community": 2,
+      "community": 0,
       "norm_label": "_cmd_manifest()"
     },
     {
@@ -3699,7 +3717,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L22",
       "id": "cli_cmd_download",
-      "community": 2,
+      "community": 0,
       "norm_label": "_cmd_download()"
     },
     {
@@ -3707,7 +3725,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/cli.py",
       "source_location": "L1",
-      "community": 2,
+      "community": 0,
       "norm_label": "cli: manifest, download, scan (bundle).",
       "id": "cli_rationale_1"
     },
@@ -3717,7 +3735,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/__main__.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_main_py",
-      "community": 23,
+      "community": 24,
       "norm_label": "__main__.py"
     },
     {
@@ -3816,7 +3834,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/configlint.py",
       "source_location": "L40",
       "id": "configlint_configfinding_to_dict",
-      "community": 0,
+      "community": 9,
       "norm_label": ".to_dict()"
     },
     {
@@ -3960,7 +3978,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_snapshot_py",
-      "community": 2,
+      "community": 0,
       "norm_label": "snapshot.py"
     },
     {
@@ -3969,7 +3987,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L12",
       "id": "snapshot_sha256_file",
-      "community": 2,
+      "community": 0,
       "norm_label": "sha256_file()"
     },
     {
@@ -3978,7 +3996,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L24",
       "id": "snapshot_fileentry",
-      "community": 2,
+      "community": 0,
       "norm_label": "fileentry"
     },
     {
@@ -3987,7 +4005,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L30",
       "id": "snapshot_build_manifest",
-      "community": 2,
+      "community": 0,
       "norm_label": "build_manifest()"
     },
     {
@@ -3996,7 +4014,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L55",
       "id": "snapshot_write_manifest",
-      "community": 2,
+      "community": 0,
       "norm_label": "write_manifest()"
     },
     {
@@ -4005,7 +4023,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L62",
       "id": "snapshot_snapshot_download",
-      "community": 2,
+      "community": 0,
       "norm_label": "snapshot_download()"
     },
     {
@@ -4013,7 +4031,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L1",
-      "community": 2,
+      "community": 0,
       "norm_label": "snapshot directory manifest and optional hugging face hub download.",
       "id": "snapshot_rationale_1"
     },
@@ -4022,7 +4040,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L31",
-      "community": 2,
+      "community": 0,
       "norm_label": "walk regular files under root, return stable json-serializable manifest.",
       "id": "snapshot_rationale_31"
     },
@@ -4031,7 +4049,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/snapshot.py",
       "source_location": "L63",
-      "community": 2,
+      "community": 0,
       "norm_label": "download hub snapshot into dest (creates directory). requires huggingface_hub.",
       "id": "snapshot_rationale_63"
     },
@@ -4041,7 +4059,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/provenance.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_provenance_py",
-      "community": 10,
+      "community": 11,
       "norm_label": "provenance.py"
     },
     {
@@ -4050,7 +4068,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/provenance.py",
       "source_location": "L15",
       "id": "provenance_parse_csv_hosts",
-      "community": 10,
+      "community": 11,
       "norm_label": "_parse_csv_hosts()"
     },
     {
@@ -4059,7 +4077,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/provenance.py",
       "source_location": "L21",
       "id": "provenance_manifest_summary",
-      "community": 10,
+      "community": 11,
       "norm_label": "_manifest_summary()"
     },
     {
@@ -4068,7 +4086,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/provenance.py",
       "source_location": "L30",
       "id": "provenance_build_bundle_provenance",
-      "community": 10,
+      "community": 11,
       "norm_label": "build_bundle_provenance()"
     },
     {
@@ -4076,7 +4094,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/provenance.py",
       "source_location": "L1",
-      "community": 10,
+      "community": 11,
       "norm_label": "phase-1 bundle report provenance (hub revision, mirror allowlist, sbom pointer,",
       "id": "provenance_rationale_1"
     },
@@ -4085,7 +4103,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/provenance.py",
       "source_location": "L39",
-      "community": 10,
+      "community": 11,
       "norm_label": "assemble the ``provenance`` object for a bundle report.      environment (opti",
       "id": "provenance_rationale_39"
     },
@@ -4095,7 +4113,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L1",
       "id": "hf_bundle_scanner_hf_bundle_scanner_discovery_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "discovery.py"
     },
     {
@@ -4104,7 +4122,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L38",
       "id": "discovery_discoveryconfig",
-      "community": 3,
+      "community": 2,
       "norm_label": "discoveryconfig"
     },
     {
@@ -4113,7 +4131,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L52",
       "id": "discovery_builtin_excluded",
-      "community": 3,
+      "community": 2,
       "norm_label": "_builtin_excluded()"
     },
     {
@@ -4122,7 +4140,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L65",
       "id": "discovery_matches_any",
-      "community": 3,
+      "community": 2,
       "norm_label": "_matches_any()"
     },
     {
@@ -4131,7 +4149,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L72",
       "id": "discovery_included",
-      "community": 3,
+      "community": 2,
       "norm_label": "_included()"
     },
     {
@@ -4140,7 +4158,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L78",
       "id": "discovery_iter_files",
-      "community": 3,
+      "community": 2,
       "norm_label": "iter_files()"
     },
     {
@@ -4149,7 +4167,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L96",
       "id": "discovery_discover_scan_artifacts",
-      "community": 3,
+      "community": 2,
       "norm_label": "discover_scan_artifacts()"
     },
     {
@@ -4158,7 +4176,7 @@
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L103",
       "id": "discovery_discover_config_files",
-      "community": 3,
+      "community": 2,
       "norm_label": "discover_config_files()"
     },
     {
@@ -4166,7 +4184,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L1",
-      "community": 3,
+      "community": 2,
       "norm_label": "discover scan targets under a snapshot root.",
       "id": "discovery_rationale_1"
     },
@@ -4175,7 +4193,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L39",
-      "community": 3,
+      "community": 2,
       "norm_label": "include_globs empty means all files (subject to excludes).",
       "id": "discovery_rationale_39"
     },
@@ -4184,7 +4202,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L97",
-      "community": 3,
+      "community": 2,
       "norm_label": "regular files whose suffix is a candidate for weight/serialization scanning.",
       "id": "discovery_rationale_97"
     },
@@ -4193,7 +4211,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/discovery.py",
       "source_location": "L104",
-      "community": 3,
+      "community": 2,
       "norm_label": "json config files checked by configlint.",
       "id": "discovery_rationale_104"
     },
@@ -4201,8 +4219,26 @@
       "label": "Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `",
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
+      "source_location": "L347",
+      "community": 25,
+      "norm_label": "build orchestrator envelope json (v2).      ``steps`` follow adr 0001: ``id``, `",
+      "id": "orchestrator_job_rationale_347"
+    },
+    {
+      "label": "Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).",
+      "file_type": "rationale",
+      "source_file": "hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py",
+      "source_location": "L29",
+      "community": 26,
+      "norm_label": "return a ``dynamic_probe_report.v1`` object (plain dict, json-serializable).",
+      "id": "dynamic_probe_report_rationale_29"
+    },
+    {
+      "label": "Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `",
+      "file_type": "rationale",
+      "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
       "source_location": "L235",
-      "community": 24,
+      "community": 27,
       "norm_label": "build orchestrator envelope json (v2).      ``steps`` follow adr 0001: ``id``, `",
       "id": "orchestrator_job_rationale_235"
     },
@@ -4211,7 +4247,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
       "source_location": "L221",
-      "community": 25,
+      "community": 28,
       "norm_label": "build orchestrator envelope json (v2).      ``steps`` follow adr 0001: ``id``, `",
       "id": "orchestrator_job_rationale_221"
     },
@@ -4220,7 +4256,7 @@
       "file_type": "rationale",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py",
       "source_location": "L25",
-      "community": 26,
+      "community": 29,
       "norm_label": "return a ``dynamic_probe_report.v1`` object (plain dict, json-serializable).",
       "id": "dynamic_probe_report_rationale_25"
     }
@@ -6966,6 +7002,18 @@
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_src": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args",
+      "_tgt": "str",
+      "source": "str",
+      "target": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "hf_bundle_scanner/tests/test_dispatch.py",
       "source_location": "L81",
       "weight": 1.0,
@@ -9486,7 +9534,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L22",
+      "source_location": "L27",
       "weight": 1.0,
       "_src": "scripts_run_dynamic_probe_py",
       "_tgt": "run_dynamic_probe_repo_root",
@@ -9498,7 +9546,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L26",
+      "source_location": "L31",
       "weight": 1.0,
       "_src": "scripts_run_dynamic_probe_py",
       "_tgt": "run_dynamic_probe_csv_names",
@@ -9510,7 +9558,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L30",
+      "source_location": "L35",
       "weight": 1.0,
       "_src": "scripts_run_dynamic_probe_py",
       "_tgt": "run_dynamic_probe_main",
@@ -9522,7 +9570,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L31",
+      "source_location": "L36",
       "weight": 1.0,
       "_src": "run_dynamic_probe_main",
       "_tgt": "run_dynamic_probe_repo_root",
@@ -9534,7 +9582,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "scripts/run_dynamic_probe.py",
-      "source_location": "L95",
+      "source_location": "L112",
       "weight": 1.0,
       "_src": "run_dynamic_probe_main",
       "_tgt": "run_dynamic_probe_csv_names",
@@ -10749,6 +10797,18 @@
       "source_location": "L274",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_orchestrator_job_py",
+      "_tgt": "test_orchestrator_job_test_dynamic_probe_execute_once_requires_execute_args",
+      "source": "hf_bundle_scanner_tests_test_orchestrator_job_py",
+      "target": "test_orchestrator_job_test_dynamic_probe_execute_once_requires_execute_args",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
+      "source_location": "L292",
+      "weight": 1.0,
+      "_src": "hf_bundle_scanner_tests_test_orchestrator_job_py",
       "_tgt": "test_orchestrator_job_test_admit_model_depends_on_must_be_scan_only",
       "source": "hf_bundle_scanner_tests_test_orchestrator_job_py",
       "target": "test_orchestrator_job_test_admit_model_depends_on_must_be_scan_only",
@@ -10758,7 +10818,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L298",
+      "source_location": "L316",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_orchestrator_job_py",
       "_tgt": "test_orchestrator_job_test_build_envelope_three_steps",
@@ -10770,7 +10830,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L334",
+      "source_location": "L352",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_orchestrator_job_py",
       "_tgt": "test_orchestrator_job_test_run_orchestrator_job_with_dynamic_writes_envelope",
@@ -10782,7 +10842,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L394",
+      "source_location": "L414",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_orchestrator_job_py",
       "_tgt": "test_orchestrator_job_test_run_orchestrator_job_with_admit_writes_envelope",
@@ -10794,7 +10854,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
-      "source_location": "L452",
+      "source_location": "L472",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_orchestrator_job_py",
       "_tgt": "test_orchestrator_job_test_build_envelope_parent_run_id",
@@ -11196,6 +11256,18 @@
       "_src": "test_orchestrator_job_test_dynamic_probe_garak_config_must_exist_under_strict_paths",
       "_tgt": "orchestrator_job_validate_job",
       "source": "test_orchestrator_job_test_dynamic_probe_garak_config_must_exist_under_strict_paths",
+      "target": "orchestrator_job_validate_job"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "hf_bundle_scanner/tests/test_orchestrator_job.py",
+      "source_location": "L288",
+      "weight": 1.0,
+      "_src": "test_orchestrator_job_test_dynamic_probe_execute_once_requires_execute_args",
+      "_tgt": "orchestrator_job_validate_job",
+      "source": "test_orchestrator_job_test_dynamic_probe_execute_once_requires_execute_args",
       "target": "orchestrator_job_validate_job"
     },
     {
@@ -11622,7 +11694,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L55",
+      "source_location": "L59",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_dynamic_probe_report_py",
       "_tgt": "test_dynamic_probe_report_test_run_dynamic_probe_script_disabled",
@@ -11634,7 +11706,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L100",
+      "source_location": "L105",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_dynamic_probe_report_py",
       "_tgt": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_invalid_budget",
@@ -11646,7 +11718,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L119",
+      "source_location": "L124",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_tests_test_dynamic_probe_report_py",
       "_tgt": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_missing_secret_env_vars",
@@ -11655,10 +11727,22 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
+      "source_location": "L147",
+      "weight": 1.0,
+      "_src": "hf_bundle_scanner_tests_test_dynamic_probe_report_py",
+      "_tgt": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args",
+      "source": "hf_bundle_scanner_tests_test_dynamic_probe_report_py",
+      "target": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L57",
+      "source_location": "L61",
       "weight": 1.0,
       "_src": "test_dynamic_probe_report_test_run_dynamic_probe_script_disabled",
       "_tgt": "test_dynamic_probe_report_repo_root",
@@ -11670,7 +11754,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L101",
+      "source_location": "L106",
       "weight": 1.0,
       "_src": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_invalid_budget",
       "_tgt": "test_dynamic_probe_report_repo_root",
@@ -11682,12 +11766,24 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
-      "source_location": "L124",
+      "source_location": "L129",
       "weight": 1.0,
       "_src": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_missing_secret_env_vars",
       "_tgt": "test_dynamic_probe_report_repo_root",
       "source": "test_dynamic_probe_report_repo_root",
       "target": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_missing_secret_env_vars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "hf_bundle_scanner/tests/test_dynamic_probe_report.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_src": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args",
+      "_tgt": "test_dynamic_probe_report_repo_root",
+      "source": "test_dynamic_probe_report_repo_root",
+      "target": "test_dynamic_probe_report_test_run_dynamic_probe_script_rejects_execute_once_without_args",
       "confidence_score": 1.0
     },
     {
@@ -12966,7 +13062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L326",
+      "source_location": "L342",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_hf_bundle_scanner_orchestrator_job_py",
       "_tgt": "orchestrator_job_load_job",
@@ -12978,7 +13074,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L330",
+      "source_location": "L346",
       "weight": 1.0,
       "_src": "hf_bundle_scanner_hf_bundle_scanner_orchestrator_job_py",
       "_tgt": "orchestrator_job_build_envelope",
@@ -13026,7 +13122,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L391",
+      "source_location": "L407",
       "weight": 1.0,
       "_src": "orchestrator_job_build_envelope",
       "_tgt": "orchestrator_job_is_non_empty_str",
@@ -13074,12 +13170,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py",
-      "source_location": "L347",
+      "source_location": "L363",
       "weight": 1.0,
-      "_src": "orchestrator_job_rationale_347",
+      "_src": "orchestrator_job_rationale_363",
       "_tgt": "orchestrator_job_build_envelope",
       "source": "orchestrator_job_build_envelope",
-      "target": "orchestrator_job_rationale_347",
+      "target": "orchestrator_job_rationale_363",
       "confidence_score": 1.0
     },
     {
@@ -13110,12 +13206,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py",
-      "source_location": "L29",
+      "source_location": "L31",
       "weight": 1.0,
-      "_src": "dynamic_probe_report_rationale_29",
+      "_src": "dynamic_probe_report_rationale_31",
       "_tgt": "dynamic_probe_report_build_report",
       "source": "dynamic_probe_report_build_report",
-      "target": "dynamic_probe_report_rationale_29",
+      "target": "dynamic_probe_report_rationale_31",
       "confidence_score": 1.0
     },
     {

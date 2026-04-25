@@ -63,7 +63,8 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Shipped (orchestrator hook):** optional **`dynamic_probe`** step in `llm_scanner.orchestrator_job.v1` (validator + `scripts/run_orchestrator_job.py run` → probe script → merged exit + envelope `steps[]`); fixture [`orchestrator_job_with_dynamic.json`](../hf_bundle_scanner/tests/fixtures/orchestrator_job_with_dynamic.json).
 - **Shipped (budget + correlation pass):** orchestrator `dynamic_probe` job fields **`budget_max_probes`** / **`budget_timeout_seconds`** validated as positive integers; runner forwards them to [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) with `run_id`; probe report records these fields for correlation.
 - **Shipped (config + secret metadata pass):** optional `dynamic_probe` fields **`garak_config`**, **`model_target`**, and **`secret_env_vars`** (names only) validated/forwarded; missing required secret env vars fail fast in probe execution with tooling lane exit (`2`) and no secret values in reports.
-- **Next:** real probe execution and policy semantics beyond `garak --help`; PyRIT / additional backends behind the same report + exit contracts.
+- **Shipped (controlled execution modes):** dynamic probe supports `execution_mode=preflight|execute_once`; `execute_once` requires explicit `execute_args` and runs one bounded non-shell garak argv payload.
+- **Next:** broader real probe execution profiles + policy semantics, then PyRIT / additional backends behind the same report + exit contracts.
 
 ## Ten capability pillars (summary)
 

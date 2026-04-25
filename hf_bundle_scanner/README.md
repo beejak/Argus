@@ -54,7 +54,7 @@ Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes writte
 
 - **Doc:** [../docs/PHASE5_DYNAMIC_PROBES.md](../docs/PHASE5_DYNAMIC_PROBES.md)
 - **Report builder:** `hf_bundle_scanner.dynamic_probe_report`
-- **CLI:** [`../scripts/run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) — supports `--run-id`, budget flags, and optional config/target/secret-name metadata (`--garak-config`, `--model-target`, `--secret-env-vars`); from repo root, **`make dynamic-probe-stub`** writes `.agent/dynamic_probe_last.json` (disabled unless **`LLM_SCANNER_DYNAMIC_PROBE=1`**).
+- **CLI:** [`../scripts/run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) — supports `--run-id`, budget flags, optional config/target/secret-name metadata (`--garak-config`, `--model-target`, `--secret-env-vars`), and controlled execution modes (`--execution-mode preflight|execute_once`, `--execute-args`); from repo root, **`make dynamic-probe-stub`** writes `.agent/dynamic_probe_last.json` (disabled unless **`LLM_SCANNER_DYNAMIC_PROBE=1`**).
 
 ### Optional: scan a small file from the “uncensored-models” collection
 
