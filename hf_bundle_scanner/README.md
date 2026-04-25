@@ -48,7 +48,7 @@ See [docs/hermes-mcp.md](docs/hermes-mcp.md) for MCP and optional HTTP.
 - **Python API:** `hf_bundle_scanner.orchestrator_job` — `validate_job`, `load_job`, `build_envelope`
 - **CLI:** from repo root, `python3 scripts/run_orchestrator_job.py validate|run --job …` (see script docstring). **`make orchestrator-validate`** runs `validate` on the committed fixture.
 
-Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes written by `run` use **`llm_scanner.orchestrator_envelope.v2`** (`run_id`, optional `parent_run_id`, per-step timestamps and `artifact_uri` values).
+Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes written by `run` use **`llm_scanner.orchestrator_envelope.v2`** (`run_id`, optional `parent_run_id`, per-step timestamps and `artifact_uri` values). Jobs may declare **one** optional **`dynamic_probe`** step between **`scan_bundle`** and **`aggregate`** (see [PHASE5 doc](../docs/PHASE5_DYNAMIC_PROBES.md)); `run` invokes [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) and merges exits into **`aggregate_exit_code`**.
 
 ## Phase-5 dynamic probes (stub)
 

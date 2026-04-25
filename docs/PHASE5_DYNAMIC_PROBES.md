@@ -14,10 +14,19 @@
 
 This proves wiring, CI safety, and **absent-tool** semantics before any real probe configuration or model calls.
 
-## Next (not in the stub)
+## Orchestrator composition (v1 slice, shipped)
 
-- Real Garak / PyRIT **job configs**, model targets, rate limits, and artifact correlation with orchestrator `run_id`.
-- Orchestrator **job graph** nodes for `dynamic_probe` with explicit **budget** and **secret** inputs (see [ADR 0001](adr/0001-bundle-scanner-vs-orchestrator-scope.md)).
+Jobs may include **at most one** `dynamic_probe` step **after** `scan_bundle` and **before** `aggregate`:
+
+- **`steps`:** `dynamic_probe` → `depends_on` must be exactly `[<scan_bundle step id>]`; `aggregate` → `depends_on` must include both `scan_bundle` and `dynamic_probe` ids when a dynamic step exists.
+- **Top-level `dynamic_probe` object:** non-empty **`out`** path for `llm_scanner.dynamic_probe_report.v1` JSON (written by [`scripts/run_dynamic_probe.py`](../scripts/run_dynamic_probe.py)).
+- **Runner:** [`scripts/run_orchestrator_job.py`](../scripts/run_orchestrator_job.py) `run` invokes the probe script after a successful job validation, merges **`aggregate_exit_code`** with the probe report’s **`exit_code`** via the same **worst-of** priority as bundle aggregates (`4 > 2 > 1 > 0`), and inserts a **middle** row in envelope **`llm_scanner.orchestrator_envelope.v2`** `steps[]`.
+- **Fixture:** [`hf_bundle_scanner/tests/fixtures/orchestrator_job_with_dynamic.json`](../hf_bundle_scanner/tests/fixtures/orchestrator_job_with_dynamic.json).
+
+## Next (beyond this slice)
+
+- Real Garak / PyRIT **job configs**, model targets, rate limits, and tighter artifact correlation with orchestrator `run_id`.
+- Explicit **budget** and **secret** inputs on the job document (see [ADR 0001](adr/0001-bundle-scanner-vs-orchestrator-scope.md)).
 
 ## References
 

@@ -14,6 +14,18 @@ JOB_SCHEMA_V1 = "llm_scanner.orchestrator_job.v1"
 ENVELOPE_SCHEMA_V2 = "llm_scanner.orchestrator_envelope.v2"
 
 
+def worst_exit_code(*codes: int) -> int:
+    """Same priority family as bundle aggregates: 4 > 2 > 1 > 0."""
+    xs = [int(x) for x in codes]
+    if any(x == 4 for x in xs):
+        return 4
+    if any(x == 2 for x in xs):
+        return 2
+    if any(x == 1 for x in xs):
+        return 1
+    return 0
+
+
 def _is_non_empty_str(v: Any) -> bool:
     return isinstance(v, str) and bool(v.strip())
 
@@ -62,8 +74,10 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
         if sid in by_id:
             errs.append(f"duplicate step id: {sid!r}")
         typ = raw.get("type")
-        if typ not in ("scan_bundle", "aggregate"):
-            errs.append(f"steps[{i}].type must be 'scan_bundle' or 'aggregate' (got {typ!r})")
+        if typ not in ("scan_bundle", "dynamic_probe", "aggregate"):
+            errs.append(
+                f"steps[{i}].type must be 'scan_bundle', 'dynamic_probe', or 'aggregate' (got {typ!r})"
+            )
         dep = raw.get("depends_on", [])
         if dep is None:
             dep = []
@@ -76,11 +90,14 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
         return errs
 
     scan_ids = [s for s, v in by_id.items() if v.get("type") == "scan_bundle"]
+    dp_ids = [s for s, v in by_id.items() if v.get("type") == "dynamic_probe"]
     agg_ids = [s for s, v in by_id.items() if v.get("type") == "aggregate"]
     if len(scan_ids) != 1:
         errs.append("v1 requires exactly one step with type 'scan_bundle'")
     if len(agg_ids) != 1:
         errs.append("v1 requires exactly one step with type 'aggregate'")
+    if len(dp_ids) > 1:
+        errs.append("v1 allows at most one step with type 'dynamic_probe'")
 
     # edges: dep -> step (dep must finish before step)
     outgoing: dict[str, set[str]] = {sid: set() for sid in by_id}
@@ -112,9 +129,30 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
 
     scan_id = scan_ids[0]
     agg_id = agg_ids[0]
+    dp_id = dp_ids[0] if dp_ids else None
     agg_deps = list(by_id[agg_id].get("depends_on", []) or [])
-    if scan_id not in set(str(x) for x in agg_deps):
+    agg_dep_set = {str(x) for x in agg_deps}
+    if scan_id not in agg_dep_set:
         errs.append("aggregate step depends_on must include the scan_bundle step id")
+    if dp_id is not None:
+        dp_raw = by_id[dp_id]
+        dp_dep = [str(x) for x in (dp_raw.get("depends_on") or [])]
+        if dp_dep != [scan_id]:
+            errs.append(
+                "dynamic_probe step depends_on must be exactly [scan_bundle step id] "
+                f"(expected [{scan_id!r}], got {dp_dep!r})"
+            )
+        if dp_id not in agg_dep_set:
+            errs.append("aggregate step depends_on must include the dynamic_probe step id")
+        dp_obj = doc.get("dynamic_probe")
+        if not isinstance(dp_obj, dict):
+            errs.append("dynamic_probe must be an object when a dynamic_probe step is present")
+        elif not _is_non_empty_str(dp_obj.get("out")):
+            errs.append("dynamic_probe.out must be a non-empty string")
+
+    dpr = doc.get("dynamic_probe")
+    if isinstance(dpr, dict) and bool(dpr) and dp_id is None:
+        errs.append("dynamic_probe settings are present but no dynamic_probe step was defined")
 
     sb = doc.get("scan_bundle")
     if not isinstance(sb, dict):
@@ -138,6 +176,12 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
         if not pol.is_file():
             errs.append(f"scan_bundle.policy not a file: {pol}")
 
+        if dp_id is not None and isinstance(doc.get("dynamic_probe"), dict):
+            dpo = doc["dynamic_probe"]
+            if _is_non_empty_str(dpo.get("out")):
+                outp = _rp(str(dpo.get("out", "")))
+                outp.parent.mkdir(parents=True, exist_ok=True)
+
     return errs
 
 
@@ -159,38 +203,44 @@ def build_envelope(
     scan_ended_at: str,
     aggregate_started_at: str,
     aggregate_ended_at: str,
+    dynamic_probe_step: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build orchestrator envelope JSON (v1).
+    """Build orchestrator envelope JSON (v2).
 
     ``steps`` follow ADR 0001: ``id``, ``name``, ``type``, ``exit_code``,
     ``artifact_uri`` (file URI when possible), ``started_at`` / ``ended_at``
     (RFC 3339 UTC with ``Z`` suffix, caller-supplied).
+
+    When ``dynamic_probe_step`` is set, it is inserted **between** the scan row and the
+    aggregate row (same envelope schema).
     """
     bundle_uri = bundle_path.expanduser().resolve().as_uri()
     env_uri = ""
     if envelope_path is not None:
         env_uri = envelope_path.expanduser().resolve().as_uri()
 
-    steps: list[dict[str, Any]] = [
-        {
-            "id": scan_step_id,
-            "name": "scan_bundle",
-            "type": "scan_bundle",
-            "exit_code": int(scan_exit),
-            "artifact_uri": bundle_uri,
-            "started_at": scan_started_at,
-            "ended_at": scan_ended_at,
-        },
-        {
-            "id": aggregate_step_id,
-            "name": "aggregate",
-            "type": "aggregate",
-            "exit_code": int(aggregate_exit),
-            "artifact_uri": env_uri,
-            "started_at": aggregate_started_at,
-            "ended_at": aggregate_ended_at,
-        },
-    ]
+    scan_row: dict[str, Any] = {
+        "id": scan_step_id,
+        "name": "scan_bundle",
+        "type": "scan_bundle",
+        "exit_code": int(scan_exit),
+        "artifact_uri": bundle_uri,
+        "started_at": scan_started_at,
+        "ended_at": scan_ended_at,
+    }
+    agg_row: dict[str, Any] = {
+        "id": aggregate_step_id,
+        "name": "aggregate",
+        "type": "aggregate",
+        "exit_code": int(aggregate_exit),
+        "artifact_uri": env_uri,
+        "started_at": aggregate_started_at,
+        "ended_at": aggregate_ended_at,
+    }
+    steps: list[dict[str, Any]] = [scan_row]
+    if dynamic_probe_step is not None:
+        steps.append(dict(dynamic_probe_step))
+    steps.append(agg_row)
     out: dict[str, Any] = {
         "schema": ENVELOPE_SCHEMA_V2,
         "run_id": run_id,

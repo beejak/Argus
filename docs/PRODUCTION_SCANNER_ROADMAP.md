@@ -41,13 +41,14 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Working artifacts:** [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](adr/0001-bundle-scanner-vs-orchestrator-scope.md) (scope + job-graph sketch + acceptance criteria for the first orchestrator slice).
 - **Shipped (v1 slice):** job document validator (`hf_bundle_scanner.orchestrator_job`), fixture `hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`, runner `scripts/run_orchestrator_job.py`, **`make orchestrator-validate`**.
 - **Shipped (2026-04-25 tighten):** job-level **`run_id`** / optional **`parent_run_id`** validated as RFC 4122 UUIDs when non-empty; orchestrator envelope schema **`llm_scanner.orchestrator_envelope.v2`** with **two** `steps` rows (`scan_bundle`, `aggregate`), per-step **`artifact_uri`** + UTC **`started_at` / `ended_at`**; runner enforces monotonic step times.
-- **Next (phase-4 backlog):** job graph beyond **one** `scan_bundle` + `aggregate` (e.g. `admit_model` fan-out per ADR); optional **echo** of `run_id` into bundle `provenance` (requires separate ADR — must stay optional on `bundle_report.v2`); YAML job documents; budgets / secrets hooks for later dynamic nodes; external runner repo reference only if execution model needs it.
+- **Next (phase-4 backlog):** job graph beyond **one** `scan_bundle` + optional `dynamic_probe` + `aggregate` (e.g. `admit_model` fan-out per ADR); optional **echo** of `run_id` into bundle `provenance` (requires separate ADR — must stay optional on `bundle_report.v2`); YAML job documents; budgets / secrets hooks for later dynamic nodes; external runner repo reference only if execution model needs it.
 
 ### Phase 5 status (`phase5-dynamic-staging`, **current**)
 
 - **Goal:** opt-in **dynamic** model / app probing (Garak-class, budgets, secrets) without contaminating default static CI.
 - **Shipped (v1 stub):** machine-readable **`llm_scanner.dynamic_probe_report.v1`** ([`dynamic_probe_report.py`](../hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py)); entrypoint [`scripts/run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) (`LLM_SCANNER_DYNAMIC_PROBE=1` enables a trivial `garak --help` check). Design notes: [PHASE5_DYNAMIC_PROBES.md](PHASE5_DYNAMIC_PROBES.md).
-- **Next:** real probe configs, orchestrator `dynamic_probe` step type, budgets enforced, correlation with `run_id`, PyRIT / additional backends behind the same report + exit contracts.
+- **Shipped (orchestrator hook):** optional **`dynamic_probe`** step in `llm_scanner.orchestrator_job.v1` (validator + `scripts/run_orchestrator_job.py run` → probe script → merged exit + envelope `steps[]`); fixture [`orchestrator_job_with_dynamic.json`](../hf_bundle_scanner/tests/fixtures/orchestrator_job_with_dynamic.json).
+- **Next:** real probe configs, budgets enforced on the job, correlation with `run_id` in reports, PyRIT / additional backends behind the same report + exit contracts.
 
 ## Ten capability pillars (summary)
 
@@ -93,6 +94,6 @@ See [LONG_HORIZON_HARNESS.md](LONG_HORIZON_HARNESS.md#scanner-catalog-pointers) 
 
 ## Repo implementation today
 
-- **Shipped:** [`model-admission`](../model-admission/README.md), [`hf_bundle_scanner`](../hf_bundle_scanner/README.md), root [`Makefile`](../Makefile), MCP/HTTP per [`hf_bundle_scanner/docs/hermes-mcp.md`](../hf_bundle_scanner/docs/hermes-mcp.md), phase-4 orchestrator validate/run + envelope v2, phase-5 [`dynamic_probe_report`](../hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py) + [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) stub.
-- **In progress / planned:** remaining phase-4 graph work; phase-5 real probes; phases 6–8; track in [`docs/sessions/SESSION_LOG.md`](sessions/SESSION_LOG.md).
+- **Shipped:** [`model-admission`](../model-admission/README.md), [`hf_bundle_scanner`](../hf_bundle_scanner/README.md), root [`Makefile`](../Makefile), MCP/HTTP per [`hf_bundle_scanner/docs/hermes-mcp.md`](../hf_bundle_scanner/docs/hermes-mcp.md), phase-4 orchestrator validate/run + envelope v2, phase-5 [`dynamic_probe_report`](../hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py) + [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) stub + optional orchestrator **`dynamic_probe`** step in `run_orchestrator_job.py`.
+- **In progress / planned:** remaining phase-4 graph work (`admit_model` fan-out, YAML jobs); phase-5 real probes + budgets; phases 6–8; track in [`docs/sessions/SESSION_LOG.md`](sessions/SESSION_LOG.md).
 - **Test catalog (LLM Scanner root):** default `llm_security_test_cases/catalog.json` (phase0-aligned, pytest guard); resolution order in [TEST_CASES_LLM_SECURITY_SCANNER.md](TEST_CASES_LLM_SECURITY_SCANNER.md#next-run-consumption) (config/CLI → `LLM_SCANNER_TEST_CATALOG` → default). **`add-catalog`** / **`wire-loader`** checklist: [TEST_CASES — todos](TEST_CASES_LLM_SECURITY_SCANNER.md#todos-under-llm-scanner).

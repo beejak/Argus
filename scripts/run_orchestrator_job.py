@@ -4,8 +4,9 @@
 ``scan_bundle`` execution delegates to ``python -m hf_bundle_scanner scan`` (same CLI as ``scan-bundle``).
 
 ``run`` writes an orchestrator envelope JSON (schema ``llm_scanner.orchestrator_envelope.v2``): UUID
-``run_id`` (from the job or generated), optional ``parent_run_id``, and ``steps`` for ``scan_bundle``
-and ``aggregate`` with RFC 3339 UTC timestamps and ``file:`` artifact URIs.
+``run_id`` (from the job or generated), optional ``parent_run_id``, and ``steps`` for ``scan_bundle``,
+optional ``dynamic_probe`` (see job schema in ``hf_bundle_scanner.orchestrator_job``), and ``aggregate``
+with RFC 3339 UTC timestamps and ``file:`` artifact URIs.
 """
 from __future__ import annotations
 
@@ -80,6 +81,7 @@ def main(argv: list[str] | None = None) -> int:
         build_envelope,
         load_job,
         validate_job,
+        worst_exit_code,
     )
 
     ap = argparse.ArgumentParser(description=__doc__)
@@ -126,6 +128,9 @@ def main(argv: list[str] | None = None) -> int:
         run_id = str(doc.get("run_id") or "").strip() or str(uuid.uuid4())
         parent_raw = doc.get("parent_run_id")
         parent_run_id = str(parent_raw).strip() if _is_non_empty_str(parent_raw) else None
+        dp_ids = [str(s["id"]) for s in doc["steps"] if s.get("type") == "dynamic_probe"]
+        dp_id = dp_ids[0] if dp_ids else None
+
         t_scan_start = _utc_now()
         # Match Makefile harness: run the module with CWD at the Python project root.
         p = subprocess.run(cmd, cwd=str(root / "hf_bundle_scanner"))
@@ -133,15 +138,65 @@ def main(argv: list[str] | None = None) -> int:
         if t_scan_end < t_scan_start:
             t_scan_end = t_scan_start
         scan_exit = int(p.returncode)
-        agg = scan_exit
+        bundle_agg = scan_exit
         if out.is_file():
             try:
                 rep = json.loads(out.read_text(encoding="utf-8"))
                 if isinstance(rep, dict) and rep.get("aggregate_exit_code") is not None:
-                    agg = int(rep["aggregate_exit_code"])
+                    bundle_agg = int(rep["aggregate_exit_code"])
             except (OSError, json.JSONDecodeError, TypeError, ValueError):
-                agg = 2
-        t_agg_start = t_scan_end
+                bundle_agg = 2
+
+        dynamic_probe_step: dict[str, object] | None = None
+        probe_exit = 0
+        t_after_scan = t_scan_end
+        if dp_id is not None:
+            dpo = doc.get("dynamic_probe")
+            if not isinstance(dpo, dict) or not _is_non_empty_str(dpo.get("out")):
+                print(
+                    json.dumps(
+                        {"errors": ["dynamic_probe step present but dynamic_probe.out is invalid"]},
+                        indent=2,
+                    )
+                )
+                return 2
+            dp_out = _resolve(job_dir, str(dpo["out"]))
+            dp_out.parent.mkdir(parents=True, exist_ok=True)
+            probe_script = root / "scripts" / "run_dynamic_probe.py"
+            t_dp_start = _utc_now()
+            probe = subprocess.run(
+                [str(py), str(probe_script), "--out", str(dp_out)],
+                cwd=str(root),
+                env=os.environ,
+                capture_output=True,
+                text=True,
+            )
+            t_dp_end = _utc_now()
+            if t_dp_end < t_dp_start:
+                t_dp_end = t_dp_start
+            probe_exit = int(probe.returncode)
+            if dp_out.is_file():
+                try:
+                    drep = json.loads(dp_out.read_text(encoding="utf-8"))
+                    if isinstance(drep, dict) and drep.get("exit_code") is not None:
+                        probe_exit = int(drep["exit_code"])
+                except (OSError, json.JSONDecodeError, TypeError, ValueError):
+                    probe_exit = worst_exit_code(probe_exit, 2)
+            dp_uri = dp_out.expanduser().resolve().as_uri()
+            dynamic_probe_step = {
+                "id": dp_id,
+                "name": "dynamic_probe",
+                "type": "dynamic_probe",
+                "exit_code": int(probe_exit),
+                "artifact_uri": dp_uri,
+                "started_at": _utc_iso_z(t_dp_start),
+                "ended_at": _utc_iso_z(t_dp_end),
+            }
+            t_after_scan = t_dp_end if t_dp_end > t_scan_end else t_scan_end
+
+        agg = worst_exit_code(bundle_agg, probe_exit) if dp_id is not None else bundle_agg
+
+        t_agg_start = t_after_scan
         t_agg_end = _utc_now()
         if t_agg_end < t_agg_start:
             t_agg_end = t_agg_start
@@ -158,6 +213,7 @@ def main(argv: list[str] | None = None) -> int:
             scan_ended_at=_utc_iso_z(t_scan_end),
             aggregate_started_at=_utc_iso_z(t_agg_start),
             aggregate_ended_at=_utc_iso_z(t_agg_end),
+            dynamic_probe_step=dynamic_probe_step,
         )
         args.envelope_out.parent.mkdir(parents=True, exist_ok=True)
         args.envelope_out.write_text(json.dumps(env, indent=2), encoding="utf-8")

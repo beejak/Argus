@@ -1,0 +1,20 @@
+{
+  "schema": "llm_scanner.orchestrator_job.v1",
+  "run_id": "00000000-0000-4000-8000-000000000010",
+  "steps": [
+    { "id": "bundle_scan", "type": "scan_bundle", "depends_on": [] },
+    { "id": "dyn", "type": "dynamic_probe", "depends_on": ["bundle_scan"] },
+    { "id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "dyn"] }
+  ],
+  "scan_bundle": {
+    "root": "minimal_tree",
+    "policy": "policy.permissive.json",
+    "out": "/tmp/orchestrator_bundle_out_dynamic_fixture.json",
+    "drivers": "",
+    "timeout": 600,
+    "fail_on": "MEDIUM"
+  },
+  "dynamic_probe": {
+    "out": "/tmp/orchestrator_dynamic_out_fixture.json"
+  }
+}
