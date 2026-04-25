@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from hf_bundle_scanner.dispatch import run_admit_scan, scan_bundle
+from hf_bundle_scanner.report import BundleReport
 
 
 def _write_minimal_safetensors(path: Path) -> None:
@@ -103,3 +104,22 @@ def test_scan_bundle_trust_remote_raises_exit(
     bundle = scan_bundle(tmp_path, pol, drivers="", timeout=60)
     assert bundle.aggregate_exit_code == 1
     assert any(f["rule_id"] == "trust_remote_code_enabled" for f in bundle.config_findings)
+
+
+def test_bundle_report_timestamps_remain_stable_across_to_dict_calls() -> None:
+    rep = BundleReport(
+        root="/tmp/root",
+        policy_path="/tmp/policy.json",
+        drivers="",
+        manifest=None,
+        config_findings=[],
+        file_scans=[],
+        aggregate_exit_code=0,
+        provenance={"provenance_version": "phase1"},
+        report_generated_at_utc="2026-01-02T03:04:05Z",
+        report_generated_at_ist="2026-01-02T08:34:05+05:30",
+    )
+    a = rep.to_dict()
+    b = rep.to_dict()
+    assert a["report_generated_at_utc"] == b["report_generated_at_utc"]
+    assert a["report_generated_at_ist"] == b["report_generated_at_ist"]

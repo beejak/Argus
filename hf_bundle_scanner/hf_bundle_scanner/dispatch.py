@@ -17,6 +17,7 @@ from hf_bundle_scanner.discovery import DiscoveryConfig, discover_config_files, 
 from hf_bundle_scanner.provenance import build_bundle_provenance
 from hf_bundle_scanner.report import BundleReport, FileScanRecord, compute_aggregate_exit, merge_aggregate_exit
 from hf_bundle_scanner.snapshot import build_manifest
+from hf_bundle_scanner.timestamps import now_report_timestamps
 
 
 # Configlint rule_ids that flip ``config_risk`` → bundle aggregate exit 1 when file scans are clean.
@@ -171,6 +172,7 @@ def scan_bundle(
         sbom_uri=sbom_uri,
     )
 
+    report_generated_at_utc, report_generated_at_ist = now_report_timestamps()
     return BundleReport(
         root=str(root),
         policy_path=str(policy),
@@ -180,4 +182,6 @@ def scan_bundle(
         file_scans=records,
         aggregate_exit_code=agg,
         provenance=provenance,
+        report_generated_at_utc=report_generated_at_utc,
+        report_generated_at_ist=report_generated_at_ist,
     )

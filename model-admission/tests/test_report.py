@@ -73,3 +73,19 @@ def test_scan_report_write_json_roundtrip(tmp_path: Path) -> None:
     assert data["artifact_sha256"] == "ab" * 32
     assert len(data["findings"]) == 1
     assert data["findings"][0]["severity"] == "medium"
+
+
+def test_scan_report_timestamps_remain_stable_across_to_dict_calls() -> None:
+    rep = ScanReport(
+        artifact_path="/tmp/m.bin",
+        artifact_sha256="0" * 64,
+        policy_path="/tmp/pol.json",
+        drivers_run=["modelscan"],
+        findings=[],
+        report_generated_at_utc="2026-01-02T03:04:05Z",
+        report_generated_at_ist="2026-01-02T08:34:05+05:30",
+    )
+    a = rep.to_dict()
+    b = rep.to_dict()
+    assert a["report_generated_at_utc"] == b["report_generated_at_utc"]
+    assert a["report_generated_at_ist"] == b["report_generated_at_ist"]

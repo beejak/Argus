@@ -18,7 +18,7 @@ class ModelScanDriver(ScanDriver):
         if not exe:
             return (
                 [],
-                f"modelscan executable not found (set MODELSCAN_BIN or install modelscan)",
+                "modelscan executable not found (set MODELSCAN_BIN or install modelscan)",
             )
         findings: list[Finding] = []
         with tempfile.TemporaryDirectory(prefix="modelscan-") as td:

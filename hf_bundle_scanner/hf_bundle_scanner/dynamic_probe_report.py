@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from hf_bundle_scanner.timestamps import ist_now_iso, utc_now_iso_z
+from hf_bundle_scanner.timestamps import now_report_timestamps
 
 DYNAMIC_PROBE_SCHEMA_V1 = "llm_scanner.dynamic_probe_report.v1"
 
@@ -29,20 +29,27 @@ def build_report(
     secret_env_vars_required: list[str] | None = None,
     secret_env_vars_missing: list[str] | None = None,
     garak_cli: str | None = None,
+    report_generated_at_utc: str | None = None,
+    report_generated_at_ist: str | None = None,
 ) -> dict[str, Any]:
     """Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
 
     ``status`` is one of: ``disabled``, ``skipped``, ``ok``, ``error`` (lowercase).
     ``exit_code`` follows bundle-style lanes: ``0`` success, ``2`` tooling missing / misconfigured.
     """
+    ts_utc, ts_ist = (
+        (str(report_generated_at_utc).strip(), str(report_generated_at_ist).strip())
+        if report_generated_at_utc is not None and report_generated_at_ist is not None
+        else now_report_timestamps()
+    )
     out: dict[str, Any] = {
         "schema": DYNAMIC_PROBE_SCHEMA_V1,
         "status": str(status).strip().lower(),
         "probe_backend": str(probe_backend).strip(),
         "message": str(message).strip(),
         "exit_code": int(exit_code),
-        "report_generated_at_utc": utc_now_iso_z(),
-        "report_generated_at_ist": ist_now_iso(),
+        "report_generated_at_utc": ts_utc,
+        "report_generated_at_ist": ts_ist,
     }
     if budget_max_probes is not None:
         out["budget_max_probes"] = int(budget_max_probes)

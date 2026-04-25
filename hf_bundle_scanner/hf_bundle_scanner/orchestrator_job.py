@@ -191,8 +191,10 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
                     errs.append("dynamic_probe.execution_mode must be a non-empty string when provided")
                 else:
                     mv = str(mode).strip()
-                    if mv not in ("preflight", "execute_once"):
-                        errs.append("dynamic_probe.execution_mode must be 'preflight' or 'execute_once'")
+                    if mv not in ("preflight", "selfcheck", "execute_once"):
+                        errs.append(
+                            "dynamic_probe.execution_mode must be 'preflight', 'selfcheck', or 'execute_once'"
+                        )
                     if mv == "execute_once":
                         if not _is_non_empty_str(dp_obj.get("execute_args")):
                             errs.append(

@@ -2,7 +2,7 @@
 """Run a single-command live E2E comparison across scanner lanes.
 
 Sequence:
-1) Dynamic probe preflight + execute_once (via isolated garak PATH)
+1) Dynamic probe preflight + selfcheck (via isolated garak PATH)
 2) Gate lane ephemeral Hub scan
 3) Assessment lane (drivers enabled)
 4) Strict lane (drivers + safetensors-only policy)
@@ -18,7 +18,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from hf_bundle_scanner.timestamps import ist_now_iso, utc_now_iso_z
+from hf_bundle_scanner.timestamps import now_report_timestamps
 
 
 def _repo_root() -> Path:
@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     if rc != 0:
         return rc
     rc = _run(
-        ["make", "dynamic-probe-live-exec", "EXECUTE_ARGS=--version"],
+        ["make", "dynamic-probe-live-selfcheck"],
         cwd=root,
         env=env_with_garak,
     )
@@ -160,10 +160,11 @@ def main(argv: list[str] | None = None) -> int:
     assess = _bundle_stats(Path(args.assessment_out))
     strict = _bundle_stats(Path(args.strict_out))
 
+    summary_ts_utc, summary_ts_ist = now_report_timestamps()
     summary = {
         "repo": args.repo,
-        "report_generated_at_utc": utc_now_iso_z(),
-        "report_generated_at_ist": ist_now_iso(),
+        "report_generated_at_utc": summary_ts_utc,
+        "report_generated_at_ist": summary_ts_ist,
         "dynamic_probe": {
             "status": dyn.get("status"),
             "exit_code": dyn.get("exit_code"),

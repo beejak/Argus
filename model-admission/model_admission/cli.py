@@ -10,6 +10,7 @@ from model_admission.ledger import append_ledger
 from model_admission.policy import PolicyConfig, evaluate_policy, sha256_file
 from model_admission.report import Finding, ScanReport, Severity
 from model_admission.taxonomy import RiskCategory, make_rule_id
+from model_admission.timestamps import now_report_timestamps
 
 
 SEVERITY_ORDER = {
@@ -77,6 +78,7 @@ def cmd_scan(args: argparse.Namespace) -> int:
                 ),
             )
 
+    report_generated_at_utc, report_generated_at_ist = now_report_timestamps()
     report = ScanReport(
         artifact_path=str(artifact),
         artifact_sha256=digest,
@@ -84,6 +86,8 @@ def cmd_scan(args: argparse.Namespace) -> int:
         drivers_run=drivers_run,
         findings=all_findings,
         driver_errors=driver_errors,
+        report_generated_at_utc=report_generated_at_utc,
+        report_generated_at_ist=report_generated_at_ist,
     )
 
     if args.report:

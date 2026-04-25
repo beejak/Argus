@@ -61,6 +61,19 @@ def test_build_report_with_budget_and_cli() -> None:
     assert re.search(r"\+05:30$", str(r["report_generated_at_ist"]))
 
 
+def test_build_report_honors_explicit_timestamps() -> None:
+    r = build_report(
+        status="ok",
+        probe_backend="garak",
+        message="ok",
+        exit_code=0,
+        report_generated_at_utc="2026-01-02T03:04:05Z",
+        report_generated_at_ist="2026-01-02T08:34:05+05:30",
+    )
+    assert r["report_generated_at_utc"] == "2026-01-02T03:04:05Z"
+    assert r["report_generated_at_ist"] == "2026-01-02T08:34:05+05:30"
+
+
 def test_run_dynamic_probe_script_disabled(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.delenv("LLM_SCANNER_DYNAMIC_PROBE", raising=False)
     root = _repo_root()

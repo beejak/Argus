@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from model_admission.timestamps import ist_now_iso, utc_now_iso_z
+from model_admission.timestamps import now_report_timestamps
 
 
 class Severity(str, Enum):
@@ -51,6 +51,8 @@ class ScanReport:
     drivers_run: list[str]
     findings: list[Finding]
     driver_errors: list[str] = field(default_factory=list)
+    report_generated_at_utc: str | None = None
+    report_generated_at_ist: str | None = None
 
     def highest_severity(self) -> Severity | None:
         order = {
@@ -67,9 +69,14 @@ class ScanReport:
         return best.severity if best else None
 
     def to_dict(self) -> dict[str, Any]:
+        ts_utc, ts_ist = (
+            (self.report_generated_at_utc, self.report_generated_at_ist)
+            if self.report_generated_at_utc is not None and self.report_generated_at_ist is not None
+            else now_report_timestamps()
+        )
         return {
-            "report_generated_at_utc": utc_now_iso_z(),
-            "report_generated_at_ist": ist_now_iso(),
+            "report_generated_at_utc": ts_utc,
+            "report_generated_at_ist": ts_ist,
             "artifact_path": self.artifact_path,
             "artifact_sha256": self.artifact_sha256,
             "policy_path": self.policy_path,

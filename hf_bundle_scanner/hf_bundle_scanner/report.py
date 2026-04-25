@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from hf_bundle_scanner.timestamps import ist_now_iso, utc_now_iso_z
+from hf_bundle_scanner.timestamps import now_report_timestamps
 
 
 @dataclass
@@ -43,13 +43,20 @@ class BundleReport:
     file_scans: list[FileScanRecord]
     aggregate_exit_code: int
     provenance: dict[str, Any]
+    report_generated_at_utc: str | None = None
+    report_generated_at_ist: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        ts_utc, ts_ist = (
+            (self.report_generated_at_utc, self.report_generated_at_ist)
+            if self.report_generated_at_utc is not None and self.report_generated_at_ist is not None
+            else now_report_timestamps()
+        )
         return {
             "schema": BUNDLE_REPORT_SCHEMA,
             "taxonomy_version": "phase0",
-            "report_generated_at_utc": utc_now_iso_z(),
-            "report_generated_at_ist": ist_now_iso(),
+            "report_generated_at_utc": ts_utc,
+            "report_generated_at_ist": ts_ist,
             "root": self.root,
             "policy_path": self.policy_path,
             "drivers": self.drivers,

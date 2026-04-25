@@ -5,7 +5,7 @@ PY := $(abspath $(VENVDIR))/bin/python
 GARAK_VENVDIR ?= .venv-garak
 GARAK_BIN := $(abspath $(GARAK_VENVDIR))/bin
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size orchestrator-validate dynamic-probe-stub dynamic-probe-live-preflight dynamic-probe-live-exec live-e2e-compare
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size orchestrator-validate dynamic-probe-stub dynamic-probe-live-preflight dynamic-probe-live-selfcheck dynamic-probe-live-exec live-e2e-compare
 
 help:
 	@echo "LLM Scanner harness"
@@ -29,6 +29,7 @@ help:
 	@echo "  make orchestrator-validate - validate orchestrator fixtures (min + dynamic_probe + admit_model; no scan)"
 	@echo "  make dynamic-probe-stub - write .agent/dynamic_probe_last.json (disabled unless LLM_SCANNER_DYNAMIC_PROBE=1)"
 	@echo "  make dynamic-probe-live-preflight - run dynamic probe with isolated garak env (.venv-garak)"
+	@echo "  make dynamic-probe-live-selfcheck - garak --version probe via isolated garak env (.venv-garak)"
 	@echo "  make dynamic-probe-live-exec - execute_once probe (needs EXECUTE_ARGS='...')"
 	@echo "  make live-e2e-compare - run dynamic + gate + assessment + strict and write summary JSON"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
@@ -133,6 +134,11 @@ dynamic-probe-live-preflight:
 	@mkdir -p .agent
 	@test -x "$(GARAK_BIN)/garak" || (echo "Missing $(GARAK_BIN)/garak. Create/install $(GARAK_VENVDIR) first." >&2; exit 1)
 	@PATH="$(GARAK_BIN):$$PATH" LLM_SCANNER_DYNAMIC_PROBE=1 "$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_dynamic_probe.py" --out "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/.agent/dynamic_probe_last.json" --execution-mode preflight --budget-max-probes 10 --budget-timeout-seconds 120
+
+dynamic-probe-live-selfcheck:
+	@mkdir -p .agent
+	@test -x "$(GARAK_BIN)/garak" || (echo "Missing $(GARAK_BIN)/garak. Create/install $(GARAK_VENVDIR) first." >&2; exit 1)
+	@PATH="$(GARAK_BIN):$$PATH" LLM_SCANNER_DYNAMIC_PROBE=1 "$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_dynamic_probe.py" --out "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/.agent/dynamic_probe_last.json" --execution-mode selfcheck --budget-max-probes 10 --budget-timeout-seconds 120
 
 dynamic-probe-live-exec:
 	@mkdir -p .agent

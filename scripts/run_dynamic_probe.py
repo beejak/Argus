@@ -7,6 +7,7 @@ exits ``0`` so CI can call this script without enabling probes.
 Set ``LLM_SCANNER_DYNAMIC_PROBE=1`` to run either:
 
 - ``execution_mode=preflight`` (default): bounded ``garak --help`` availability check
+- ``execution_mode=selfcheck``: bounded ``garak --version`` CLI self-check
 - ``execution_mode=execute_once``: one explicit garak argv payload via ``--execute-args``
 
 If ``garak`` is missing, exits ``2`` and writes ``status: skipped`` with a clear message
@@ -35,9 +36,8 @@ def _csv_names(raw: str) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     root = _repo_root()
     sys.path.insert(0, str(root / "hf_bundle_scanner"))
-    from hf_bundle_scanner.dynamic_probe_report import (  # noqa: PLC0415
-        build_report,
-    )
+    from hf_bundle_scanner.dynamic_probe_report import build_report  # noqa: PLC0415
+    from hf_bundle_scanner.timestamps import now_report_timestamps  # noqa: PLC0415
 
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, required=True, help="Output dynamic_probe_report.v1 JSON path")
@@ -79,9 +79,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument(
         "--execution-mode",
-        choices=("preflight", "execute_once"),
+        choices=("preflight", "selfcheck", "execute_once"),
         default="preflight",
-        help="preflight=garak availability check; execute_once=run one explicit garak argv payload",
+        help="preflight=garak --help; selfcheck=garak --version; execute_once=explicit argv via --execute-args",
     )
     ap.add_argument(
         "--execute-args",
@@ -96,6 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.garak_config is not None:
         garak_config = Path(args.garak_config).resolve()
         if not garak_config.is_file():
+            ts_utc, ts_ist = now_report_timestamps()
             doc = build_report(
                 status="error",
                 probe_backend="none",
@@ -106,12 +107,15 @@ def main(argv: list[str] | None = None) -> int:
                 run_id=args.run_id,
                 garak_config=str(garak_config),
                 model_target=args.model_target,
+                report_generated_at_utc=ts_utc,
+                report_generated_at_ist=ts_ist,
             )
             out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
             return 2
     required_secret_vars = _csv_names(args.secret_env_vars)
 
     if args.budget_max_probes is not None and int(args.budget_max_probes) <= 0:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="error",
             probe_backend="none",
@@ -124,10 +128,13 @@ def main(argv: list[str] | None = None) -> int:
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
     if int(args.budget_timeout_seconds) <= 0:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="error",
             probe_backend="none",
@@ -140,12 +147,15 @@ def main(argv: list[str] | None = None) -> int:
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
     enabled = os.environ.get("LLM_SCANNER_DYNAMIC_PROBE", "").strip() == "1"
     if not enabled:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="disabled",
             probe_backend="none",
@@ -158,11 +168,14 @@ def main(argv: list[str] | None = None) -> int:
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 0
     missing_secret_vars = [name for name in required_secret_vars if not os.environ.get(name, "").strip()]
     if missing_secret_vars:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="error",
             probe_backend="garak",
@@ -176,12 +189,15 @@ def main(argv: list[str] | None = None) -> int:
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
             secret_env_vars_missing=missing_secret_vars,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
     exec_args = shlex.split(args.execute_args) if str(args.execute_args).strip() else []
     if args.execution_mode == "execute_once" and not exec_args:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="error",
             probe_backend="garak",
@@ -194,12 +210,15 @@ def main(argv: list[str] | None = None) -> int:
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
     garak = shutil.which("garak")
     if not garak:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="skipped",
             probe_backend="garak",
@@ -212,25 +231,36 @@ def main(argv: list[str] | None = None) -> int:
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
     executed_argv = [garak, *exec_args] if args.execution_mode == "execute_once" else []
     preflight_argv = [garak, "--help"] if garak_config is None else [garak, "--config", str(garak_config), "--help"]
+    selfcheck_argv = [garak, "--version"]
+    probe_argv = (
+        executed_argv
+        if args.execution_mode == "execute_once"
+        else selfcheck_argv
+        if args.execution_mode == "selfcheck"
+        else preflight_argv
+    )
     try:
         p = subprocess.run(
-            preflight_argv if args.execution_mode == "preflight" else executed_argv,
+            probe_argv,
             capture_output=True,
             text=True,
             timeout=int(args.budget_timeout_seconds),
             check=False,
         )
     except subprocess.TimeoutExpired:
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="error",
             probe_backend="garak",
-            message=f"garak --help timed out after {int(args.budget_timeout_seconds)}s",
+            message=f"garak command timed out after {int(args.budget_timeout_seconds)}s: {probe_argv!r}",
             exit_code=2,
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
@@ -238,16 +268,24 @@ def main(argv: list[str] | None = None) -> int:
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
-            executed_argv=executed_argv if args.execution_mode == "execute_once" else preflight_argv,
+            executed_argv=probe_argv,
             secret_env_vars_required=required_secret_vars,
             garak_cli=garak,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
     if p.returncode != 0:
         tail = (p.stderr or p.stdout or "").strip()[-2000:]
-        cmd_label = "--help preflight" if args.execution_mode == "preflight" else "execute_once command"
+        if args.execution_mode == "preflight":
+            cmd_label = "--help preflight"
+        elif args.execution_mode == "selfcheck":
+            cmd_label = "--version selfcheck"
+        else:
+            cmd_label = "execute_once command"
+        ts_utc, ts_ist = now_report_timestamps()
         doc = build_report(
             status="error",
             probe_backend="garak",
@@ -259,19 +297,24 @@ def main(argv: list[str] | None = None) -> int:
             garak_config=str(garak_config) if garak_config is not None else None,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
-            executed_argv=executed_argv if args.execution_mode == "execute_once" else preflight_argv,
+            executed_argv=probe_argv,
             secret_env_vars_required=required_secret_vars,
             garak_cli=garak,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
         )
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
+    ts_utc, ts_ist = now_report_timestamps()
     doc = build_report(
         status="ok",
         probe_backend="garak",
         message=(
             "garak CLI preflight ok (--help)."
             if args.execution_mode == "preflight"
+            else "garak CLI selfcheck ok (--version)."
+            if args.execution_mode == "selfcheck"
             else "garak execute_once command completed successfully."
         ),
         exit_code=0,
@@ -281,9 +324,11 @@ def main(argv: list[str] | None = None) -> int:
         garak_config=str(garak_config) if garak_config is not None else None,
         model_target=args.model_target,
         execution_mode=args.execution_mode,
-        executed_argv=executed_argv if args.execution_mode == "execute_once" else preflight_argv,
+        executed_argv=probe_argv,
         secret_env_vars_required=required_secret_vars,
         garak_cli=garak,
+        report_generated_at_utc=ts_utc,
+        report_generated_at_ist=ts_ist,
     )
     out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
     return 0
