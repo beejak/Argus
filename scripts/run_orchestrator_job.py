@@ -6,7 +6,8 @@
 ``run`` writes an orchestrator envelope JSON (schema ``llm_scanner.orchestrator_envelope.v2``): UUID
 ``run_id`` (from the job or generated), optional ``parent_run_id``, and ``steps`` for ``scan_bundle``,
 optional ``dynamic_probe`` (see job schema in ``hf_bundle_scanner.orchestrator_job``), and ``aggregate``
-with RFC 3339 UTC timestamps and ``file:`` artifact URIs.
+with RFC 3339 UTC timestamps and ``file:`` artifact URIs. When present, ``dynamic_probe`` receives
+``run_id`` and optional budget flags from the job document.
 """
 from __future__ import annotations
 
@@ -168,9 +169,14 @@ def main(argv: list[str] | None = None) -> int:
             dp_out = _resolve(job_dir, str(dpo["out"]))
             dp_out.parent.mkdir(parents=True, exist_ok=True)
             probe_script = root / "scripts" / "run_dynamic_probe.py"
+            probe_cmd: list[str] = [str(py), str(probe_script), "--out", str(dp_out), "--run-id", run_id]
+            if dpo.get("budget_max_probes") is not None:
+                probe_cmd.extend(["--budget-max-probes", str(int(dpo["budget_max_probes"]))])
+            if dpo.get("budget_timeout_seconds") is not None:
+                probe_cmd.extend(["--budget-timeout-seconds", str(int(dpo["budget_timeout_seconds"]))])
             t_dp_start = _utc_now()
             probe = subprocess.run(
-                [str(py), str(probe_script), "--out", str(dp_out)],
+                probe_cmd,
                 cwd=str(root),
                 env=os.environ,
                 capture_output=True,

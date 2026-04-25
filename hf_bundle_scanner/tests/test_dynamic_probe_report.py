@@ -34,9 +34,13 @@ def test_build_report_with_budget_and_cli() -> None:
         message="ok",
         exit_code=0,
         budget_max_probes=10,
+        budget_timeout_seconds=30,
+        run_id="00000000-0000-4000-8000-00000000abcd",
         garak_cli="/usr/bin/garak",
     )
     assert r["budget_max_probes"] == 10
+    assert r["budget_timeout_seconds"] == 30
+    assert r["run_id"] == "00000000-0000-4000-8000-00000000abcd"
     assert r["garak_cli"] == "/usr/bin/garak"
 
 
@@ -48,7 +52,18 @@ def test_run_dynamic_probe_script_disabled(tmp_path: Path, monkeypatch: pytest.M
         pytest.skip("monorepo scripts/ not present")
     out = tmp_path / "dp.json"
     r = subprocess.run(
-        [sys.executable, str(script), "--out", str(out)],
+        [
+            sys.executable,
+            str(script),
+            "--out",
+            str(out),
+            "--budget-max-probes",
+            "8",
+            "--budget-timeout-seconds",
+            "33",
+            "--run-id",
+            "00000000-0000-4000-8000-0000000000aa",
+        ],
         cwd=str(root),
         capture_output=True,
         text=True,
@@ -58,3 +73,25 @@ def test_run_dynamic_probe_script_disabled(tmp_path: Path, monkeypatch: pytest.M
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["schema"] == DYNAMIC_PROBE_SCHEMA_V1
     assert data["status"] == "disabled"
+    assert data["budget_max_probes"] == 8
+    assert data["budget_timeout_seconds"] == 33
+    assert data["run_id"] == "00000000-0000-4000-8000-0000000000aa"
+
+
+def test_run_dynamic_probe_script_rejects_invalid_budget(tmp_path: Path) -> None:
+    root = _repo_root()
+    script = root / "scripts" / "run_dynamic_probe.py"
+    if not script.is_file():
+        pytest.skip("monorepo scripts/ not present")
+    out = tmp_path / "dp_invalid.json"
+    r = subprocess.run(
+        [sys.executable, str(script), "--out", str(out), "--budget-max-probes", "0"],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 2, r.stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["status"] == "error"
+    assert "budget_max_probes" in data["message"]

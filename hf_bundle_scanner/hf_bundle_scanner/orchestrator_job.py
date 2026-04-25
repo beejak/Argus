@@ -147,8 +147,21 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
         dp_obj = doc.get("dynamic_probe")
         if not isinstance(dp_obj, dict):
             errs.append("dynamic_probe must be an object when a dynamic_probe step is present")
-        elif not _is_non_empty_str(dp_obj.get("out")):
-            errs.append("dynamic_probe.out must be a non-empty string")
+        else:
+            if not _is_non_empty_str(dp_obj.get("out")):
+                errs.append("dynamic_probe.out must be a non-empty string")
+            if "budget_max_probes" in dp_obj and dp_obj.get("budget_max_probes") is not None:
+                try:
+                    if int(dp_obj["budget_max_probes"]) <= 0:
+                        errs.append("dynamic_probe.budget_max_probes must be >= 1 when provided")
+                except (TypeError, ValueError):
+                    errs.append("dynamic_probe.budget_max_probes must be an integer when provided")
+            if "budget_timeout_seconds" in dp_obj and dp_obj.get("budget_timeout_seconds") is not None:
+                try:
+                    if int(dp_obj["budget_timeout_seconds"]) <= 0:
+                        errs.append("dynamic_probe.budget_timeout_seconds must be >= 1 when provided")
+                except (TypeError, ValueError):
+                    errs.append("dynamic_probe.budget_timeout_seconds must be an integer when provided")
 
     dpr = doc.get("dynamic_probe")
     if isinstance(dpr, dict) and bool(dpr) and dp_id is None:

@@ -18,6 +18,8 @@ def build_report(
     message: str,
     exit_code: int,
     budget_max_probes: int | None = None,
+    budget_timeout_seconds: int | None = None,
+    run_id: str | None = None,
     garak_cli: str | None = None,
 ) -> dict[str, Any]:
     """Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
@@ -34,6 +36,10 @@ def build_report(
     }
     if budget_max_probes is not None:
         out["budget_max_probes"] = int(budget_max_probes)
+    if budget_timeout_seconds is not None:
+        out["budget_timeout_seconds"] = int(budget_timeout_seconds)
+    if run_id:
+        out["run_id"] = str(run_id).strip()
     if garak_cli:
         out["garak_cli"] = str(garak_cli).strip()
     return out

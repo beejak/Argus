@@ -209,4 +209,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Phase:** harness / docs only.
 - **Changes:** **`docs/LESSONS_LEARNED.md`** (2026-04-25 lessons: Make colon + commit-msg, choice capture, README vs pytest matrix, missing probe JSON); **`docs/LONG_HORIZON_HARNESS.md`** Makefile rows + **Propagating sanitized lessons** section; **`docs/HERMES_AGENTS.md`** test-inventory + lessons pointer; **`.cursor/skills/llm-scanner-long-horizon/SKILL.md`** checklist; **`README.md`** test row clarifies README is not the full scenario list; **`AGENTS.md`** cross-link for mirroring hints.
 
+### 2026-04-25 — Phase 5 budget + run_id correlation pass
+
+- **Phase:** `phase5-dynamic-staging` (`phase5-garak-config-budgets`, first implementation slice).
+- **Changes:** `dynamic_probe_report.v1` now includes optional `budget_timeout_seconds` + `run_id`; `run_dynamic_probe.py` accepts `--run-id`, `--budget-max-probes`, `--budget-timeout-seconds`, enforces positive budget values, and uses timeout budget for `garak --help`; orchestrator job validation enforces positive integer budget fields; orchestrator runner forwards run_id + budget flags; dynamic fixture updated with budget fields; tests expanded (`test_dynamic_probe_report.py`, `test_orchestrator_job.py`); phase-5 and roadmap docs updated.
+- **Commands:** `pytest tests/test_dynamic_probe_report.py tests/test_orchestrator_job.py -q`; `make test`; `make lint`; `python3 scripts/run_tests_for_agent.py`.
+- **Next:** define real Garak config surface (beyond `--help`) and secret-handling fields while keeping default CI opt-in.
+
 ---

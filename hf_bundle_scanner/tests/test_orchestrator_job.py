@@ -171,6 +171,26 @@ def test_dynamic_probe_settings_without_step() -> None:
     assert any("no dynamic_probe step" in e for e in validate_job(doc))
 
 
+def test_dynamic_probe_budget_fields_must_be_positive_ints() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "dyn", "type": "dynamic_probe", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "dyn"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "dynamic_probe": {
+            "out": "dyn.json",
+            "budget_max_probes": 0,
+            "budget_timeout_seconds": "bad",
+        },
+    }
+    errs = validate_job(doc)
+    assert any("budget_max_probes" in e for e in errs)
+    assert any("budget_timeout_seconds" in e for e in errs)
+
+
 def test_build_envelope_three_steps(tmp_path: Path) -> None:
     bundle = tmp_path / "bundle.json"
     bundle.write_text("{}", encoding="utf-8")
@@ -231,7 +251,11 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
             "timeout": 600,
             "fail_on": "MEDIUM",
         },
-        "dynamic_probe": {"out": str(dp_out)},
+        "dynamic_probe": {
+            "out": str(dp_out),
+            "budget_max_probes": 7,
+            "budget_timeout_seconds": 120,
+        },
     }
     job_path = tmp_path / "job.json"
     job_path.write_text(json.dumps(job), encoding="utf-8")
@@ -250,6 +274,9 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
     assert env["steps"][1]["type"] == "dynamic_probe"
     assert env["steps"][1]["exit_code"] == 0
     assert dp_out.is_file()
+    dp = json.loads(dp_out.read_text(encoding="utf-8"))
+    assert dp["run_id"] == job["run_id"]
+    assert dp["budget_timeout_seconds"] == 120
 
 
 def test_build_envelope_parent_run_id(tmp_path: Path) -> None:

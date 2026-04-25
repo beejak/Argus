@@ -10,7 +10,7 @@ When a discussion produces **multiple** viable next steps and the team (or an ag
 
 | Track | Backlog id | What | Status |
 | ----- | ---------- | ---- | ------ |
-| Phase 5 depth | `phase5-garak-config-budgets` | Real Garak (later PyRIT) job config on disk or in job JSON, **budget** fields enforced, `run_id` echoed into probe reports | **Next candidate** — extends the shipped stub without new orchestrator graph shapes |
+| Phase 5 depth | `phase5-garak-config-budgets` | Real Garak (later PyRIT) job config on disk or in job JSON, **budget** fields enforced, `run_id` echoed into probe reports | **In progress** — budget + `run_id` pass shipped; real probe config + secrets still open |
 | Phase 4 breadth | `phase4-admit-model-fanout` | `admit_model` fan-out jobs + reducer per ADR 0001 | **Deferred** until we need multi-artifact admission in one orchestrated run |
 
 ## Goal
@@ -59,7 +59,8 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Goal:** opt-in **dynamic** model / app probing (Garak-class, budgets, secrets) without contaminating default static CI.
 - **Shipped (v1 stub):** machine-readable **`llm_scanner.dynamic_probe_report.v1`** ([`dynamic_probe_report.py`](../hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py)); entrypoint [`scripts/run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) (`LLM_SCANNER_DYNAMIC_PROBE=1` enables a trivial `garak --help` check). Design notes: [PHASE5_DYNAMIC_PROBES.md](PHASE5_DYNAMIC_PROBES.md).
 - **Shipped (orchestrator hook):** optional **`dynamic_probe`** step in `llm_scanner.orchestrator_job.v1` (validator + `scripts/run_orchestrator_job.py run` → probe script → merged exit + envelope `steps[]`); fixture [`orchestrator_job_with_dynamic.json`](../hf_bundle_scanner/tests/fixtures/orchestrator_job_with_dynamic.json).
-- **Next:** real probe configs, budgets enforced on the job, correlation with `run_id` in reports, PyRIT / additional backends behind the same report + exit contracts.
+- **Shipped (budget + correlation pass):** orchestrator `dynamic_probe` job fields **`budget_max_probes`** / **`budget_timeout_seconds`** validated as positive integers; runner forwards them to [`run_dynamic_probe.py`](../scripts/run_dynamic_probe.py) with `run_id`; probe report records these fields for correlation.
+- **Next:** real probe configs and policy semantics beyond `garak --help`, secret handling, PyRIT / additional backends behind the same report + exit contracts.
 
 ## Ten capability pillars (summary)
 

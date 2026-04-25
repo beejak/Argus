@@ -84,6 +84,16 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 - **Mistake:** Assuming **`run_dynamic_probe.py`** always writes **`--out`** when the subprocess exits `0` (crash, disk full, or killed mid-write).
 - **Fix:** Runner treats **missing output file** like a tooling failure: merge with **`worst_exit_code(..., 2)`** so aggregate exit stays honest; same pattern when the report JSON is **unreadable**.
 
+## 2026-04-25 — Budget fields without validation drift into runtime-only failures
+
+- **Mistake:** Treating dynamic budget fields as “optional hints” and validating only at script runtime. Invalid job JSON (`budget_max_probes: 0`, timeout strings) then fails late and opaquely.
+- **Fix:** Validate `dynamic_probe.budget_max_probes` and `dynamic_probe.budget_timeout_seconds` as positive integers in orchestrator job validation and mirror checks in the dynamic probe script for direct CLI use.
+
+## 2026-04-25 — Correlation IDs must be pushed to leaf reports, not only envelopes
+
+- **Mistake:** Keeping `run_id` only in the orchestrator envelope while downstream probe artifacts lack correlation fields.
+- **Fix:** Forward `run_id` into `run_dynamic_probe.py` and persist it in `dynamic_probe_report.v1`, then assert in tests so cross-artifact joins are stable.
+
 ## Template (copy below)
 
 ```
