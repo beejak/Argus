@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from hf_bundle_scanner.timestamps import ist_now_iso, utc_now_iso_z
+
 
 @dataclass
 class FileScanRecord:
@@ -46,6 +48,8 @@ class BundleReport:
         return {
             "schema": BUNDLE_REPORT_SCHEMA,
             "taxonomy_version": "phase0",
+            "report_generated_at_utc": utc_now_iso_z(),
+            "report_generated_at_ist": ist_now_iso(),
             "root": self.root,
             "policy_path": self.policy_path,
             "drivers": self.drivers,

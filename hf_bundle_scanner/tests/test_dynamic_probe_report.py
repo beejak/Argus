@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -23,6 +24,8 @@ def test_build_report_disabled() -> None:
     )
     assert r["schema"] == DYNAMIC_PROBE_SCHEMA_V1
     assert r["status"] == "disabled"
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", str(r["report_generated_at_utc"]))
+    assert re.search(r"\+05:30$", str(r["report_generated_at_ist"]))
     assert "budget_max_probes" not in r
     json.dumps(r)
 
@@ -54,6 +57,8 @@ def test_build_report_with_budget_and_cli() -> None:
     assert r["secret_env_vars_required"] == ["OPENAI_API_KEY"]
     assert r["secret_env_vars_missing"] == ["OPENAI_API_KEY"]
     assert r["garak_cli"] == "/usr/bin/garak"
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", str(r["report_generated_at_utc"]))
+    assert re.search(r"\+05:30$", str(r["report_generated_at_ist"]))
 
 
 def test_run_dynamic_probe_script_disabled(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -93,6 +98,8 @@ def test_run_dynamic_probe_script_disabled(tmp_path: Path, monkeypatch: pytest.M
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["schema"] == DYNAMIC_PROBE_SCHEMA_V1
     assert data["status"] == "disabled"
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", str(data["report_generated_at_utc"]))
+    assert re.search(r"\+05:30$", str(data["report_generated_at_ist"]))
     assert data["budget_max_probes"] == 8
     assert data["budget_timeout_seconds"] == 33
     assert data["run_id"] == "00000000-0000-4000-8000-0000000000aa"

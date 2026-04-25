@@ -1,12 +1,12 @@
 # Graph Report - .  (2026-04-25)
 
 ## Corpus Check
-- 67 files · ~46,004 words
+- 70 files · ~47,498 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 473 nodes · 846 edges · 30 communities detected
-- Extraction: 67% EXTRACTED · 33% INFERRED · 0% AMBIGUOUS · INFERRED: 279 edges (avg confidence: 0.76)
+- 488 nodes · 877 edges · 37 communities detected
+- Extraction: 66% EXTRACTED · 34% INFERRED · 0% AMBIGUOUS · INFERRED: 294 edges (avg confidence: 0.77)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -40,6 +40,13 @@
 - [[_COMMUNITY_Community 27|Community 27]]
 - [[_COMMUNITY_Community 28|Community 28]]
 - [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `validate_job()` - 25 edges
@@ -56,24 +63,24 @@
 ## Surprising Connections (you probably didn't know these)
 - `test_sha256_file()` --calls--> `sha256_file()`  [INFERRED]
   model-admission/tests/test_policy.py → hf_bundle_scanner/hf_bundle_scanner/snapshot.py
+- `append_ledger()` --calls--> `_cmd_scan()`  [INFERRED]
+  model-admission/model_admission/ledger.py → hf_bundle_scanner/hf_bundle_scanner/cli.py
 - `Finding` --calls--> `_cmd_scan()`  [INFERRED]
   model-admission/model_admission/report.py → hf_bundle_scanner/hf_bundle_scanner/cli.py
 - `ScanReport` --calls--> `_cmd_scan()`  [INFERRED]
   model-admission/model_admission/report.py → hf_bundle_scanner/hf_bundle_scanner/cli.py
 - `_cmd_scan()` --calls--> `get_driver()`  [INFERRED]
   hf_bundle_scanner/hf_bundle_scanner/cli.py → model-admission/model_admission/drivers/__init__.py
-- `_cmd_scan()` --calls--> `scan()`  [INFERRED]
-  hf_bundle_scanner/hf_bundle_scanner/cli.py → model-admission/model_admission/drivers/base.py
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.05
-Nodes (41): _any_finding_at_or_above(), build_parser(), _cmd_download(), _cmd_manifest(), _cmd_scan(), main(), CLI: manifest, download, scan (bundle)., main() (+33 more)
+Cohesion: 0.06
+Nodes (61): _blast_for_config(), _blast_for_exec_summary(), _blast_for_finding(), _blast_for_weight_clean(), _catalog_rules_index(), _decision_catalog_path(), _decision_english(), _decision_legend_rows() (+53 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
-Nodes (43): build_report(), Phase-5 dynamic probe lane — machine-readable report (v1).  This is **not** a, Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable)., _catalog_rules_index(), _decision_catalog_path(), _decision_legend_rows(), _decision_support_reference_fields(), _format_reference_list() (+35 more)
+Nodes (39): _any_finding_at_or_above(), build_parser(), _cmd_download(), _cmd_manifest(), _cmd_scan(), main(), _min_severity(), CLI: manifest, download, scan (bundle). (+31 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.08
@@ -85,15 +92,15 @@ Nodes (25): ABC, finding_from_severity(), scan(), ScanDriver, get_driver(), Mode
 
 ### Community 4 - "Community 4"
 Cohesion: 0.1
-Nodes (38): _blast_for_config(), _blast_for_exec_summary(), _blast_for_finding(), _blast_for_weight_clean(), _decision_english(), default_demos(), Demo, _html_report_scope_block() (+30 more)
-
-### Community 5 - "Community 5"
-Cohesion: 0.1
 Nodes (37): build_envelope(), _is_non_empty_str(), load_job(), Orchestrator job document v1 — structure + DAG validation (no scan execution)., Same priority family as bundle aggregates: 4 > 2 > 1 > 0., If ``value`` is non-empty after strip, it must be a RFC 4122 UUID string., Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `, Return a list of human-readable errors; empty means valid. (+29 more)
 
-### Community 6 - "Community 6"
+### Community 5 - "Community 5"
 Cohesion: 0.09
 Nodes (24): llm_security_test_catalog(), Pytest hooks and fixtures for model-admission., Machine-readable LLM security test catalog for the monorepo (see docs/TEST_CASES, Same catalog JSON as hf_bundle_scanner tests (monorepo sibling import)., main(), _pick_python(), Resolve catalog path and export absolute ``LLM_SCANNER_TEST_CATALOG`` for child, Prefer repo-local .venv; fall back to sys.executable (e.g. GitHub Actions). (+16 more)
+
+### Community 6 - "Community 6"
+Cohesion: 0.11
+Nodes (21): build_report(), Phase-5 dynamic probe lane — machine-readable report (v1).  This is **not** a, Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable)., _bundle_stats(), _load_json(), main(), _repo_root(), _run() (+13 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.12
@@ -104,8 +111,8 @@ Cohesion: 0.1
 Nodes (18): category_for_register_id(), make_rule_id(), owasp_rows(), Phase-0 risk taxonomy: categories, OWASP LLM mapping, stable rule_id prefixes., Normalized category for findings and future policy packs., Stable ``rule_id`` like ``modelscan.unsafe_pickle``., Serializable rows for bundle docs / tooling., RiskCategory (+10 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.15
-Nodes (15): Run scan. Returns (findings, error_message_or_none)., _min_severity(), Enum, Finding, ScanReport, Severity, Exit logic for --fail-on (imports private helpers — stable contract tests)., test_any_finding_at_or_above_respects_floor() (+7 more)
+Cohesion: 0.18
+Nodes (13): Run scan. Returns (findings, error_message_or_none)., Enum, Finding, ScanReport, Severity, Exit logic for --fail-on (imports private helpers — stable contract tests)., test_any_finding_at_or_above_respects_floor(), ScanReport / Finding serialization and severity aggregation. (+5 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.27
@@ -132,28 +139,28 @@ Cohesion: 0.47
 Nodes (5): _minimal_safetensors(), Optional: run when modelscan / modelaudit are on PATH., Tiny valid safetensors payload (empty tensor map)., test_modelaudit_on_minimal_safetensors(), test_modelscan_on_minimal_safetensors()
 
 ### Community 16 - "Community 16"
+Cohesion: 0.4
+Nodes (4): append_ledger(), Ledger append-only JSONL., test_append_ledger_appends_second_line(), test_append_ledger_writes_one_json_line()
+
+### Community 17 - "Community 17"
+Cohesion: 0.6
+Nodes (3): _run_admit(), test_cli_scan_no_drivers_passes(), test_cli_scan_policy_forbidden_extension_fails()
+
+### Community 18 - "Community 18"
+Cohesion: 0.6
+Nodes (4): More CLI subprocess coverage., _run(), test_ledger_via_env_without_flag(), test_unknown_driver_exits_4()
+
+### Community 19 - "Community 19"
 Cohesion: 0.67
 Nodes (3): Org policy template stays aligned with configlint + dispatch., _repo_root(), test_configlint_policy_template_matches_dispatch()
 
-### Community 17 - "Community 17"
+### Community 20 - "Community 20"
 Cohesion: 0.67
 Nodes (1): Ensure the shared LLM security test catalog loads in this package's pytest sessi
 
-### Community 18 - "Community 18"
+### Community 21 - "Community 21"
 Cohesion: 0.67
 Nodes (1): HF bundle scanner: snapshot manifest, discovery, dispatch to model-admission, co
-
-### Community 19 - "Community 19"
-Cohesion: 1.0
-Nodes (0): 
-
-### Community 20 - "Community 20"
-Cohesion: 1.0
-Nodes (0): 
-
-### Community 21 - "Community 21"
-Cohesion: 1.0
-Nodes (0): 
 
 ### Community 22 - "Community 22"
 Cohesion: 1.0
@@ -169,61 +176,97 @@ Nodes (0):
 
 ### Community 25 - "Community 25"
 Cohesion: 1.0
-Nodes (1): Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `
+Nodes (0): 
 
 ### Community 26 - "Community 26"
 Cohesion: 1.0
-Nodes (1): Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
+Nodes (0): 
 
 ### Community 27 - "Community 27"
 Cohesion: 1.0
-Nodes (1): Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `
+Nodes (0): 
 
 ### Community 28 - "Community 28"
 Cohesion: 1.0
-Nodes (1): Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `
+Nodes (1): Phase2 static drivers: missing ModelScan binary → admit exit 2 → bundle aggregat
 
 ### Community 29 - "Community 29"
 Cohesion: 1.0
 Nodes (1): Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
 
+### Community 30 - "Community 30"
+Cohesion: 1.0
+Nodes (1): Priority: any 4 (usage) > 2 (driver) > 1 (policy/findings) > 0.
+
+### Community 31 - "Community 31"
+Cohesion: 1.0
+Nodes (1): If configlint reports risky settings, treat as exit 1 unless bundle already wors
+
+### Community 32 - "Community 32"
+Cohesion: 1.0
+Nodes (1): Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `
+
+### Community 33 - "Community 33"
+Cohesion: 1.0
+Nodes (1): Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
+
+### Community 34 - "Community 34"
+Cohesion: 1.0
+Nodes (1): Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `
+
+### Community 35 - "Community 35"
+Cohesion: 1.0
+Nodes (1): Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, `
+
+### Community 36 - "Community 36"
+Cohesion: 1.0
+Nodes (1): Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).
+
 ## Knowledge Gaps
-- **82 isolated node(s):** `Pytest hooks and fixtures for model-admission.`, `Same catalog JSON as hf_bundle_scanner tests (monorepo sibling import).`, `Optional: run when modelscan / modelaudit are on PATH.`, `Tiny valid safetensors payload (empty tensor map).`, `More CLI subprocess coverage.` (+77 more)
+- **86 isolated node(s):** `Pytest hooks and fixtures for model-admission.`, `Same catalog JSON as hf_bundle_scanner tests (monorepo sibling import).`, `Optional: run when modelscan / modelaudit are on PATH.`, `Tiny valid safetensors payload (empty tensor map).`, `More CLI subprocess coverage.` (+81 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 19`** (2 nodes): `main()`, `redact_ephemeral_report.py`
+- **Thin community `Community 22`** (2 nodes): `main()`, `redact_ephemeral_report.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 20`** (2 nodes): `summarize_bundle_json.py`, `main()`
+- **Thin community `Community 23`** (2 nodes): `summarize_bundle_json.py`, `main()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 21`** (2 nodes): `main()`, `git_doctor.py`
+- **Thin community `Community 24`** (2 nodes): `main()`, `git_doctor.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 22`** (2 nodes): `test_mcp_import.py`, `test_fastmcp_import()`
+- **Thin community `Community 25`** (2 nodes): `test_mcp_import.py`, `test_fastmcp_import()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 23`** (1 nodes): `__main__.py`
+- **Thin community `Community 26`** (1 nodes): `__main__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 24`** (1 nodes): `__main__.py`
+- **Thin community `Community 27`** (1 nodes): `__main__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (1 nodes): `Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, ``
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (1 nodes): `Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (1 nodes): `Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, ``
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (1 nodes): `Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, ``
+- **Thin community `Community 28`** (1 nodes): `Phase2 static drivers: missing ModelScan binary → admit exit 2 → bundle aggregat`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 29`** (1 nodes): `Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 30`** (1 nodes): `Priority: any 4 (usage) > 2 (driver) > 1 (policy/findings) > 0.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 31`** (1 nodes): `If configlint reports risky settings, treat as exit 1 unless bundle already wors`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 32`** (1 nodes): `Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, ``
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 33`** (1 nodes): `Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 34`** (1 nodes): `Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, ``
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 35`** (1 nodes): `Build orchestrator envelope JSON (v2).      ``steps`` follow ADR 0001: ``id``, ``
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 36`** (1 nodes): `Return a ``dynamic_probe_report.v1`` object (plain dict, JSON-serializable).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `_cmd_scan()` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 8`, `Community 9`?**
-  _High betweenness centrality (0.168) - this node is a cross-community bridge._
+- **Why does `_cmd_scan()` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 6`, `Community 8`, `Community 9`, `Community 16`?**
+  _High betweenness centrality (0.160) - this node is a cross-community bridge._
 - **Why does `scan_bundle()` connect `Community 2` to `Community 0`, `Community 1`, `Community 7`, `Community 9`, `Community 11`?**
-  _High betweenness centrality (0.168) - this node is a cross-community bridge._
-- **Why does `lint_config_file()` connect `Community 7` to `Community 1`?**
-  _High betweenness centrality (0.089) - this node is a cross-community bridge._
-- **Are the 68 inferred relationships involving `str` (e.g. with `test_cli_scan_driver_error_yields_exit_2()` and `test_cli_scan_driver_timeout_yields_exit_2()`) actually correct?**
-  _`str` has 68 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.157) - this node is a cross-community bridge._
+- **Why does `lint_config_file()` connect `Community 7` to `Community 0`?**
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
+- **Are the 73 inferred relationships involving `str` (e.g. with `test_cli_scan_driver_error_yields_exit_2()` and `test_cli_scan_driver_timeout_yields_exit_2()`) actually correct?**
+  _`str` has 73 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 21 inferred relationships involving `validate_job()` (e.g. with `main()` and `test_fixture_min_validates()`) actually correct?**
   _`validate_job()` has 21 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 19 inferred relationships involving `scan_bundle()` (e.g. with `test_scan_bundle_empty_tree()` and `test_scan_bundle_with_weight()`) actually correct?**

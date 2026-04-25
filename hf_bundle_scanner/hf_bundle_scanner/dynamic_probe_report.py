@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from hf_bundle_scanner.timestamps import ist_now_iso, utc_now_iso_z
+
 DYNAMIC_PROBE_SCHEMA_V1 = "llm_scanner.dynamic_probe_report.v1"
 
 
@@ -39,6 +41,8 @@ def build_report(
         "probe_backend": str(probe_backend).strip(),
         "message": str(message).strip(),
         "exit_code": int(exit_code),
+        "report_generated_at_utc": utc_now_iso_z(),
+        "report_generated_at_ist": ist_now_iso(),
     }
     if budget_max_probes is not None:
         out["budget_max_probes"] = int(budget_max_probes)

@@ -6,6 +6,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from model_admission.timestamps import ist_now_iso, utc_now_iso_z
+
 
 class Severity(str, Enum):
     INFO = "info"
@@ -66,6 +68,8 @@ class ScanReport:
 
     def to_dict(self) -> dict[str, Any]:
         return {
+            "report_generated_at_utc": utc_now_iso_z(),
+            "report_generated_at_ist": ist_now_iso(),
             "artifact_path": self.artifact_path,
             "artifact_sha256": self.artifact_sha256,
             "policy_path": self.policy_path,

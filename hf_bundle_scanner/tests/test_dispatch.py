@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -67,6 +68,8 @@ def test_scan_bundle_with_weight(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     assert bundle.manifest["file_count"] >= 2
     d = bundle.to_dict()
     assert d["schema"] == "hf_bundle_scanner.bundle_report.v2"
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", str(d["report_generated_at_utc"]))
+    assert re.search(r"\+05:30$", str(d["report_generated_at_ist"]))
     assert d["provenance"]["provenance_version"] == "phase1"
     assert d["provenance"]["hub"] == {"repo_id": "demo/repo", "revision": "abc123"}
     assert d["provenance"]["sbom"] == {"uri": "https://example.invalid/sbom.json"}
