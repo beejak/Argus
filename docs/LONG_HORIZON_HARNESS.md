@@ -14,6 +14,7 @@ Feedback loop: [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (append mistakes and fix
 | `make integration` | Integration-marked tests |
 | `make scan-fixture` | Minimal tree + bundle scan smoke |
 | `make roadmap` | Print pointer to this roadmap doc |
+| `make docs-map` | Print pointer to [DOCUMENTATION.md](DOCUMENTATION.md) (canonical doc hub + contracts) |
 | `make graphify-update` | Refresh `graphify-out/` if `graphify` CLI or Python module is available |
 | `make memory-open` | Print path to session log for append-only notes |
 | `make agent-verify` | Run **[`scripts/run_tests_for_agent.py`](../scripts/run_tests_for_agent.py)** (repo `.venv` if present, else `sys.executable`); writes [`.agent/pytest-last.log`](../.agent/pytest-last.log) + `.agent/pytest-last.exit` so agents can **read** results when terminal stdout is empty |
@@ -21,8 +22,12 @@ Feedback loop: [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (append mistakes and fix
 | `make plain-english-brief` | Write `docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md` (non-technical; does not overwrite CSV/HTML/blast MD) |
 | `make sample-reports-all` | `sample-action-sheets` + `plain-english-brief` |
 | `make hub-find-models-under-size` | Hub metadata search for repos under **`HF_HUB_FIND_FLAGS`** (default script flags: `--max-mb 200`; optional **`--probe-configlint`**; needs network) |
-| `make orchestrator-validate` | **`run_orchestrator_job.py validate`** on **`orchestrator_job_min.json`** and **`orchestrator_job_with_dynamic.json`** (no scan) |
+| `make orchestrator-validate` | **`run_orchestrator_job.py validate`** on **min**, **dynamic**, and **admit** orchestrator fixtures (no scan) |
 | `make dynamic-probe-stub` | Writes **`.agent/dynamic_probe_last.json`** via **`run_dynamic_probe.py`** (disabled unless **`LLM_SCANNER_DYNAMIC_PROBE=1`**) |
+| `make dynamic-probe-live-preflight` | Live **`garak --help`** using **`.venv-garak`** on `PATH` |
+| `make dynamic-probe-live-selfcheck` | Live **`garak --version`** using **`.venv-garak`** |
+| `make dynamic-probe-live-exec` | Live **`execute_once`** — requires **`EXECUTE_ARGS='…'`** |
+| `make live-e2e-compare` | Multi-lane harness ([`scripts/live_e2e_compare.py`](../scripts/live_e2e_compare.py)); optional **`LIVE_E2E_FLAGS`** |
 
 Delegate from `hf_bundle_scanner/` with `make -C .. <target>` (see that folder’s stub Makefile).
 
@@ -36,6 +41,7 @@ When you append a **durable** lesson to [`LESSONS_LEARNED.md`](LESSONS_LEARNED.m
 | **`.cursor/skills/llm-scanner-long-horizon/SKILL.md`** | Short **judgement / discipline** bullets (no secrets); keeps Cursor agents aligned on phases, Hermes bounds, and harness commands. |
 | **Root `Makefile` `help`** | One-line **operational** hints (e.g. commit message pitfall) when a lesson is “how to run a command safely.” |
 | **[`docs/HERMES_AGENTS.md`](HERMES_AGENTS.md)** | Boundaries and **env** reminders for tools agents call (MCP, HTTP, `make …`). |
+| **[`docs/DOCUMENTATION.md`](DOCUMENTATION.md)** | Canonical **contracts + audiences** map; use when README would duplicate deep tables. |
 | **`README.md`** | **Map only** — link to test docs and harness; do **not** mirror the full pytest matrix (see lesson **2026-04-25 — Mirroring every pytest scenario in the README**). |
 
 **Sanitize before copying:** strip customer names, paths, tokens, and one-off host quirks unless the fix is reusable. Prefer **pattern + fix** over raw logs.

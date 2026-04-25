@@ -9,6 +9,7 @@ This monorepo contains:
 
 ## Must read before large changes
 
+- [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) — **canonical documentation hub**: audiences, JSON contracts, timestamp semantics, Makefile map, maintenance bar.
 - [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) — phased long-horizon plan.
 - [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md) — phase 0 threat model, OWASP mapping, `rule_id` / categories.
 - [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md) — index of LLM security test cases and where they live.
@@ -23,8 +24,10 @@ From `/root/LLM Scanner`:
 
 ```bash
 make install
+make docs-map
 make test
 make scan-fixture
+make agent-verify
 ```
 
 If **`git commit -m …`** fails with **`option trailer requires a value`**, run **`make git-doctor`**, then commit with **`make commit-msg MSG='…'`** or **`python3 scripts/git_commit_via_file.py '…'`** (see [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)).

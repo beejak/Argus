@@ -1,6 +1,6 @@
 # Program Status Snapshot
 
-Last updated: 2026-04-25
+Last updated: 2026-04-26
 
 This document is the high-level operational view for the LLM Scanner program:
 - what exists now,
@@ -76,17 +76,18 @@ This document is the high-level operational view for the LLM Scanner program:
 - Optional `admit_model` fan-out with explicit job mapping
 
 ### Controlled/experimental (opt-in lane)
-- Dynamic probe depth beyond preflight is intentionally constrained
-- Dynamic lane requires explicit enablement and budget/secret controls
+- Dynamic probe depth beyond CLI self-checks is intentionally constrained
+- Dynamic lane requires explicit enablement (`LLM_SCANNER_DYNAMIC_PROBE=1`) and budget/secret controls
+- Optional **`.venv-garak/`** is used for live Makefile targets so the main CI venv stays lean (not committed)
 - YAML orchestrator job format not shipped yet
 
 ## Current capabilities vs planned
 
 | Area | Current | Planned next |
 | --- | --- | --- |
-| Dynamic execution | `preflight` and controlled `execute_once` | richer probe profiles, policy-governed execution depth |
+| Dynamic execution | `preflight`, `selfcheck`, and controlled `execute_once` (bounded subprocess) | richer probe profiles, policy-governed execution depth |
 | Job format | JSON schema v1 | YAML surface (with same strict validation intent) |
-| Correlation | envelope + optional bundle provenance echo | stronger event lineage for SIEM/audit |
+| Correlation | envelope + optional bundle provenance echo + **paired UTC/IST report timestamps** on JSON artifacts | stronger event lineage for SIEM/audit |
 | Pillar 8/9 readiness | taxonomy + roadmap + placeholders | concrete app-eval and runtime-guard adapters/workflows |
 
 ## Practical posture (kept intentionally)

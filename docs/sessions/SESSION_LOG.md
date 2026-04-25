@@ -237,4 +237,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `pytest tests/test_orchestrator_job.py -q`, `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`.
 - **Next:** YAML orchestrator job format + richer graph composition, while keeping current subprocess contracts deterministic.
 
+### 2026-04-26 — Documentation hub + README alignment
+
+- **Phase:** harness / docs (cross-cutting).
+- **Changes:** Added `docs/DOCUMENTATION.md` as the canonical documentation hub (audiences, JSON contracts, UTC/IST timestamp semantics, Makefile/orchestrator/dynamic pointers, maintainer quality bar). Updated root `README.md` (phase 5 row, reporting timestamps subsection, Makefile + env + scripts tables, pytest green counts, typo fix), `docs/PHASE5_DYNAMIC_PROBES.md`, `docs/PROGRAM_STATUS_SNAPSHOT.md`, `docs/LONG_HORIZON_HARNESS.md`, `AGENTS.md`, `hf_bundle_scanner/README.md`, `model-admission/README.md`. Root `Makefile`: new `docs-map` target + `help` line.
+- **Commands:** `make docs-map`, `make agent-verify` (recommended after doc-only edits when Makefile changes).
+- **Next:** keep **one hub** (`DOCUMENTATION.md`) authoritative for deep tables; README stays the front door + quick links.
+
 ---

@@ -78,6 +78,15 @@ Integration tests (`pytest -m integration`) run when `modelscan` / `modelaudit` 
 
 **Goals vs test outcomes:** [docs/GOALS_AND_TEST_REPORT.md](docs/GOALS_AND_TEST_REPORT.md)
 
+## Report JSON (`--report`)
+
+Written by `admit-model scan --report /path/to/out.json`. Alongside findings and driver metadata, reports include:
+
+- **`report_generated_at_utc`** — completion instant in UTC (RFC 3339, **`Z`**).
+- **`report_generated_at_ist`** — same instant in **Asia/Kolkata** (`+05:30`).
+
+Semantics mirror the monorepo-wide contract described in [docs/DOCUMENTATION.md](../docs/DOCUMENTATION.md) (timestamps are fixed when the scan result is assembled, not on incidental re-serialization).
+
 ## References
 
 - [ModelScan](https://github.com/protectai/modelscan)

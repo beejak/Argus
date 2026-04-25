@@ -13,7 +13,7 @@
 [![LLM Scanner CI](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml/badge.svg?branch=main)](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml?query=branch%3Amain)
 ![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-101624?logo=python&logoColor=white)
 
-**Production-minded scanning** for Hugging Face–style model bundles — static admission, config risk, a **phase-4 orchestrator** (job JSON + envelope), and a **phase-5 opt-in dynamic probe stub** (contract + `garak --help` check when enabled).
+**Production-minded scanning** for Hugging Face–style model bundles — static admission, config risk, a **phase-4 orchestrator** (job JSON + envelope), and a **phase-5 opt-in dynamic probe** (stable `llm_scanner.dynamic_probe_report.v1` JSON; bounded **`preflight` / `selfcheck` / `execute_once`** when **`LLM_SCANNER_DYNAMIC_PROBE=1`**).
 
 [**Argus** (GitHub mirror)](https://github.com/beejak/Argus) · [Publish notes](docs/PUBLISH_ARGUS.md)
 
@@ -38,7 +38,7 @@ Program overview: [docs/PROGRAM_STATUS_SNAPSHOT.md](docs/PROGRAM_STATUS_SNAPSHOT
 - A **traffic-light style signal** for “did our default static gate object?” — useful in CI and procurement conversations.
 - **Separate outputs:** engineers can use the detailed tables/CSV; approvers can start with a **plain-language brief** of the same sample scans ([`docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md`](docs/sample_reports/actionable/PLAIN_ENGLISH_BRIEF.md)).
 
-**What we do *not* do (yet):** we do **not** replace human judgment, legal review, or full red-teaming. **Phase 5** ships a **stub + JSON report only** (no default Garak runs); phases **6–8** add supply-chain appendices, runtime guardrails, and observability — see [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) and [docs/PHASE5_DYNAMIC_PROBES.md](docs/PHASE5_DYNAMIC_PROBES.md).
+**What we do *not* do (yet):** we do **not** replace human judgment, legal review, or full red-teaming. **Phase 5** ships a **JSON contract + bounded CLI checks** (no Garak on the default CI path; optional **`.venv-garak`** + Makefile targets for live checks); phases **6–8** add supply-chain appendices, runtime guardrails, and observability — see [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) and [docs/PHASE5_DYNAMIC_PROBES.md](docs/PHASE5_DYNAMIC_PROBES.md). **Canonical doc map:** [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).
 
 **Keeping this section honest:** when a roadmap **phase** lands user-visible behavior, update **this blurb** in the same change when you can, and regenerate **`PLAIN_ENGLISH_BRIEF.md`** with **`make plain-english-brief`** (or **`make sample-reports-all`** after changing sample JSON).
 
@@ -52,9 +52,9 @@ Program overview: [docs/PROGRAM_STATUS_SNAPSHOT.md](docs/PROGRAM_STATUS_SNAPSHOT
 | **Bundle orchestration** | [`hf_bundle_scanner/`](hf_bundle_scanner/README.md) | Walks a snapshot tree: **manifest** (hashes), **discovery**, **configlint** (static JSON hints), **dispatch** to model-admission per weight-like file, **aggregate JSON** report (**`hf_bundle_scanner.bundle_report.v2`** + **provenance**). |
 | **Taxonomy & findings** | [`model_admission/taxonomy.py`](model-admission/model_admission/taxonomy.py) | Normalized **`RiskCategory`**, OWASP LLM01–10 mapping, **risk register** ids, optional **`rule_id` / `category`** on findings. |
 | **Test catalog & scenarios** | [`llm_security_test_cases/catalog.json`](llm_security_test_cases/catalog.json), [`hf_bundle_scanner/tests/`](hf_bundle_scanner/tests/), **`make test`** | Canonical matrix lives in **pytest + catalog +** [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_SECURITY_SCANNER.md). **README does not list every test case** (would duplicate CI and drift); this row is the pointer. |
-| **Agent / CI harness** | [`Makefile`](Makefile), [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py), [`.github/workflows/llm-scanner.yml`](.github/workflows/llm-scanner.yml) | One command runs both packages, **ruff**, orchestrator **validate**, dynamic-probe **stub**, and writes **`.agent/pytest-last.log`**; GitHub Actions runs the same script. |
+| **Agent / CI harness** | [`Makefile`](Makefile), [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py), [`.github/workflows/llm-scanner.yml`](.github/workflows/llm-scanner.yml) | **`make agent-verify`**: both packages’ pytest, **ruff**, orchestrator **`validate`** (three fixtures), dynamic-probe **stub**, **`.agent/pytest-last.log`**. Deep tables + contracts: [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md). GitHub Actions runs the same script. |
 | **Orchestrator (phase 4)** | [`scripts/run_orchestrator_job.py`](scripts/run_orchestrator_job.py), [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md) | Declarative job JSON → `scan-bundle` + optional **`admit_model` fan-out** + optional **`dynamic_probe`** + **envelope v2** (`run_id`, per-step timestamps). **`make orchestrator-validate`**. |
-| **Dynamic probe stub (phase 5)** | [`scripts/run_dynamic_probe.py`](scripts/run_dynamic_probe.py), [`docs/PHASE5_DYNAMIC_PROBES.md`](docs/PHASE5_DYNAMIC_PROBES.md) | Opt-in via **`LLM_SCANNER_DYNAMIC_PROBE=1`**; writes **`llm_scanner.dynamic_probe_report.v1`**. Supports controlled modes (`execution_mode=preflight|execute_once`) with bounded command execution. Orchestrator **`run`** forwards `run_id`, budgets, and config metadata. **`make dynamic-probe-stub`**. |
+| **Dynamic probe (phase 5)** | [`scripts/run_dynamic_probe.py`](scripts/run_dynamic_probe.py), [`docs/PHASE5_DYNAMIC_PROBES.md`](docs/PHASE5_DYNAMIC_PROBES.md) | Opt-in via **`LLM_SCANNER_DYNAMIC_PROBE=1`**; writes **`llm_scanner.dynamic_probe_report.v1`** (includes **`report_generated_at_utc`** / **`report_generated_at_ist`**). Modes: **`preflight`** (`garak --help`), **`selfcheck`** (`garak --version`), **`execute_once`** (explicit argv via **`--execute-args`**). Orchestrator **`run`** forwards settings. **`make dynamic-probe-stub`**; live targets use isolated **`.venv-garak/`** (`make dynamic-probe-live-preflight`, `make dynamic-probe-live-selfcheck`, `make dynamic-probe-live-exec`). **`make live-e2e-compare`** runs the multi-lane harness ([`scripts/live_e2e_compare.py`](scripts/live_e2e_compare.py)). |
 | **Optional surfaces** | MCP + HTTP | Bounded tools for agents; see [hf_bundle_scanner/docs/hermes-mcp.md](hf_bundle_scanner/docs/hermes-mcp.md). |
 
 ---
@@ -62,7 +62,7 @@ Program overview: [docs/PROGRAM_STATUS_SNAPSHOT.md](docs/PROGRAM_STATUS_SNAPSHOT
 ## What this repository does **not** do
 
 - **It is not a full application or RAG pentest.** Phase 8 and the roadmap describe broader evals; today the default path is **artifact + config static** analysis inside a bundle directory.
-- **It does not run real Garak harnesses in default CI.** The phase-5 entrypoint defaults to **`status: disabled`**; set **`LLM_SCANNER_DYNAMIC_PROBE=1`** only when you intend to check tooling (`garak --help` today, real probes later).
+- **It does not run real Garak harnesses in default CI.** The phase-5 entrypoint defaults to **`status: disabled`**; set **`LLM_SCANNER_DYNAMIC_PROBE=1`** only when you intend bounded CLI checks (`--help`, `--version`, or a single **`execute_once`** argv). Real probe breadth remains roadmap work ([docs/PHASE5_DYNAMIC_PROBES.md](docs/PHASE5_DYNAMIC_PROBES.md)).
 - **It does not replace legal, compliance, or vendor attestation.** Findings are **technical signals**; severity and policy live in **your** policy JSON and process.
 - **It is not a hosted scanner SaaS.** You run CLI, Makefile, MCP, or HTTP **on your infrastructure**.
 - **It does not silently “fix” models.** The gate **reports** and exits; it does not rewrite weights or auto-remediate Hub repos.
@@ -178,7 +178,7 @@ After a successful scan, the helper also writes an **HTML briefing** next to the
 
 Summarize any written bundle JSON: **`python3 scripts/summarize_bundle_json.py /tmp/ephemeral-gpt2.json`**.
 
-**Broaden candidate discovery (metadata, ≤200 MiB default):** search the Hub for small model repos before you download anything heavy::
+**Broaden candidate discovery (metadata, ≤200 MiB default):** search the Hub for small model repos before you download anything heavy:
 
 ```bash
 "$(pwd)/.venv/bin/python" scripts/hub_find_models_under_size.py --max-mb 200 --per-query 15
@@ -200,6 +200,17 @@ Advanced flags are passed through **`EPHEMERAL_FLAGS`** (see **`make help`**). *
 | **GitHub Actions** | Same harness as local agent-verify; uploads the log artifact. | [`.github/workflows/llm-scanner.yml`](.github/workflows/llm-scanner.yml) — open the latest run for your branch. |
 
 **Exit semantics (bundle aggregate):** worst child wins by priority — code **`4`** (usage), then **`2`** (driver/tooling), then **`1`** (policy / findings / certain configlint escalations), else **`0`** (`compute_aggregate_exit` in [`report.py`](hf_bundle_scanner/hf_bundle_scanner/report.py)). Config risk from **`CONFIG_RISK_RULE_IDS`** in [`dispatch.py`](hf_bundle_scanner/hf_bundle_scanner/dispatch.py) (mirrored in [`docs/policy/configlint_rule_defaults.json`](docs/policy/configlint_rule_defaults.json)) can raise the aggregate to **`1`** when the file lane was clean. See [docs/THREAT_MODEL_TAXONOMY.md](docs/THREAT_MODEL_TAXONOMY.md).
+
+### Report timestamps (JSON)
+
+Machine-readable reports include a paired timestamp for audit and human parity:
+
+| Field | Meaning |
+| ----- | ------- |
+| **`report_generated_at_utc`** | Scan/report completion instant in **UTC**, RFC 3339 with **`Z`**. |
+| **`report_generated_at_ist`** | Same instant in **Asia/Kolkata** (`+05:30`). |
+
+Present on **bundle** (`hf_bundle_scanner.bundle_report.v2`), **admit-model** JSON, **dynamic_probe_report.v1**, and the optional **`live_e2e_compare`** summary. Values are fixed when the report is **completed**, so orchestrator rewrites (for example provenance echo) do not roll the clock. **HTML** exports show generation time at **HTML build**; reopening old HTML does not change the stamp — regenerate if needed. Full contract table: [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md).
 
 ---
 
@@ -291,8 +302,8 @@ Canonical index: [docs/TEST_CASES_LLM_SECURITY_SCANNER.md](docs/TEST_CASES_LLM_S
 
 | Step | Result | Meaning |
 | ---- | ------ | ------- |
-| **model-admission** | **42 passed**, **2 skipped** | Skips are integration-style driver checks that need optional external tools; they are not failures. |
-| **hf_bundle_scanner** | **36 passed**, **2 deselected** | Deselected = tests marked **`integration`** excluded on purpose for speed and determinism. |
+| **model-admission** | **45 passed**, **2 skipped** | Skips are integration-style driver checks that need optional external tools; they are not failures. |
+| **hf_bundle_scanner** | **80 passed**, **2 deselected** | Deselected = tests marked **`integration`** excluded on purpose for speed and determinism. |
 | **Overall** | **`overall_exit=0`** | Both subprocess exit codes were `0`. |
 
 The [![LLM Scanner CI](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml/badge.svg?branch=main)](https://github.com/beejak/Argus/actions/workflows/llm-scanner.yml?query=branch%3Amain) badge reflects the same harness in GitHub Actions (open the workflow run to download the uploaded log if you need it).
@@ -347,6 +358,7 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 
 | Topic | Where |
 | ----- | ----- |
+| **Documentation map (start here for depth)** | [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) |
 | Agent entry + commands | [AGENTS.md](AGENTS.md) |
 | Phased roadmap (0–8) | [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) |
 | ADR starter (bundle vs orchestrator, phase 4) | [docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md](docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md) |
@@ -372,9 +384,17 @@ After you change behavior, contracts, or defaults: run **`make agent-verify`**, 
 | Target | Purpose |
 | ------ | ------- |
 | `make install` | Create `.venv` and install `model-admission` + `hf_bundle_scanner[mcp,http]` |
+| `make docs-map` | Print pointer to [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) (canonical documentation hub) |
 | `make test` | Pytest for `hf_bundle_scanner` (excludes integration) |
 | `make agent-verify` | Both packages; writes `.agent/pytest-last.log` |
 | `make scan-fixture` | Minimal bundle scan smoke |
+| `make integration` | Pytest with **`integration`** marker (`hf_bundle_scanner`; network / opt-in) |
+| `make orchestrator-validate` | Validate three orchestrator job fixtures (min + dynamic + admit); no subprocess scans |
+| `make dynamic-probe-stub` | Write `.agent/dynamic_probe_last.json` (disabled unless **`LLM_SCANNER_DYNAMIC_PROBE=1`**) |
+| `make dynamic-probe-live-preflight` | Live **`garak --help`** using isolated **`.venv-garak`** on `PATH` |
+| `make dynamic-probe-live-selfcheck` | Live **`garak --version`** using isolated **`.venv-garak`** |
+| `make dynamic-probe-live-exec` | Live **`execute_once`** — requires **`EXECUTE_ARGS='…'`** |
+| `make live-e2e-compare` | Multi-lane harness ([`scripts/live_e2e_compare.py`](scripts/live_e2e_compare.py)); optional **`LIVE_E2E_FLAGS`** |
 | `make git-doctor` | Diagnose `git commit` / trailer config issues |
 | `make commit-msg MSG='…'` | Commit via `git commit -F` (safer quoting) |
 | `make ephemeral-hub-scan` | `OUT=/tmp/report.json` — live Hub download → scan → delete tree ([`scripts/ephemeral_hub_scan.py`](scripts/ephemeral_hub_scan.py); optional `INJECT=1`) |
@@ -418,6 +438,9 @@ scan-bundle scan \
 | **`HF_BUNDLE_SBOM_URI`** | SBOM pointer merged into **`provenance`**. |
 | **`LLM_SCANNER_TEST_CATALOG`** | Absolute path to [`llm_security_test_cases/catalog.json`](llm_security_test_cases/catalog.json) for pytest harnesses ([`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py)). |
 | **`MODELSCAN_BIN`**, **`MODELAUDIT_BIN`** | Override **`modelscan`** / **`modelaudit`** executables when using **`--drivers`** on **`admit-model`** or **`scan-bundle scan`** (see [`model-admission/README.md`](model-admission/README.md)). |
+| **`LLM_SCANNER_DYNAMIC_PROBE`** | Set to **`1`** to enable the Garak lane in [`scripts/run_dynamic_probe.py`](scripts/run_dynamic_probe.py) (default CI leaves it unset → **`status: disabled`**). |
+
+**Optional Garak venv:** live Makefile targets expect **`garak`** under **`.venv-garak/bin/`** (see **`GARAK_VENVDIR`** in the root [`Makefile`](Makefile)). That tree is **gitignored**; keep the main **`.venv/`** lean for `make install` / `make agent-verify`.
 
 ---
 
@@ -432,6 +455,8 @@ scan-bundle scan \
 | [`scripts/summarize_bundle_json.py`](scripts/summarize_bundle_json.py) | Short stdout summary of a bundle JSON (paths, exits, configlint hits) | `python3 scripts/summarize_bundle_json.py /tmp/ephemeral-gpt2.json` |
 | [`scripts/hub_find_models_under_size.py`](scripts/hub_find_models_under_size.py) | Hub **metadata** search: repos whose summed file sizes are under **`--max-mb`** (default **200**); optional **`--probe-configlint`** | `.venv/bin/python scripts/hub_find_models_under_size.py --max-mb 200 --per-query 12` |
 | [`scripts/run_tests_for_agent.py`](scripts/run_tests_for_agent.py) | **`make agent-verify`** backend; writes **`.agent/pytest-last.log`** | `make agent-verify` |
+| [`scripts/run_dynamic_probe.py`](scripts/run_dynamic_probe.py) | Phase-5 probe CLI → **`llm_scanner.dynamic_probe_report.v1`** | See [docs/PHASE5_DYNAMIC_PROBES.md](docs/PHASE5_DYNAMIC_PROBES.md); `make dynamic-probe-stub` / live `make dynamic-probe-live-*` |
+| [`scripts/live_e2e_compare.py`](scripts/live_e2e_compare.py) | Optional multi-lane comparison harness (network + drivers + strict) | `make live-e2e-compare` |
 | [`scripts/git_commit_via_file.py`](scripts/git_commit_via_file.py) | Commit when `git commit -m` / trailers misbehave | `python3 scripts/git_commit_via_file.py 'subject line'` |
 | [`scripts/git_doctor.py`](scripts/git_doctor.py) | Diagnose trailer / identity issues | `make git-doctor` |
 

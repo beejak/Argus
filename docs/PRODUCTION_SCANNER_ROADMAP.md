@@ -2,6 +2,8 @@
 
 This file is the **working copy** of the long-horizon plan: phases, YAML-style todos, and pointers to standards. The canonical detailed narrative may also live in a Cursor plan file on your machine; keep this document **updated when phases complete** so WSL/CI/agents do not depend on IDE-local paths.
 
+**Documentation hub (audiences, JSON contracts, timestamps, Makefile map):** [DOCUMENTATION.md](DOCUMENTATION.md).
+
 ### Choice capture (no orphan suggestions)
 
 When a discussion produces **multiple** viable next steps and the team (or an agent) implements **one** of them, the **others are not discarded in chat**. Within the **same change** or the **immediate follow-up**, they are recorded here under the correct phase as **explicit backlog** (or marked **won’t do** with a one-line reason). That way “we picked A” never silently deletes B and C.

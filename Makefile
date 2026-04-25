@@ -5,7 +5,7 @@ PY := $(abspath $(VENVDIR))/bin/python
 GARAK_VENVDIR ?= .venv-garak
 GARAK_BIN := $(abspath $(GARAK_VENVDIR))/bin
 
-.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size orchestrator-validate dynamic-probe-stub dynamic-probe-live-preflight dynamic-probe-live-selfcheck dynamic-probe-live-exec live-e2e-compare
+.PHONY: help install test integration scan-fixture lint fmt docker docker-bundle ruff-check roadmap docs-map graphify-update memory-open agent-verify git-doctor commit-msg slogan-dry-run ephemeral-hub-scan sample-action-sheets sample-reports-all plain-english-brief drivers-help hub-find-models-under-size orchestrator-validate dynamic-probe-stub dynamic-probe-live-preflight dynamic-probe-live-selfcheck dynamic-probe-live-exec live-e2e-compare
 
 help:
 	@echo "LLM Scanner harness"
@@ -14,6 +14,7 @@ help:
 	@echo "  make integration      - pytest integration"
 	@echo "  make scan-fixture     - minimal bundle scan smoke"
 	@echo "  make roadmap          - pointer to docs/PRODUCTION_SCANNER_ROADMAP.md"
+	@echo "  make docs-map         - pointer to docs/DOCUMENTATION.md (canonical doc hub)"
 	@echo "  make graphify-update  - refresh graphify-out/ if graphify is installed"
 	@echo "  make memory-open      - path to docs/sessions/SESSION_LOG.md"
 	@echo "  make agent-verify     - model-admission + hf_bundle_scanner pytest, orchestrator validate, dynamic-probe stub, ruff; write .agent/pytest-last.log"
@@ -72,6 +73,10 @@ ruff-check: lint
 roadmap:
 	@echo "Long-horizon roadmap: docs/PRODUCTION_SCANNER_ROADMAP.md"
 	@test -f docs/PRODUCTION_SCANNER_ROADMAP.md
+
+docs-map:
+	@echo "Documentation hub (contracts, audiences, Makefile map): docs/DOCUMENTATION.md"
+	@test -f docs/DOCUMENTATION.md
 
 graphify-update:
 	@if command -v graphify >/dev/null 2>&1; then \

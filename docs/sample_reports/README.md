@@ -2,6 +2,8 @@
 
 **Prefer a human briefing?** Start at **[`actionable/`](actionable/)** — committed **CSV** (Excel-friendly), **HTML** (print → PDF), and **[`BLAST_RADIUS_LEADERSHIP.md`](actionable/BLAST_RADIUS_LEADERSHIP.md)** (exec prod impact + blast radius) derived from the JSON below.
 
+**Contracts & timestamps:** stable schema/field semantics for bundle and related JSON live in **[`../DOCUMENTATION.md`](../DOCUMENTATION.md)** (including **`report_generated_at_utc`** / **`report_generated_at_ist`** on bundle reports). **HTML** headers reflect **HTML generation** time, not silent refresh on reopen.
+
 These JSON files were produced by [`scripts/ephemeral_hub_scan.py`](../../scripts/ephemeral_hub_scan.py) against **`hf-internal-testing/tiny-random-BertModel`** (small public snapshot used by Hugging Face for tests).
 
 | File | What it demonstrates |
