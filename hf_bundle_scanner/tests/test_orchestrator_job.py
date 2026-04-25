@@ -143,6 +143,21 @@ def test_dynamic_probe_depends_on_must_be_scan_only() -> None:
     assert any("depends_on must be exactly" in e for e in validate_job(doc))
 
 
+def test_at_most_one_dynamic_probe_step() -> None:
+    doc = {
+        "schema": JOB_SCHEMA_V1,
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "dyn1", "type": "dynamic_probe", "depends_on": ["bundle_scan"]},
+            {"id": "dyn2", "type": "dynamic_probe", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "dyn1", "dyn2"]},
+        ],
+        "scan_bundle": {"root": "x", "policy": "y", "out": "z"},
+        "dynamic_probe": {"out": "dyn.json"},
+    }
+    assert any("at most one" in e.lower() for e in validate_job(doc))
+
+
 def test_dynamic_probe_settings_without_step() -> None:
     doc = {
         "schema": JOB_SCHEMA_V1,
@@ -188,6 +203,7 @@ def test_build_envelope_three_steps(tmp_path: Path) -> None:
     assert len(env["steps"]) == 3
     assert env["steps"][1]["type"] == "dynamic_probe"
     assert env["steps"][1]["id"] == "dyn"
+    assert env["aggregate_exit_code"] == env["steps"][-1]["exit_code"]
     json.dumps(env)
 
 

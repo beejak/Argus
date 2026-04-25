@@ -24,7 +24,7 @@ help:
 	@echo "  make sample-reports-all - action sheets + plain-English brief"
 	@echo "  make drivers-help       - list model-admission scan drivers + env overrides"
 	@echo "  make hub-find-models-under-size - Hub metadata search for repos under --max-mb (default 200; needs network)"
-	@echo "  make orchestrator-validate - validate phase-4 orchestrator job fixture (no scan)"
+	@echo "  make orchestrator-validate - validate orchestrator job fixtures (min + with dynamic_probe; no scan)"
 	@echo "  make dynamic-probe-stub - write .agent/dynamic_probe_last.json (disabled unless LLM_SCANNER_DYNAMIC_PROBE=1)"
 	@echo "  make lint | fmt | docker | docker-bundle | ruff-check"
 
@@ -86,7 +86,7 @@ git-doctor:
 	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/git_doctor.py"
 
 commit-msg:
-	@test -n "$(MSG)" || (echo 'Usage: make commit-msg MSG="commit subject"' >&2 && exit 1)
+	@test -n "$(MSG)" || (echo 'Usage: make commit-msg MSG=one-line-subject' >&2; echo 'Note: GNU Make treats colon specially; for conventional type prefixes use: python3 scripts/git_commit_via_file.py "type: subject"' >&2; exit 1)
 	@python3 "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/git_commit_via_file.py" "$(MSG)"
 
 slogan-dry-run:
@@ -117,6 +117,7 @@ hub-find-models-under-size:
 
 orchestrator-validate:
 	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_orchestrator_job.py" validate --job "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json"
+	@"$(PY)" "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/scripts/run_orchestrator_job.py" validate --job "$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/hf_bundle_scanner/tests/fixtures/orchestrator_job_with_dynamic.json"
 
 dynamic-probe-stub:
 	@mkdir -p .agent

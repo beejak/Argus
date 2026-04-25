@@ -91,7 +91,10 @@ def main(argv: list[str] | None = None) -> int:
     pv.add_argument("--job", type=Path, required=True)
     pv.add_argument("--no-strict", action="store_true", help="Skip on-disk path checks")
 
-    pr = sub.add_parser("run", help="Validate, run scan_bundle step, write envelope JSON")
+    pr = sub.add_parser(
+        "run",
+        help="Validate, run scan_bundle (and optional dynamic_probe), write envelope JSON",
+    )
     pr.add_argument("--job", type=Path, required=True)
     pr.add_argument("--envelope-out", type=Path, required=True)
     pr.add_argument("--python", type=Path, default=None, help="Override interpreter (default HF_BUNDLE_PYTHON or .venv)")
@@ -114,8 +117,10 @@ def main(argv: list[str] | None = None) -> int:
         if errs:
             print(json.dumps({"errors": errs}, indent=2))
             return 2
-        sb = doc["scan_bundle"]
-        assert isinstance(sb, dict)
+        sb = doc.get("scan_bundle")
+        if not isinstance(sb, dict):
+            print(json.dumps({"errors": ["scan_bundle must be an object"]}, indent=2))
+            return 2
         job_dir = job_path.parent
         r = _resolve(job_dir, str(sb["root"]))
         pol = _resolve(job_dir, str(sb["policy"]))
@@ -175,7 +180,9 @@ def main(argv: list[str] | None = None) -> int:
             if t_dp_end < t_dp_start:
                 t_dp_end = t_dp_start
             probe_exit = int(probe.returncode)
-            if dp_out.is_file():
+            if not dp_out.is_file():
+                probe_exit = worst_exit_code(probe_exit, 2)
+            else:
                 try:
                     drep = json.loads(dp_out.read_text(encoding="utf-8"))
                     if isinstance(drep, dict) and drep.get("exit_code") is not None:

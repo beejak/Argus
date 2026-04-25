@@ -30,5 +30,5 @@ Jobs may include **at most one** `dynamic_probe` step **after** `scan_bundle` an
 
 ## References
 
-- [PRODUCTION_SCANNER_ROADMAP.md](PRODUCTION_SCANNER_ROADMAP.md) — phase table and pillar 7.
+- [PRODUCTION_SCANNER_ROADMAP.md](PRODUCTION_SCANNER_ROADMAP.md) — phase table, pillar 7, and **Choice capture** (backlog for Garak config / budgets vs phase-4 fan-out).
 - [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) — dynamic findings map to app-layer controls, not bundle file hashes.

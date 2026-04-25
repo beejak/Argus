@@ -36,6 +36,7 @@ If **`git commit -m …`** fails with **`option trailer requires a value`**, run
 
 - Cursor skill: [`.cursor/skills/llm-scanner-long-horizon/SKILL.md`](.cursor/skills/llm-scanner-long-horizon/SKILL.md)
 - End-of-session notes: [docs/sessions/SESSION_LOG.md](docs/sessions/SESSION_LOG.md)
+- **Multi-option handoffs:** if several next steps were discussed and only one was built, record the **rest** in [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) under **Choice capture** (same PR or immediate follow-up) so backlog stays explicit.
 
 ## Cursor rules
 

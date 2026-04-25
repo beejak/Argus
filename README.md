@@ -73,7 +73,7 @@
 2. **Deterministic CI first** — Default tests avoid network and multi‑GiB downloads. Anything slow or flaky is **marked** and **env-gated**.
 3. **OSS-by-default, commercial optional** — Static lanes prefer open tooling; commercial adapters stay behind explicit configuration (roadmap).
 4. **Agents orchestrate, they do not replace judgment** — Hermes / MCP should call **bounded** tools; humans (or your org) own severity floors and ship decisions. See [docs/HERMES_AGENTS.md](docs/HERMES_AGENTS.md).
-5. **Phased honesty** — [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) names what exists today vs **phase 6–8** backlog (supply extras, runtime guards, observability); **phase 5** is the dynamic lane (stub now, real probes next).
+5. **Phased honesty** — [docs/PRODUCTION_SCANNER_ROADMAP.md](docs/PRODUCTION_SCANNER_ROADMAP.md) names what exists today vs **phase 6–8** backlog (supply extras, runtime guards, observability); **phase 5** is the dynamic lane (stub now, real probes next). **Choice capture:** when multiple next steps are proposed and one ships first, the roadmap **Choice capture** table holds the others until they ship, are re-prioritized, or are explicitly declined.
 6. **Provenance as a first-class column** — Bundle JSON **v2** carries **`provenance`** (Hub hints, mirror allowlist, SBOM pointer, manifest digest summary) so downstream SIEMs and auditors can tie a report to **what** was scanned and **from where** ([`provenance.py`](hf_bundle_scanner/hf_bundle_scanner/provenance.py)).
 
 ---

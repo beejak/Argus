@@ -2,6 +2,17 @@
 
 This file is the **working copy** of the long-horizon plan: phases, YAML-style todos, and pointers to standards. The canonical detailed narrative may also live in a Cursor plan file on your machine; keep this document **updated when phases complete** so WSL/CI/agents do not depend on IDE-local paths.
 
+### Choice capture (no orphan suggestions)
+
+When a discussion produces **multiple** viable next steps and the team (or an agent) implements **one** of them, the **others are not discarded in chat**. Within the **same change** or the **immediate follow-up**, they are recorded here under the correct phase as **explicit backlog** (or marked **won’t do** with a one-line reason). That way “we picked A” never silently deletes B and C.
+
+**Current fork (after orchestrator `dynamic_probe` hook):** both remain valid; order is a product decision, not a technical dependency.
+
+| Track | Backlog id | What | Status |
+| ----- | ---------- | ---- | ------ |
+| Phase 5 depth | `phase5-garak-config-budgets` | Real Garak (later PyRIT) job config on disk or in job JSON, **budget** fields enforced, `run_id` echoed into probe reports | **Next candidate** — extends the shipped stub without new orchestrator graph shapes |
+| Phase 4 breadth | `phase4-admit-model-fanout` | `admit_model` fan-out jobs + reducer per ADR 0001 | **Deferred** until we need multi-artifact admission in one orchestrated run |
+
 ## Goal
 
 One orchestrated scanner answering: *What can go wrong if we ship this LLM integration to production?* — weights, Hub config, optional dynamic probes, optional runtime guards — with **OSS-by-default** and **optional commercial** backends behind explicit policy (air-gapped CI stays deterministic).
@@ -40,7 +51,7 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Goal:** define the **composition layer above** `scan-bundle` — job graph, fan-out/fan-in, budgets, correlation — without turning `hf_bundle_scanner` into an orchestrator (see ADR).
 - **Working artifacts:** [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](adr/0001-bundle-scanner-vs-orchestrator-scope.md) (scope + job-graph sketch + acceptance criteria for the first orchestrator slice).
 - **Shipped (v1 slice):** job document validator (`hf_bundle_scanner.orchestrator_job`), fixture `hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`, runner `scripts/run_orchestrator_job.py`, **`make orchestrator-validate`**.
-- **Shipped (2026-04-25 tighten):** job-level **`run_id`** / optional **`parent_run_id`** validated as RFC 4122 UUIDs when non-empty; orchestrator envelope schema **`llm_scanner.orchestrator_envelope.v2`** with **two** `steps` rows (`scan_bundle`, `aggregate`), per-step **`artifact_uri`** + UTC **`started_at` / `ended_at`**; runner enforces monotonic step times.
+- **Shipped (2026-04-25 tighten):** job-level **`run_id`** / optional **`parent_run_id`** validated as RFC 4122 UUIDs when non-empty; orchestrator envelope schema **`llm_scanner.orchestrator_envelope.v2`** with **`steps`** for `scan_bundle`, optional `dynamic_probe`, and `aggregate`, per-step **`artifact_uri`** + UTC **`started_at` / `ended_at`**; runner enforces monotonic step times.
 - **Next (phase-4 backlog):** job graph beyond **one** `scan_bundle` + optional `dynamic_probe` + `aggregate` (e.g. `admit_model` fan-out per ADR); optional **echo** of `run_id` into bundle `provenance` (requires separate ADR — must stay optional on `bundle_report.v2`); YAML job documents; budgets / secrets hooks for later dynamic nodes; external runner repo reference only if execution model needs it.
 
 ### Phase 5 status (`phase5-dynamic-staging`, **current**)
@@ -81,7 +92,9 @@ Starter ADR (bundle vs orchestrator): [`docs/adr/0001-bundle-scanner-vs-orchestr
 | 7 | `phase7-runtime-guards` | Integration guides + optional guard adapters |
 | 8 | `phase8-observability` | `scanner_versions`, correlation IDs, ledger/SIEM shape |
 
-**Dependency order:** 0 → (1 ∥ 2 ∥ 3) → **4 (baseline shipped)** → **5 (current; stub + contract)** → (6 / 7 as policy-gated) → 8.
+**Dependency order:** 0 → (1 ∥ 2 ∥ 3) → **4 (baseline shipped)** → **5 (current; stub + contract + orchestrator hook)** → (6 / 7 as policy-gated) → 8.
+
+**Recommended next slice (2026-04):** implement **`phase5-garak-config-budgets`** first (deepen phase 5 on the existing `dynamic_probe` path). Schedule **`phase4-admit-model-fanout`** when CI needs multi-step admission graphs; see **Choice capture** above.
 
 ## External references (issues)
 

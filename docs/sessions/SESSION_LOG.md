@@ -197,4 +197,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Changes:** UUID **`run_id` / `parent_run_id`** validation; envelope **`llm_scanner.orchestrator_envelope.v2`** (two steps, `artifact_uri`, monotonic UTC timestamps); ADR + roadmap updates; **`hf_bundle_scanner/dynamic_probe_report.py`**, **`scripts/run_dynamic_probe.py`**, **`docs/PHASE5_DYNAMIC_PROBES.md`**; **`scripts/run_tests_for_agent.py`** now runs **orchestrator validate**, **dynamic probe stub**, and **ruff**; **`make dynamic-probe-stub`**; README / hf_bundle_scanner README / `.gitignore` for `.agent/dynamic_probe_last.json`.
 - **Commands:** `make test`; `make lint`; `python3 scripts/run_tests_for_agent.py`; `make orchestrator-validate`; `make dynamic-probe-stub`.
 
+### 2026-04-25 — Orchestrator sanity, tests, choice-capture docs
+
+- **Phase:** `phase4-orchestrator-scope` / `phase5-dynamic-staging` (hygiene + process).
+- **Changes:** `run_orchestrator_job.py` defensive checks (missing probe report → tooling-style merge), `Makefile` + `run_tests_for_agent.py` validate **both** orchestrator fixtures; extra pytest (`at most one` dynamic step, envelope aggregate exit); roadmap **Choice capture** + recommended next slice **`phase5-garak-config-budgets`**; AGENTS + README + PHASE5 links.
+- **Commands:** `make test`, `make lint`, `python3 scripts/run_tests_for_agent.py`.
+- **Next:** implement `phase5-garak-config-budgets` or schedule `phase4-admit-model-fanout` per roadmap table.
+
 ---
