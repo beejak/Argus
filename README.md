@@ -17,6 +17,8 @@
 
 [**Argus** (GitHub mirror)](https://github.com/beejak/Argus) · [Publish notes](docs/PUBLISH_ARGUS.md)
 
+Program overview: [docs/PROGRAM_STATUS_SNAPSHOT.md](docs/PROGRAM_STATUS_SNAPSHOT.md)
+
 <sub><b>Fonts:</b> <code>github.com</code> ignores custom web fonts in READMEs. This layout uses <b>spacing, centering, and badges</b> instead. For a bespoke typeface, ship docs via <a href="https://pages.github.com/">GitHub Pages</a> (or any static site) with your own CSS.</sub>
 
 </div>
