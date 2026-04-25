@@ -2,6 +2,10 @@
 """Validate or run a phase-4 orchestrator job document (v1).
 
 ``scan_bundle`` execution delegates to ``python -m hf_bundle_scanner scan`` (same CLI as ``scan-bundle``).
+
+``run`` writes an orchestrator envelope JSON (schema ``llm_scanner.orchestrator_envelope.v2``): UUID
+``run_id`` (from the job or generated), optional ``parent_run_id``, and ``steps`` for ``scan_bundle``
+and ``aggregate`` with RFC 3339 UTC timestamps and ``file:`` artifact URIs.
 """
 from __future__ import annotations
 
@@ -11,6 +15,7 @@ import os
 import subprocess
 import sys
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -58,6 +63,14 @@ def _scan_argv(*, py: Path, sb: dict[str, object], root: Path, policy: Path, out
 
 def _is_non_empty_str(v: object) -> bool:
     return isinstance(v, str) and bool(v.strip())
+
+
+def _utc_iso_z(dt: datetime) -> str:
+    return dt.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(microsecond=0)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -108,8 +121,17 @@ def main(argv: list[str] | None = None) -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         py = Path(args.python) if args.python is not None else _pick_python()
         cmd = _scan_argv(py=py, sb=sb, root=r, policy=pol, out=out)
+        scan_id = next(str(s["id"]) for s in doc["steps"] if s.get("type") == "scan_bundle")
+        agg_id = next(str(s["id"]) for s in doc["steps"] if s.get("type") == "aggregate")
+        run_id = str(doc.get("run_id") or "").strip() or str(uuid.uuid4())
+        parent_raw = doc.get("parent_run_id")
+        parent_run_id = str(parent_raw).strip() if _is_non_empty_str(parent_raw) else None
+        t_scan_start = _utc_now()
         # Match Makefile harness: run the module with CWD at the Python project root.
         p = subprocess.run(cmd, cwd=str(root / "hf_bundle_scanner"))
+        t_scan_end = _utc_now()
+        if t_scan_end < t_scan_start:
+            t_scan_end = t_scan_start
         scan_exit = int(p.returncode)
         agg = scan_exit
         if out.is_file():
@@ -119,14 +141,23 @@ def main(argv: list[str] | None = None) -> int:
                     agg = int(rep["aggregate_exit_code"])
             except (OSError, json.JSONDecodeError, TypeError, ValueError):
                 agg = 2
-        scan_id = next(str(s["id"]) for s in doc["steps"] if s.get("type") == "scan_bundle")
-        run_id = str(doc.get("run_id") or "").strip() or str(uuid.uuid4())
+        t_agg_start = t_scan_end
+        t_agg_end = _utc_now()
+        if t_agg_end < t_agg_start:
+            t_agg_end = t_agg_start
         env = build_envelope(
             run_id=run_id,
+            parent_run_id=parent_run_id,
             scan_step_id=scan_id,
-            bundle_path=out,
+            aggregate_step_id=agg_id,
+            bundle_path=out.resolve(),
+            envelope_path=args.envelope_out.resolve(),
             scan_exit=scan_exit,
             aggregate_exit=agg,
+            scan_started_at=_utc_iso_z(t_scan_start),
+            scan_ended_at=_utc_iso_z(t_scan_end),
+            aggregate_started_at=_utc_iso_z(t_agg_start),
+            aggregate_ended_at=_utc_iso_z(t_agg_end),
         )
         args.envelope_out.parent.mkdir(parents=True, exist_ok=True)
         args.envelope_out.write_text(json.dumps(env, indent=2), encoding="utf-8")

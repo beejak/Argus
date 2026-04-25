@@ -1,6 +1,6 @@
 {
   "schema": "llm_scanner.orchestrator_job.v1",
-  "run_id": "fixture-min",
+  "run_id": "00000000-0000-4000-8000-000000000001",
   "steps": [
     { "id": "bundle_scan", "type": "scan_bundle", "depends_on": [] },
     { "id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan"] }

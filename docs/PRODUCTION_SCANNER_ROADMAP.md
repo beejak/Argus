@@ -40,7 +40,8 @@ One orchestrated scanner answering: *What can go wrong if we ship this LLM integ
 - **Goal:** define the **composition layer above** `scan-bundle` — job graph, fan-out/fan-in, budgets, correlation — without turning `hf_bundle_scanner` into an orchestrator (see ADR).
 - **Working artifacts:** [`docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md`](adr/0001-bundle-scanner-vs-orchestrator-scope.md) (scope + job-graph sketch + acceptance criteria for the first orchestrator slice).
 - **Shipped (v1 slice):** job document validator (`hf_bundle_scanner.orchestrator_job`), fixture `hf_bundle_scanner/tests/fixtures/orchestrator_job_min.json`, runner `scripts/run_orchestrator_job.py`, **`make orchestrator-validate`**.
-- **Next:** refine ADR into implementation tickets; add **`run_id` / correlation** story (orchestrator envelope vs optional bundle `provenance` field); stub or reference external job-runner repo only when execution shape is agreed.
+- **Shipped (2026-04-25 tighten):** job-level **`run_id`** / optional **`parent_run_id`** validated as RFC 4122 UUIDs when non-empty; orchestrator envelope schema **`llm_scanner.orchestrator_envelope.v2`** with **two** `steps` rows (`scan_bundle`, `aggregate`), per-step **`artifact_uri`** + UTC **`started_at` / `ended_at`**; runner enforces monotonic step times.
+- **Next:** job graph beyond **one** `scan_bundle` + `aggregate` (e.g. `admit_model` fan-out per ADR); optional **echo** of `run_id` into bundle `provenance` (requires separate ADR — must stay optional on `bundle_report.v2`); YAML job documents; budgets / secrets hooks for later dynamic nodes; external runner repo reference only if execution model needs it.
 
 ## Ten capability pillars (summary)
 

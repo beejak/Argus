@@ -1,6 +1,6 @@
 # ADR 0001 — Bundle scanner vs future orchestrator scope
 
-- **Status:** accepted for **phase 4 design**; execution code intentionally not started in this repo until the job graph + contract below are stable.
+- **Status:** accepted. **Implemented (repo, 2026-04-25):** job document `llm_scanner.orchestrator_job.v1` validation + `run` / `validate` in [`scripts/run_orchestrator_job.py`](../scripts/run_orchestrator_job.py); envelope `llm_scanner.orchestrator_envelope.v2` with UUID `run_id` / optional `parent_run_id` and per-step wall times. **Not implemented yet:** `admit_model` fan-out nodes, dynamic probe nodes, YAML job format, non-subprocess backends.
 - **Date:** 2026-04-24 (phase 4 kickoff notes: 2026-04-25)
 
 ## Context
@@ -17,9 +17,9 @@ Keep **`scan-bundle`** as a **bounded, deterministic bundle admission** tool. Tr
 - Bundle JSON remains the **contract** for “what this lane saw.”
 - Cross-lane correlation IDs, fan-out/fan-in, and budgeted dynamic jobs live **above** bundle scan in a later component (ADR to be refined when phase 4 implementation starts).
 
-## Phase 4 — job graph sketch (design only)
+## Phase 4 — job graph sketch (v1 shipped subset)
 
-Minimal **directed acyclic** graph for the first orchestrator slice (names are logical; not code yet):
+Minimal **directed acyclic** graph for the **first shipped** orchestrator slice (validator + runner):
 
 1. **`bundle_scan`** — subprocess or HTTP/MCP call to existing `scan-bundle scan` → artifact: `bundle_report.v2` JSON.
 2. **`admit_model` (optional fan-out)** — one job per heavyweight file already supported by `model-admission` when policy demands it; artifacts: admit-model JSON paths referenced from bundle or orchestrator index.
@@ -29,14 +29,16 @@ Edges: `admit_model*` → `aggregate`; `bundle_scan` → `aggregate`. Dynamic pr
 
 ## Phase 4 — correlation & provenance
 
-- **Orchestrator-owned:** `run_id` (UUID), optional `parent_run_id`, ordered `steps[]` with `{ "name", "artifact_uri", "exit_code", "started_at", "ended_at" }`.
+- **Orchestrator-owned (envelope v2):** `run_id` (RFC 4122 UUID string; optional in job doc — runner generates one if absent), optional `parent_run_id` (UUID when present). `steps[]` entries include **`id`** and **`type`** (mirror job document) plus **`name`**, **`artifact_uri`** (`file:` URI for bundle output and envelope path), **`exit_code`**, **`started_at` / `ended_at`** (RFC 3339 UTC with `Z`). Job documents must use UUID `run_id` / `parent_run_id` when those keys are non-empty.
 - **Bundle-owned (optional extension later):** mirror today’s `provenance` object; if a correlation field is added, it must be **optional** so existing consumers and fixtures keep working.
 
 ## Phase 4 — acceptance criteria (first implementation slice)
 
-1. A single **declarative job document** (YAML or JSON) can describe the graph above and be validated without executing scans.
-2. Running the orchestrator on a fixture tree produces: bundle JSON + envelope JSON + **non-zero exit** iff any child failed, preserving priority semantics already documented for bundle aggregates.
-3. No new **required** fields on `hf_bundle_scanner.bundle_report.v2` until a dedicated schema bump ADR exists.
+1. **Done (JSON):** a declarative **JSON** job document describes the **scan_bundle → aggregate** graph and validates without executing scans (`validate` subcommand).
+2. **Done:** running `run` on the fixture tree produces bundle JSON + envelope JSON; process exit follows bundle **`aggregate_exit_code`** when readable (else tooling-style failure).
+3. **Done:** no new **required** fields on `hf_bundle_scanner.bundle_report.v2`.
+
+**Still open (later slices):** YAML jobs; `admit_model` / multi-scan fan-out; optional echo of `run_id` into bundle `provenance` (separate ADR if pursued); HTTP/MCP job backends.
 
 ## Links
 

@@ -42,6 +42,14 @@ Org-level defaults for **configlint** severities vs CI escalation live in [`docs
 
 See [docs/hermes-mcp.md](docs/hermes-mcp.md) for MCP and optional HTTP.
 
+## Phase-4 orchestrator (composition above `scan-bundle`)
+
+- **ADR:** [../docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md](../docs/adr/0001-bundle-scanner-vs-orchestrator-scope.md)
+- **Python API:** `hf_bundle_scanner.orchestrator_job` — `validate_job`, `load_job`, `build_envelope`
+- **CLI:** from repo root, `python3 scripts/run_orchestrator_job.py validate|run --job …` (see script docstring). **`make orchestrator-validate`** runs `validate` on the committed fixture.
+
+Job documents use schema **`llm_scanner.orchestrator_job.v1`**; envelopes written by `run` use **`llm_scanner.orchestrator_envelope.v2`** (`run_id`, optional `parent_run_id`, per-step timestamps and `artifact_uri` values).
+
 ### Optional: scan a small file from the “uncensored-models” collection
 
 The curated list [uncensored-models](https://huggingface.co/collections/chwoo/uncensored-models) mostly hosts **multi‑GiB** full weights. One repo in that list has a **under 1 GiB** weight-like artifact we can use for a real download + scan check: **`mradermacher/gemma3-4b-it-abliterated-GGUF`** file **`gemma3-4b-it-abliterated.mmproj-Q8_0.gguf`** (~561 MiB, vision projector tensors—not the full chat stack).
