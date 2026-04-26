@@ -1,6 +1,8 @@
 {
   "schema": "hf_bundle_scanner.bundle_report.v2",
   "taxonomy_version": "phase0",
+  "report_generated_at_utc": "2026-04-26T02:22:57Z",
+  "report_generated_at_ist": "2026-04-26T07:52:57+05:30",
   "root": "/tmp/<ephemeral-hub-demo>",
   "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
   "drivers": "",
@@ -21,47 +23,47 @@
       {
         "relpath": ".cache/huggingface/download/.gitattributes.metadata",
         "size_bytes": 101,
-        "sha256": "924fe69ef1b6b562b8025a0257206c51ffd95b8ba5ab9942831e88e63c26eccb"
+        "sha256": "ebf6c6340d8de1bdcd4d37ff4fffcdab244be2ce4a24edba5965bdab3123ff21"
       },
       {
         "relpath": ".cache/huggingface/download/config.json.metadata",
-        "size_bytes": 99,
-        "sha256": "7dacb122f1c1b2064c6601d69e68fbcb8f4cf8861ab92859566cba55f8b62cbd"
+        "size_bytes": 101,
+        "sha256": "d64006d8d31b2a3791d6185793eed3bdc1a7056a9d314d4395d1ab45b66950af"
       },
       {
         "relpath": ".cache/huggingface/download/onnx/model.onnx.metadata",
         "size_bytes": 125,
-        "sha256": "2ad599043a379f66bb134cdf9ef3b07e37745e9dc3bacf6110d2ff5fd009f7c0"
+        "sha256": "8bf62cbf7e66bd98f6afff404200e49d8adecaf6e83b7d9367dc70ef2b2fc9a6"
       },
       {
         "relpath": ".cache/huggingface/download/pytorch_model.bin.metadata",
         "size_bytes": 125,
-        "sha256": "1816a7c09cd2a649d240a957a39ea0ceab55b93f1a0edf068316c7fabc95de37"
+        "sha256": "41f1f67e67ffcb48185cfa567caeed69c66c8b92035d399dadc87b5e29f839eb"
       },
       {
         "relpath": ".cache/huggingface/download/special_tokens_map.json.metadata",
-        "size_bytes": 101,
-        "sha256": "43506f7ddf4399cd50d0359e11a71635f466a7b4d845efb210fd9722724fb71b"
+        "size_bytes": 100,
+        "sha256": "cb71413bbadd71709fce9eaafd30a4f7fa5741bacbdac188326b23cac641eba9"
       },
       {
         "relpath": ".cache/huggingface/download/tf_model.h5.metadata",
-        "size_bytes": 125,
-        "sha256": "97efcc8a81e07a8d1643120b9d9fc51943cbe578df6f0011f4f5ff186845e980"
+        "size_bytes": 123,
+        "sha256": "33344d52888611065d18f68f2445f7a4cd8c31a80d0643499394277a11a412e4"
       },
       {
         "relpath": ".cache/huggingface/download/tokenizer.json.metadata",
-        "size_bytes": 97,
-        "sha256": "7ddb7def6f21e4879ace49b8d3a4bf00a436c6cb0fbc972de348f7266495206a"
+        "size_bytes": 100,
+        "sha256": "ceea119f6d79ece44496fbd40d1ae10613745f906a4a6ee3c455636416c23879"
       },
       {
         "relpath": ".cache/huggingface/download/tokenizer_config.json.metadata",
-        "size_bytes": 101,
-        "sha256": "666e57349e1e36162df91330a020aee0f5cff4c2cf4f1967466290cd17686c89"
+        "size_bytes": 100,
+        "sha256": "9adc84494c4e1c147cdfdc70473d9680783d43e944d1156154b73b5609d12809"
       },
       {
         "relpath": ".cache/huggingface/download/vocab.txt.metadata",
         "size_bytes": 101,
-        "sha256": "c3e2be24c8ccf1a1c7cc2b6a8d445f070c96ce47ee874c9bcd69216c390ef2e3"
+        "sha256": "99318c9a9551bc010a5336b146b14a70f3817ab1f9a4175dc16e5a7c019c36fd"
       },
       {
         "relpath": ".gitattributes",
@@ -124,6 +126,8 @@
       "report_path": null,
       "error": null,
       "report": {
+        "report_generated_at_utc": "2026-04-26T02:22:56Z",
+        "report_generated_at_ist": "2026-04-26T07:52:56+05:30",
         "artifact_path": "/tmp/<ephemeral-hub-demo>/onnx/model.onnx",
         "artifact_sha256": "ebc3af0117e7fcc734a5c8b951d8b711dda1e21baaa3052daeddfbc15401bc77",
         "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
@@ -138,6 +142,8 @@
       "report_path": null,
       "error": null,
       "report": {
+        "report_generated_at_utc": "2026-04-26T02:22:57Z",
+        "report_generated_at_ist": "2026-04-26T07:52:57+05:30",
         "artifact_path": "/tmp/<ephemeral-hub-demo>/pytorch_model.bin",
         "artifact_sha256": "545d8feae7cdaa752dfcecd8d480928b31a0f7a0b494877c9ab5ddf504906703",
         "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
@@ -152,6 +158,8 @@
       "report_path": null,
       "error": null,
       "report": {
+        "report_generated_at_utc": "2026-04-26T02:22:57Z",
+        "report_generated_at_ist": "2026-04-26T07:52:57+05:30",
         "artifact_path": "/tmp/<ephemeral-hub-demo>/tf_model.h5",
         "artifact_sha256": "8961e0116b64f7aa000cdee56f226922e47168126dfc846a85b935b259311edf",
         "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.permissive.json",
@@ -168,7 +176,7 @@
       "repo_id": "hf-internal-testing/tiny-random-BertModel"
     },
     "manifest_summary": {
-      "sha256": "27b746fa9981f7481e10d2f4f9bc64908ea161ef63a519507ca5098f8e01f1b8",
+      "sha256": "10dfb68a949cf9c114f09e97247a3111df2d10402bbadacf5740f60b4167df84",
       "file_count": 20
     }
   }

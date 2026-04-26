@@ -1,6 +1,8 @@
 {
   "schema": "hf_bundle_scanner.bundle_report.v2",
   "taxonomy_version": "phase0",
+  "report_generated_at_utc": "2026-04-26T02:23:09Z",
+  "report_generated_at_ist": "2026-04-26T07:53:09+05:30",
   "root": "/tmp/<ephemeral-hub-demo>",
   "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.safetensors-only.json",
   "drivers": "",
@@ -21,47 +23,47 @@
       {
         "relpath": ".cache/huggingface/download/.gitattributes.metadata",
         "size_bytes": 101,
-        "sha256": "1149f33e8fddf59a31a2707c0aaea1d5fa560e8584db353c414f8ad0cce79f23"
+        "sha256": "a1a372ddca5843ac9423fd7d0b0714532a3a50cd9f51a73ea42ccccb5dcf4e0c"
       },
       {
         "relpath": ".cache/huggingface/download/config.json.metadata",
         "size_bytes": 101,
-        "sha256": "7a2709b1aedf74ab454e1890c55d44888aa5eb8a7458d3e8fe7ef1b364066125"
+        "sha256": "9f9adaa1789b88956256c988f3c38e0855509442b69008681ea94e302d37f267"
       },
       {
         "relpath": ".cache/huggingface/download/onnx/model.onnx.metadata",
         "size_bytes": 125,
-        "sha256": "13cb199007da7efc504250fc20090f8d3e1c4d7d6056016478d4e76827abf592"
+        "sha256": "5ca0b04baee98781aed7540157fa9fea0a64eb779859b6c9427e88a91c97f955"
       },
       {
         "relpath": ".cache/huggingface/download/pytorch_model.bin.metadata",
         "size_bytes": 125,
-        "sha256": "c5084b6b6e0b6d53134a415c525b380d6ef80d1ac15ca7aad392180da2f987e2"
+        "sha256": "4a706bf2672bfbd2a425a4cbf19a8ea7b0f03d8dd22f5d2e47fb1cf99857c5b0"
       },
       {
         "relpath": ".cache/huggingface/download/special_tokens_map.json.metadata",
         "size_bytes": 100,
-        "sha256": "342861cc1371422ed60c2b6eacb4d346de58826df8ce9787fbae4731d8c7ff3c"
+        "sha256": "3fdcfd94fd82ce2b637a85586000211f9a25d42e64af167d3154e0b75e087110"
       },
       {
         "relpath": ".cache/huggingface/download/tf_model.h5.metadata",
         "size_bytes": 125,
-        "sha256": "ea71f8b364233e0704e160741aa758a6f573e0adadc24077dc475faab370e7d8"
+        "sha256": "eba752e483ea12d015217de056bcf459d738fb137e527a2adc8fb56d5a523b2d"
       },
       {
         "relpath": ".cache/huggingface/download/tokenizer.json.metadata",
-        "size_bytes": 101,
-        "sha256": "3728a211fa5a625e904cff66e623190c5f6cf374a9baaaf65c555df91e48cea3"
+        "size_bytes": 100,
+        "sha256": "baa1d09e4e556f72441d8efc0b16da4f2bc133d29e485b4960d3ea33ed3479f1"
       },
       {
         "relpath": ".cache/huggingface/download/tokenizer_config.json.metadata",
         "size_bytes": 101,
-        "sha256": "7aa64538f76418c78cc3b1a6c5c311b8690b7ca8ee871dfe734f34fb8e024067"
+        "sha256": "365e5bff51f996d0296a871ccfbe725b13ed956f4ee9d1bd4e4afe395102f533"
       },
       {
         "relpath": ".cache/huggingface/download/vocab.txt.metadata",
         "size_bytes": 101,
-        "sha256": "42443718d761c25106e079f7143cb72fc593ec9c554c4e4b4bfa855df75cadf1"
+        "sha256": "314f98b324b4e9c88506198b9efa72b9b2c5ddb256236566a820c48f8a3a9cc0"
       },
       {
         "relpath": ".gitattributes",
@@ -118,6 +120,8 @@
       "report_path": null,
       "error": null,
       "report": {
+        "report_generated_at_utc": "2026-04-26T02:23:08Z",
+        "report_generated_at_ist": "2026-04-26T07:53:08+05:30",
         "artifact_path": "/tmp/<ephemeral-hub-demo>/onnx/model.onnx",
         "artifact_sha256": "ebc3af0117e7fcc734a5c8b951d8b711dda1e21baaa3052daeddfbc15401bc77",
         "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.safetensors-only.json",
@@ -141,6 +145,8 @@
       "report_path": null,
       "error": null,
       "report": {
+        "report_generated_at_utc": "2026-04-26T02:23:09Z",
+        "report_generated_at_ist": "2026-04-26T07:53:09+05:30",
         "artifact_path": "/tmp/<ephemeral-hub-demo>/pytorch_model.bin",
         "artifact_sha256": "545d8feae7cdaa752dfcecd8d480928b31a0f7a0b494877c9ab5ddf504906703",
         "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.safetensors-only.json",
@@ -164,6 +170,8 @@
       "report_path": null,
       "error": null,
       "report": {
+        "report_generated_at_utc": "2026-04-26T02:23:09Z",
+        "report_generated_at_ist": "2026-04-26T07:53:09+05:30",
         "artifact_path": "/tmp/<ephemeral-hub-demo>/tf_model.h5",
         "artifact_sha256": "8961e0116b64f7aa000cdee56f226922e47168126dfc846a85b935b259311edf",
         "policy_path": "/root/LLM Scanner/hf_bundle_scanner/tests/fixtures/policy.safetensors-only.json",
@@ -189,7 +197,7 @@
       "repo_id": "hf-internal-testing/tiny-random-BertModel"
     },
     "manifest_summary": {
-      "sha256": "341188a3dd321341e4f10fa75651cbce6e2a1230625138277c052e3c9167340d",
+      "sha256": "d04854d7abec60ed3276bb73d8e59c05a0eff4a254b9ecc95b96b6f2758c2998",
       "file_count": 20
     }
   }

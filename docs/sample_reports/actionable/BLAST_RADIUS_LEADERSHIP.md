@@ -1,6 +1,6 @@
 # Blast radius & leadership brief (sample Hub demos)
 
-**Report generated (IST, Asia/Kolkata):** `2026-04-24T10:59:17+05:30`
+**Report generated (IST, Asia/Kolkata):** `2026-04-26T07:52:16+05:30`
 
 ## Scan scope (model identity)
 
