@@ -10,6 +10,9 @@ Set ``LLM_SCANNER_DYNAMIC_PROBE=1`` to run either:
 - ``execution_mode=selfcheck``: bounded ``garak --version`` CLI self-check
 - ``execution_mode=execute_once``: one explicit garak argv payload via ``--execute-args``
 
+Config source can be either ``--garak-config`` (file path) or
+``--garak-config-inline`` (inline content), but not both.
+
 If ``garak`` is missing, exits ``2`` and writes ``status: skipped`` with a clear message
 (tooling lane, aligned with absent ModelScan/ModelAudit semantics).
 """
@@ -22,6 +25,7 @@ import shutil
 import shlex
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 
@@ -66,6 +70,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Optional Garak config path (recorded + validated when provided)",
     )
     ap.add_argument(
+        "--garak-config-inline",
+        type=str,
+        default="",
+        help="Optional inline Garak config content (mutually exclusive with --garak-config).",
+    )
+    ap.add_argument(
         "--model-target",
         type=str,
         default=None,
@@ -93,8 +103,28 @@ def main(argv: list[str] | None = None) -> int:
     out = Path(args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)
     garak_config = None
+    garak_config_inline = str(args.garak_config_inline or "")
+    if args.garak_config is not None and garak_config_inline.strip():
+        ts_utc, ts_ist = now_report_timestamps()
+        doc = build_report(
+            status="error",
+            probe_backend="none",
+            message="--garak-config and --garak-config-inline are mutually exclusive.",
+            exit_code=2,
+            budget_max_probes=args.budget_max_probes,
+            budget_timeout_seconds=args.budget_timeout_seconds,
+            run_id=args.run_id,
+            garak_config="inline://dynamic_probe.garak_config_inline",
+            model_target=args.model_target,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
+        )
+        out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
+        return 2
+    garak_config_label: str | None = None
     if args.garak_config is not None:
         garak_config = Path(args.garak_config).resolve()
+        garak_config_label = str(garak_config)
         if not garak_config.is_file():
             ts_utc, ts_ist = now_report_timestamps()
             doc = build_report(
@@ -105,13 +135,15 @@ def main(argv: list[str] | None = None) -> int:
                 budget_max_probes=args.budget_max_probes,
                 budget_timeout_seconds=args.budget_timeout_seconds,
                 run_id=args.run_id,
-                garak_config=str(garak_config),
+                garak_config=garak_config_label,
                 model_target=args.model_target,
                 report_generated_at_utc=ts_utc,
                 report_generated_at_ist=ts_ist,
             )
             out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
             return 2
+    elif garak_config_inline.strip():
+        garak_config_label = "inline://dynamic_probe.garak_config_inline"
     required_secret_vars = _csv_names(args.secret_env_vars)
 
     if args.budget_max_probes is not None and int(args.budget_max_probes) <= 0:
@@ -124,7 +156,7 @@ def main(argv: list[str] | None = None) -> int:
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
+            garak_config=garak_config_label,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
@@ -143,7 +175,7 @@ def main(argv: list[str] | None = None) -> int:
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
+            garak_config=garak_config_label,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
@@ -164,7 +196,7 @@ def main(argv: list[str] | None = None) -> int:
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
+            garak_config=garak_config_label,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
@@ -184,7 +216,7 @@ def main(argv: list[str] | None = None) -> int:
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
+            garak_config=garak_config_label,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
@@ -206,7 +238,7 @@ def main(argv: list[str] | None = None) -> int:
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
+            garak_config=garak_config_label,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
@@ -227,7 +259,7 @@ def main(argv: list[str] | None = None) -> int:
             budget_max_probes=args.budget_max_probes,
             budget_timeout_seconds=args.budget_timeout_seconds,
             run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
+            garak_config=garak_config_label,
             model_target=args.model_target,
             execution_mode=args.execution_mode,
             secret_env_vars_required=required_secret_vars,
@@ -237,101 +269,116 @@ def main(argv: list[str] | None = None) -> int:
         out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
         return 2
 
-    executed_argv = [garak, *exec_args] if args.execution_mode == "execute_once" else []
-    preflight_argv = [garak, "--help"] if garak_config is None else [garak, "--config", str(garak_config), "--help"]
-    selfcheck_argv = [garak, "--version"]
-    probe_argv = (
-        executed_argv
-        if args.execution_mode == "execute_once"
-        else selfcheck_argv
-        if args.execution_mode == "selfcheck"
-        else preflight_argv
-    )
+    cfg_temp_dir: tempfile.TemporaryDirectory[str] | None = None
+    effective_garak_config = garak_config
+    if garak_config_inline.strip():
+        cfg_temp_dir = tempfile.TemporaryDirectory(prefix="garak-inline-")
+        cfg_path = Path(cfg_temp_dir.name) / "garak.dynamic.inline.yaml"
+        cfg_path.write_text(garak_config_inline, encoding="utf-8", newline="\n")
+        effective_garak_config = cfg_path
     try:
-        p = subprocess.run(
-            probe_argv,
-            capture_output=True,
-            text=True,
-            timeout=int(args.budget_timeout_seconds),
-            check=False,
+        executed_argv = [garak, *exec_args] if args.execution_mode == "execute_once" else []
+        preflight_argv = (
+            [garak, "--help"]
+            if effective_garak_config is None
+            else [garak, "--config", str(effective_garak_config), "--help"]
         )
-    except subprocess.TimeoutExpired:
-        ts_utc, ts_ist = now_report_timestamps()
-        doc = build_report(
-            status="error",
-            probe_backend="garak",
-            message=f"garak command timed out after {int(args.budget_timeout_seconds)}s: {probe_argv!r}",
-            exit_code=2,
-            budget_max_probes=args.budget_max_probes,
-            budget_timeout_seconds=args.budget_timeout_seconds,
-            run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
-            model_target=args.model_target,
-            execution_mode=args.execution_mode,
-            executed_argv=probe_argv,
-            secret_env_vars_required=required_secret_vars,
-            garak_cli=garak,
-            report_generated_at_utc=ts_utc,
-            report_generated_at_ist=ts_ist,
-        )
-        out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
-        return 2
-
-    if p.returncode != 0:
-        tail = (p.stderr or p.stdout or "").strip()[-2000:]
-        if args.execution_mode == "preflight":
-            cmd_label = "--help preflight"
-        elif args.execution_mode == "selfcheck":
-            cmd_label = "--version selfcheck"
-        else:
-            cmd_label = "execute_once command"
-        ts_utc, ts_ist = now_report_timestamps()
-        doc = build_report(
-            status="error",
-            probe_backend="garak",
-            message=f"garak {cmd_label} failed (exit {p.returncode}). stderr/stdout tail: {tail!r}",
-            exit_code=2,
-            budget_max_probes=args.budget_max_probes,
-            budget_timeout_seconds=args.budget_timeout_seconds,
-            run_id=args.run_id,
-            garak_config=str(garak_config) if garak_config is not None else None,
-            model_target=args.model_target,
-            execution_mode=args.execution_mode,
-            executed_argv=probe_argv,
-            secret_env_vars_required=required_secret_vars,
-            garak_cli=garak,
-            report_generated_at_utc=ts_utc,
-            report_generated_at_ist=ts_ist,
-        )
-        out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
-        return 2
-
-    ts_utc, ts_ist = now_report_timestamps()
-    doc = build_report(
-        status="ok",
-        probe_backend="garak",
-        message=(
-            "garak CLI preflight ok (--help)."
-            if args.execution_mode == "preflight"
-            else "garak CLI selfcheck ok (--version)."
+        selfcheck_argv = [garak, "--version"]
+        probe_argv = (
+            executed_argv
+            if args.execution_mode == "execute_once"
+            else selfcheck_argv
             if args.execution_mode == "selfcheck"
-            else "garak execute_once command completed successfully."
-        ),
-        exit_code=0,
-        budget_max_probes=args.budget_max_probes,
-        budget_timeout_seconds=args.budget_timeout_seconds,
-        run_id=args.run_id,
-        garak_config=str(garak_config) if garak_config is not None else None,
-        model_target=args.model_target,
-        execution_mode=args.execution_mode,
-        executed_argv=probe_argv,
-        secret_env_vars_required=required_secret_vars,
-        garak_cli=garak,
-        report_generated_at_utc=ts_utc,
-        report_generated_at_ist=ts_ist,
-    )
-    out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
-    return 0
+            else preflight_argv
+        )
+        try:
+            p = subprocess.run(
+                probe_argv,
+                capture_output=True,
+                text=True,
+                timeout=int(args.budget_timeout_seconds),
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            ts_utc, ts_ist = now_report_timestamps()
+            doc = build_report(
+                status="error",
+                probe_backend="garak",
+                message=f"garak command timed out after {int(args.budget_timeout_seconds)}s: {probe_argv!r}",
+                exit_code=2,
+                budget_max_probes=args.budget_max_probes,
+                budget_timeout_seconds=args.budget_timeout_seconds,
+                run_id=args.run_id,
+                garak_config=garak_config_label,
+                model_target=args.model_target,
+                execution_mode=args.execution_mode,
+                executed_argv=probe_argv,
+                secret_env_vars_required=required_secret_vars,
+                garak_cli=garak,
+                report_generated_at_utc=ts_utc,
+                report_generated_at_ist=ts_ist,
+            )
+            out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
+            return 2
+
+        if p.returncode != 0:
+            tail = (p.stderr or p.stdout or "").strip()[-2000:]
+            if args.execution_mode == "preflight":
+                cmd_label = "--help preflight"
+            elif args.execution_mode == "selfcheck":
+                cmd_label = "--version selfcheck"
+            else:
+                cmd_label = "execute_once command"
+            ts_utc, ts_ist = now_report_timestamps()
+            doc = build_report(
+                status="error",
+                probe_backend="garak",
+                message=f"garak {cmd_label} failed (exit {p.returncode}). stderr/stdout tail: {tail!r}",
+                exit_code=2,
+                budget_max_probes=args.budget_max_probes,
+                budget_timeout_seconds=args.budget_timeout_seconds,
+                run_id=args.run_id,
+                garak_config=garak_config_label,
+                model_target=args.model_target,
+                execution_mode=args.execution_mode,
+                executed_argv=probe_argv,
+                secret_env_vars_required=required_secret_vars,
+                garak_cli=garak,
+                report_generated_at_utc=ts_utc,
+                report_generated_at_ist=ts_ist,
+            )
+            out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
+            return 2
+
+        ts_utc, ts_ist = now_report_timestamps()
+        doc = build_report(
+            status="ok",
+            probe_backend="garak",
+            message=(
+                "garak CLI preflight ok (--help)."
+                if args.execution_mode == "preflight"
+                else "garak CLI selfcheck ok (--version)."
+                if args.execution_mode == "selfcheck"
+                else "garak execute_once command completed successfully."
+            ),
+            exit_code=0,
+            budget_max_probes=args.budget_max_probes,
+            budget_timeout_seconds=args.budget_timeout_seconds,
+            run_id=args.run_id,
+            garak_config=garak_config_label,
+            model_target=args.model_target,
+            execution_mode=args.execution_mode,
+            executed_argv=probe_argv,
+            secret_env_vars_required=required_secret_vars,
+            garak_cli=garak,
+            report_generated_at_utc=ts_utc,
+            report_generated_at_ist=ts_ist,
+        )
+        out.write_text(json.dumps(doc, indent=2), encoding="utf-8", newline="\n")
+        return 0
+    finally:
+        if cfg_temp_dir is not None:
+            cfg_temp_dir.cleanup()
 
 
 if __name__ == "__main__":

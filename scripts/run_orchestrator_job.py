@@ -295,6 +295,8 @@ def main(argv: list[str] | None = None) -> int:
             if _is_non_empty_str(dpo.get("garak_config")):
                 gcfg = _resolve(job_dir, str(dpo["garak_config"]))
                 probe_cmd.extend(["--garak-config", str(gcfg)])
+            if _is_non_empty_str(dpo.get("garak_config_inline")):
+                probe_cmd.extend(["--garak-config-inline", str(dpo["garak_config_inline"]).strip()])
             if _is_non_empty_str(dpo.get("model_target")):
                 probe_cmd.extend(["--model-target", str(dpo["model_target"]).strip()])
             sev = dpo.get("secret_env_vars")

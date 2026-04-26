@@ -184,3 +184,64 @@ def test_run_dynamic_probe_script_rejects_execute_once_without_args(
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["status"] == "error"
     assert "execute_once" in data["message"]
+
+
+def test_run_dynamic_probe_script_accepts_inline_config_metadata_when_disabled(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("LLM_SCANNER_DYNAMIC_PROBE", raising=False)
+    root = _repo_root()
+    script = root / "scripts" / "run_dynamic_probe.py"
+    if not script.is_file():
+        pytest.skip("monorepo scripts/ not present")
+    out = tmp_path / "dp_inline_disabled.json"
+    r = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--out",
+            str(out),
+            "--garak-config-inline",
+            "plugins: {}\n",
+        ],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 0, r.stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["status"] == "disabled"
+    assert data["garak_config"] == "inline://dynamic_probe.garak_config_inline"
+
+
+def test_run_dynamic_probe_script_rejects_both_config_sources(
+    tmp_path: Path,
+) -> None:
+    root = _repo_root()
+    script = root / "scripts" / "run_dynamic_probe.py"
+    if not script.is_file():
+        pytest.skip("monorepo scripts/ not present")
+    cfg = tmp_path / "garak.yaml"
+    cfg.write_text("plugins: {}\n", encoding="utf-8")
+    out = tmp_path / "dp_both_configs.json"
+    r = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--out",
+            str(out),
+            "--garak-config",
+            str(cfg),
+            "--garak-config-inline",
+            "plugins: {}\n",
+        ],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 2, r.stderr
+    data = json.loads(out.read_text(encoding="utf-8"))
+    assert data["status"] == "error"
+    assert "mutually exclusive" in data["message"]

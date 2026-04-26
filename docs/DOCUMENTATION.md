@@ -27,7 +27,7 @@ These are the **schemas and fields** downstream tools (CI, SIEM, orchestrators) 
 | -------- | --------------------- | -------- |
 | **Bundle report** | `hf_bundle_scanner.bundle_report.v2` — emitted by `scan-bundle scan --out` | Per-file admission, configlint, manifest, aggregate exit, **provenance**. |
 | **Admit-model report** | JSON from `admit-model scan --report` (shape documented in model-admission README) | Single-artifact findings + driver errors. |
-| **Dynamic probe report** | `llm_scanner.dynamic_probe_report.v1` — [dynamic_probe_report.py](../hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py) | Opt-in Garak lane: status, exit_code, execution metadata, **no secret values**. |
+| **Dynamic probe report** | `llm_scanner.dynamic_probe_report.v1` — [dynamic_probe_report.py](../hf_bundle_scanner/hf_bundle_scanner/dynamic_probe_report.py) | Opt-in Garak lane: status, exit_code, execution metadata (including config source labels), **no secret values**. |
 | **Orchestrator job** | `llm_scanner.orchestrator_job.v1` — [orchestrator_job.py](../hf_bundle_scanner/hf_bundle_scanner/orchestrator_job.py) | Declarative DAG: `scan_bundle`, optional `admit_model` fan-out, optional `dynamic_probe`, `aggregate`. |
 | **Orchestrator envelope** | `llm_scanner.orchestrator_envelope.v2` — written by `run_orchestrator_job.py run` | Per-step exit codes, UTC **Z** timestamps, `artifact_uri` for bundle / admit / dynamic outputs. |
 

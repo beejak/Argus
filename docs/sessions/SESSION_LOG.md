@@ -251,4 +251,11 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `make agent-verify`; smoke `python scripts/export_bundle_action_sheet.py --bundle-json /tmp/hf-bundle-fixture-report.json --html-out /tmp/test-export.html`.
 - **Next:** optional refresh of committed `docs/sample_reports/*.json` to embed timestamps for prettier static HTML regeneration.
 
+### 2026-04-26 — Phase 5 inline Garak config source (job JSON friendly)
+
+- **Phase:** `phase5-dynamic-staging` (`phase5-garak-config-budgets`, contract depth).
+- **Changes:** `scripts/run_dynamic_probe.py` now supports `--garak-config-inline` (mutually exclusive with `--garak-config`), records inline usage as `garak_config: "inline://dynamic_probe.garak_config_inline"`, and writes temporary config file only for bounded probe execution. `orchestrator_job.validate_job` accepts/validates `dynamic_probe.garak_config_inline` and rejects dual config sources; strict path checks skip file existence when inline config is provided. `scripts/run_orchestrator_job.py` forwards `garak_config_inline`. Tests expanded in `tests/test_dynamic_probe_report.py` and `tests/test_orchestrator_job.py` (validation + run path). Docs updated: `docs/PHASE5_DYNAMIC_PROBES.md`, `hf_bundle_scanner/README.md`, `docs/DOCUMENTATION.md`.
+- **Commands:** `pytest tests/test_dynamic_probe_report.py tests/test_orchestrator_job.py -q`; `pytest tests -q -m 'not integration'`; `make orchestrator-validate`; `make dynamic-probe-stub`; `make agent-verify`.
+- **Next:** consider bounded `execution_mode=profile` presets backed by validated job JSON (still opt-in, no default CI probe execution).
+
 ---

@@ -178,6 +178,11 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
             if "garak_config" in dp_obj and dp_obj.get("garak_config") is not None:
                 if not _is_non_empty_str(dp_obj.get("garak_config")):
                     errs.append("dynamic_probe.garak_config must be a non-empty string when provided")
+            if "garak_config_inline" in dp_obj and dp_obj.get("garak_config_inline") is not None:
+                if not _is_non_empty_str(dp_obj.get("garak_config_inline")):
+                    errs.append("dynamic_probe.garak_config_inline must be a non-empty string when provided")
+            if _is_non_empty_str(dp_obj.get("garak_config")) and _is_non_empty_str(dp_obj.get("garak_config_inline")):
+                errs.append("dynamic_probe.garak_config and dynamic_probe.garak_config_inline are mutually exclusive")
             if "model_target" in dp_obj and dp_obj.get("model_target") is not None:
                 if not _is_non_empty_str(dp_obj.get("model_target")):
                     errs.append("dynamic_probe.model_target must be a non-empty string when provided")
@@ -306,7 +311,7 @@ def validate_job(doc: Any, *, job_path: Path | None = None, strict_paths: bool =
             if _is_non_empty_str(dpo.get("out")):
                 outp = _rp(str(dpo.get("out", "")))
                 outp.parent.mkdir(parents=True, exist_ok=True)
-            if _is_non_empty_str(dpo.get("garak_config")):
+            if _is_non_empty_str(dpo.get("garak_config")) and not _is_non_empty_str(dpo.get("garak_config_inline")):
                 gcfg = _rp(str(dpo.get("garak_config", "")))
                 if not gcfg.is_file():
                     errs.append(f"dynamic_probe.garak_config not a file: {gcfg}")

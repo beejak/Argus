@@ -271,6 +271,25 @@ def test_dynamic_probe_garak_config_must_exist_under_strict_paths() -> None:
     assert any("dynamic_probe.garak_config not a file" in e for e in errs)
 
 
+def test_dynamic_probe_inline_config_validates_under_strict_paths() -> None:
+    p = _fixture("orchestrator_job_with_dynamic.json")
+    doc = load_job(p)
+    assert isinstance(doc["dynamic_probe"], dict)
+    doc["dynamic_probe"].pop("garak_config", None)
+    doc["dynamic_probe"]["garak_config_inline"] = "plugins: {}\n"
+    errs = validate_job(doc, job_path=p, strict_paths=True)
+    assert errs == []
+
+
+def test_dynamic_probe_rejects_both_config_sources() -> None:
+    p = _fixture("orchestrator_job_with_dynamic.json")
+    doc = load_job(p)
+    assert isinstance(doc["dynamic_probe"], dict)
+    doc["dynamic_probe"]["garak_config_inline"] = "plugins: {}\n"
+    errs = validate_job(doc, job_path=p, strict_paths=False)
+    assert any("mutually exclusive" in e for e in errs)
+
+
 def test_dynamic_probe_execute_once_requires_execute_args() -> None:
     doc = {
         "schema": JOB_SCHEMA_V1,
@@ -409,6 +428,59 @@ def test_run_orchestrator_job_with_dynamic_writes_envelope(
     assert dp["model_target"] == "fixture://model"
     assert dp["secret_env_vars_required"] == ["OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
     assert dp["execution_mode"] == "preflight"
+
+
+def test_run_orchestrator_job_with_dynamic_inline_config_writes_envelope(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("LLM_SCANNER_DYNAMIC_PROBE", raising=False)
+    repo = Path(__file__).resolve().parents[2]
+    bundle_out = tmp_path / "bundle_report.json"
+    dp_out = tmp_path / "dynamic_report.json"
+    env_out = tmp_path / "envelope.json"
+    job = {
+        "schema": JOB_SCHEMA_V1,
+        "run_id": "00000000-0000-4000-8000-000000000022",
+        "steps": [
+            {"id": "bundle_scan", "type": "scan_bundle", "depends_on": []},
+            {"id": "dyn", "type": "dynamic_probe", "depends_on": ["bundle_scan"]},
+            {"id": "aggregate", "type": "aggregate", "depends_on": ["bundle_scan", "dyn"]},
+        ],
+        "scan_bundle": {
+            "root": str(repo / "hf_bundle_scanner/tests/fixtures/minimal_tree"),
+            "policy": str(repo / "hf_bundle_scanner/tests/fixtures/policy.permissive.json"),
+            "out": str(bundle_out),
+            "drivers": "",
+            "timeout": 600,
+            "fail_on": "MEDIUM",
+        },
+        "dynamic_probe": {
+            "out": str(dp_out),
+            "budget_max_probes": 7,
+            "budget_timeout_seconds": 120,
+            "garak_config_inline": "plugins: {}\n",
+            "model_target": "fixture://model",
+            "secret_env_vars": ["OPENAI_API_KEY"],
+            "execution_mode": "preflight",
+        },
+    }
+    job_path = tmp_path / "job_inline.json"
+    job_path.write_text(json.dumps(job), encoding="utf-8")
+    script = repo / "scripts" / "run_orchestrator_job.py"
+    r = subprocess.run(
+        [sys.executable, str(script), "run", "--job", str(job_path), "--envelope-out", str(env_out)],
+        cwd=str(repo),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert r.returncode == 0, (r.stdout, r.stderr)
+    env = json.loads(env_out.read_text(encoding="utf-8"))
+    assert env["schema"] == ENVELOPE_SCHEMA_V2
+    assert env["steps"][1]["type"] == "dynamic_probe"
+    dp = json.loads(dp_out.read_text(encoding="utf-8"))
+    assert dp["run_id"] == job["run_id"]
+    assert dp["garak_config"] == "inline://dynamic_probe.garak_config_inline"
 
 
 def test_run_orchestrator_job_with_admit_writes_envelope(tmp_path: Path) -> None:
