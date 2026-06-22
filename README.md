@@ -3,7 +3,7 @@
 # LLM Scanner
 
 <!-- SLOGAN_START -->
-<p align="center"><i>If it loads arbitrary Python, it is not a minor convenience flag.</i></p>
+<p align="center"><i>We ask rude questions quietly, in JSON.</i></p>
 <!-- SLOGAN_END -->
 
 <sub>Rotating tagline pool: <code>docs/slogans.json</code> · <a href="docs/SLOGANS.md">how it rotates</a> · <a href=".github/workflows/rotate-slogan.yml">workflow</a></sub>
