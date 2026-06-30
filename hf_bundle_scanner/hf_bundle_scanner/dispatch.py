@@ -82,14 +82,17 @@ def run_admit_scan(
             "--fail-on",
             fail_on,
         ]
-        proc = subprocess.run(
-            argv,
-            capture_output=True,
-            text=True,
-            timeout=timeout + 120,
-            check=False,
-            env=os.environ.copy(),
-        )
+        try:
+            proc = subprocess.run(
+                argv,
+                capture_output=True,
+                text=True,
+                timeout=timeout + 120,
+                check=False,
+                env=os.environ.copy(),
+            )
+        except subprocess.TimeoutExpired:
+            return 2, None, f"admit-model subprocess timed out after {timeout + 120}s"
         data: dict[str, Any] | None = None
         err = (proc.stderr or "") + (proc.stdout or "")
         if report_path.exists():

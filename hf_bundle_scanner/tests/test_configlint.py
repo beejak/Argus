@@ -84,3 +84,87 @@ def test_torchscript_truthy(tmp_path: Path) -> None:
     p.write_text(json.dumps({"torchscript": True}), encoding="utf-8")
     fs = lint_config_file(p)
     assert any(f.rule_id == "torchscript_truthy" for f in fs)
+
+
+def test_use_auth_token_present_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"use_auth_token": True}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "use_auth_token_present" for f in fs)
+
+
+# --- string-boolean variants ---
+
+
+def test_trust_remote_code_string_true(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"trust_remote_code": "true"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "trust_remote_code_enabled" for f in fs)
+
+
+def test_trust_remote_code_string_one(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"trust_remote_code": "1"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "trust_remote_code_enabled" for f in fs)
+
+
+def test_local_files_only_string_false(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"local_files_only": "false"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "local_files_only_false" for f in fs)
+
+
+def test_local_files_only_string_zero(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"local_files_only": "0"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "local_files_only_false" for f in fs)
+
+
+def test_use_safetensors_string_false(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"use_safetensors": "false"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "use_safetensors_disabled" for f in fs)
+
+
+# --- negative / non-triggering cases ---
+
+
+def test_empty_proxies_no_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"proxies": {}}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert not any(f.rule_id == "http_proxies_configured" for f in fs)
+
+
+def test_remote_pretrained_http_url_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps({"pretrained_model_name_or_path": "http://insecure.example/model"}),
+        encoding="utf-8",
+    )
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "remote_pretrained_identifier_url" for f in fs)
+
+
+def test_tokenizer_subfolder_absolute_path_finding(tmp_path: Path) -> None:
+    p = tmp_path / "tokenizer_config.json"
+    p.write_text(json.dumps({"subfolder": "/etc/passwd"}), encoding="utf-8")
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "tokenizer_subfolder_path_traversal" for f in fs)
+
+
+# --- nested structure ---
+
+
+def test_trust_remote_code_nested_finding(tmp_path: Path) -> None:
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps({"model_config": {"trust_remote_code": True}}), encoding="utf-8"
+    )
+    fs = lint_config_file(p)
+    assert any(f.rule_id == "trust_remote_code_enabled" for f in fs)
