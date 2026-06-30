@@ -69,9 +69,9 @@ class ModelScanDriver(ScanDriver):
             argv = [exe, "-p", str(artifact), "-r", "json", "-o", str(out)]
             proc = self._run(argv, timeout_sec=timeout_sec)
             if proc.returncode == -1:
-                return [], proc.stderr or "modelscan subprocess timed out"
+                return findings, proc.stderr or "modelscan subprocess timed out"
             if proc.returncode == 4:
-                return [], f"modelscan usage error: {proc.stderr or proc.stdout}"
+                return findings, f"modelscan usage error: {proc.stderr or proc.stdout}"
             if proc.returncode == 3:
                 findings.append(
                     Finding(
@@ -84,7 +84,7 @@ class ModelScanDriver(ScanDriver):
                 return findings, None
             if proc.returncode == 2:
                 return (
-                    [],
+                    findings,
                     f"modelscan scan failed (exit 2): {proc.stderr or proc.stdout}",
                 )
             if out.exists():

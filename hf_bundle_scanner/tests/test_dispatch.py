@@ -162,6 +162,19 @@ def test_scan_bundle_timeout_on_one_file_does_not_abort_others(
     assert bundle.aggregate_exit_code == 2
 
 
+def test_scan_bundle_script_lint_trust_remote_code_detected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Bundled .py with trust_remote_code=True must appear in config_findings and raise aggregate."""
+    _patch_admit_env(monkeypatch)
+    py_file = tmp_path / "train.py"
+    py_file.write_text("from transformers import AutoModel\nAutoModel.from_pretrained('x', trust_remote_code=True)\n", encoding="utf-8")
+    pol = _policy(tmp_path)
+    bundle = scan_bundle(tmp_path, pol, drivers="", timeout=60)
+    assert any(f.get("rule_id") == "trust_remote_code_in_script" for f in bundle.config_findings)
+    assert bundle.aggregate_exit_code == 1
+
+
 def test_bundle_report_timestamps_remain_stable_across_to_dict_calls() -> None:
     rep = BundleReport(
         root="/tmp/root",

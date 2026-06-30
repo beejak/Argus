@@ -43,13 +43,15 @@ def _is_trust_remote_code_kwarg(node: ast.keyword) -> bool:
     )
 
 
-def lint_python_file(path: Path) -> list[ScriptFinding]:
-    rel = str(path)
+def lint_python_file(path: Path, *, root: Path | None = None) -> list[ScriptFinding]:
+    rel = path.relative_to(root).as_posix() if root else str(path)
     try:
         source = path.read_text(encoding="utf-8", errors="replace")
         tree = ast.parse(source, filename=rel)
     except SyntaxError as e:
         return [ScriptFinding(rel, "script_parse_error", f"syntax error: {e}", lineno=e.lineno)]
+    except OSError as e:
+        return [ScriptFinding(rel, "script_parse_error", f"cannot read file: {e}")]
 
     findings: list[ScriptFinding] = []
     for node in ast.walk(tree):
@@ -68,8 +70,8 @@ def lint_python_file(path: Path) -> list[ScriptFinding]:
     return findings
 
 
-def lint_python_files(paths: list[Path]) -> list[ScriptFinding]:
+def lint_python_files(paths: list[Path], *, root: Path | None = None) -> list[ScriptFinding]:
     out: list[ScriptFinding] = []
     for p in paths:
-        out.extend(lint_python_file(p))
+        out.extend(lint_python_file(p, root=root))
     return out

@@ -14,6 +14,7 @@ from typing import Any
 
 from hf_bundle_scanner.configlint import lint_tree
 from hf_bundle_scanner.discovery import DiscoveryConfig, discover_config_files, discover_scan_artifacts
+from hf_bundle_scanner.script_lint import lint_python_files
 from hf_bundle_scanner.provenance import build_bundle_provenance
 from hf_bundle_scanner.report import BundleReport, FileScanRecord, compute_aggregate_exit, merge_aggregate_exit
 from hf_bundle_scanner.snapshot import build_manifest
@@ -25,6 +26,7 @@ from hf_bundle_scanner.timestamps import now_report_timestamps
 CONFIG_RISK_RULE_IDS: frozenset[str] = frozenset(
     {
         "trust_remote_code_enabled",
+        "trust_remote_code_in_script",
         "auto_map_custom_classes",
         "config_json_invalid",
     }
@@ -127,6 +129,11 @@ def scan_bundle(
 
     cfg_paths = discover_config_files(root, discovery)
     cfg_findings = [f.to_dict() for f in lint_tree(cfg_paths)]
+
+    py_files = sorted(root.rglob("*.py"))
+    script_findings = [f.to_dict() for f in lint_python_files(py_files, root=root)]
+    cfg_findings.extend(script_findings)
+
     config_risk = any(f["rule_id"] in CONFIG_RISK_RULE_IDS for f in cfg_findings)
 
     targets = discover_scan_artifacts(root, discovery)
