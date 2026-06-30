@@ -36,7 +36,7 @@ class ScanDriver(ABC):
                 x in k.upper()
                 for x in ("KEY", "TOKEN", "SECRET", "PASSWORD", "CREDENTIAL")
             ):
-                if k not in env_extra:  # allow explicit scan-time vars if ever needed
+                if not env_extra or k not in env_extra:  # allow explicit scan-time vars if ever needed
                     env.pop(k, None)
         try:
             return subprocess.run(
