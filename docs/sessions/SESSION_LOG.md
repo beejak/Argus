@@ -258,4 +258,22 @@ Append-only notes for multi-session work. **No secrets.** Newest entries at the 
 - **Commands:** `pytest tests/test_dynamic_probe_report.py tests/test_orchestrator_job.py -q`; `pytest tests -q -m 'not integration'`; `make orchestrator-validate`; `make dynamic-probe-stub`; `make agent-verify`.
 - **Next:** consider bounded `execution_mode=profile` presets backed by validated job JSON (still opt-in, no default CI probe execution).
 
+### 2026-06-30 — Gap analysis + bug fix + script_lint module
+
+- **Phase:** `phase3-configlint-oss` (gap closure) + cross-cutting security hardening.
+- **Commit:** `8470112`
+- **Changes:**
+  - **Bug fix** — `hf_bundle_scanner/hf_bundle_scanner/dispatch.py`: `subprocess.TimeoutExpired` now caught in `run_admit_scan`; maps to exit code 2 instead of crashing the scan.
+  - **New module** — `hf_bundle_scanner/hf_bundle_scanner/script_lint.py`: AST-based scanner for `.py` files in model bundles. Detects `trust_remote_code=True` as a literal bool keyword argument (ignores comments, docstrings, `False`, variable references). Motivated by CVE-2026-6859 class.
+  - **Test gaps closed** — `test_configlint.py`: `use_auth_token_present`, `torchscript_truthy`, string-boolean variants, empty proxies negative, `http://` URL, absolute subfolder, nested `trust_remote_code`. `test_discovery.py`: uppercase extensions (.GGUF/.PT), `include_globs`, `generation_config.json`, `node_modules` exclusion, empty directory. `test_report.py`: exit-4 priority combinations, `merge_aggregate_exit` does not downgrade from 4 under config risk. `test_dispatch.py`: timeout returns exit 2, timeout on one file does not stop remaining files.
+  - **New tests** — `hf_bundle_scanner/tests/test_script_lint.py`: 12 tests covering literal true, false, variable reference, commented-out code, string boolean, nested call, parse error, multi-file scan.
+  - **New doc** — `docs/GAP_TRACKER.md`: structured gap register with status, CVE/research references, effort estimates, and next steps.
+- **Gaps identified but not implemented:**
+  - Gap 3: GGUF metadata scan (CVE-2026-5760 Jinja2 SSTI in chat_template field) — needs GGUF header parser + `gguf_lint.py`.
+  - Gap 4: picklescan version enforcement (CVEs 2025-10155/10156/10157 require >= 0.0.31) — no version check exists.
+  - Gap 5 (partial): `script_lint.py` only covers `trust_remote_code=True`; could expand to `exec`, `eval`, `os.system`, `pickle.loads` patterns.
+- **External research backing open gaps:** NullifAI 7z bypass (Feb 2025), picklescan zero-days (2025), GGUF SSTI (CVE-2026-5760 CVSS 9.5), SafePickle ML classifier (Feb 2026).
+- **Commands:** `make test`, `make agent-verify`.
+- **Next:** implement GGUF lint (Gap 3) or picklescan version guard (Gap 4); see `docs/GAP_TRACKER.md`.
+
 ---
