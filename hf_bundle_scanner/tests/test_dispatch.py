@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -104,6 +105,74 @@ def test_scan_bundle_trust_remote_raises_exit(
     bundle = scan_bundle(tmp_path, pol, drivers="", timeout=60)
     assert bundle.aggregate_exit_code == 1
     assert any(f["rule_id"] == "trust_remote_code_enabled" for f in bundle.config_findings)
+
+
+def test_run_admit_scan_timeout_returns_tooling_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A hung subprocess must not crash the scan — it must return exit_code=2 (tooling error)."""
+    import hf_bundle_scanner.dispatch as dispatch_mod
+
+    _patch_admit_env(monkeypatch)
+
+    def _raise_timeout(*args: object, **kwargs: object) -> None:
+        raise subprocess.TimeoutExpired(cmd=["admit-model"], timeout=60)
+
+    monkeypatch.setattr(dispatch_mod.subprocess, "run", _raise_timeout)
+
+    art = tmp_path / "f.bin"
+    art.write_bytes(b"x")
+    pol = _policy(tmp_path)
+    code, data, err = run_admit_scan(art, pol, drivers="", timeout=60, fail_on="MEDIUM")
+
+    assert code == 2
+    assert data is None
+    assert err is not None and ("timeout" in err.lower() or "timed out" in err.lower())
+
+
+def test_scan_bundle_timeout_on_one_file_does_not_abort_others(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Timeout on one file must yield exit_code=2 for that record and not stop remaining files."""
+    import hf_bundle_scanner.dispatch as dispatch_mod
+
+    _patch_admit_env(monkeypatch)
+
+    call_count = 0
+    real_run = dispatch_mod.subprocess.run
+
+    def _timeout_first_then_real(*args: object, **kwargs: object) -> object:
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            raise subprocess.TimeoutExpired(cmd=args[0] if args else [], timeout=60)
+        return real_run(*args, **kwargs)
+
+    monkeypatch.setattr(dispatch_mod.subprocess, "run", _timeout_first_then_real)
+
+    _write_minimal_safetensors(tmp_path / "a.safetensors")
+    _write_minimal_safetensors(tmp_path / "b.safetensors")
+    pol = _policy(tmp_path)
+    bundle = scan_bundle(tmp_path, pol, drivers="", timeout=60)
+
+    assert len(bundle.file_scans) == 2
+    exit_codes = {r.relpath.split("/")[-1]: r.exit_code for r in bundle.file_scans}
+    assert exit_codes["a.safetensors"] == 2
+    assert exit_codes["b.safetensors"] == 0
+    assert bundle.aggregate_exit_code == 2
+
+
+def test_scan_bundle_script_lint_trust_remote_code_detected(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Bundled .py with trust_remote_code=True must appear in config_findings and raise aggregate."""
+    _patch_admit_env(monkeypatch)
+    py_file = tmp_path / "train.py"
+    py_file.write_text("from transformers import AutoModel\nAutoModel.from_pretrained('x', trust_remote_code=True)\n", encoding="utf-8")
+    pol = _policy(tmp_path)
+    bundle = scan_bundle(tmp_path, pol, drivers="", timeout=60)
+    assert any(f.get("rule_id") == "trust_remote_code_in_script" for f in bundle.config_findings)
+    assert bundle.aggregate_exit_code == 1
 
 
 def test_bundle_report_timestamps_remain_stable_across_to_dict_calls() -> None:

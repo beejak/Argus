@@ -5,8 +5,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from hf_bundle_scanner.configlint import RULE_IDS_EMITTED
+from hf_bundle_scanner.configlint import RULE_IDS_EMITTED as CONFIGLINT_RULE_IDS
 from hf_bundle_scanner.dispatch import CONFIG_RISK_RULE_IDS
+from hf_bundle_scanner.script_lint import RULE_IDS_EMITTED as SCRIPT_RULE_IDS
 
 
 def _repo_root() -> Path:
@@ -21,4 +22,4 @@ def test_configlint_policy_template_matches_dispatch() -> None:
     escalating = {r["rule_id"] for r in rules if r.get("default_aggregate_escalates") is True}
     assert escalating == set(CONFIG_RISK_RULE_IDS)
     all_ids = {r["rule_id"] for r in rules}
-    assert all_ids == RULE_IDS_EMITTED
+    assert all_ids == CONFIGLINT_RULE_IDS | SCRIPT_RULE_IDS

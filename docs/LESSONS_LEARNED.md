@@ -114,6 +114,26 @@ Append **newest lessons at the bottom** under a dated heading. This file is the 
 - **Mistake:** Keeping orchestrator identity only in envelope JSON forces downstream tools that only receive bundle report to lose run correlation.
 - **Fix:** During orchestrator `run`, echo `run_id` / `parent_run_id` into `bundle_report.v2.provenance.orchestrator` as optional fields; keep schema backward-compatible by not making them required.
 
+## 2026-06-30 — Unhandled `subprocess.TimeoutExpired` crashes entire bundle scan
+
+- **Mistake:** `hf_bundle_scanner/dispatch.py` `run_admit_scan` called `subprocess.run(..., timeout=...)` but only caught `subprocess.CalledProcessError`. A hung subprocess raised `TimeoutExpired`, which propagated uncaught and aborted the whole scan rather than recording a tooling-error (exit 2) for that file and continuing.
+- **Fix:** Wrap `subprocess.run` in a `try/except (subprocess.CalledProcessError, subprocess.TimeoutExpired)` block; map `TimeoutExpired` to exit code 2 so remaining files continue. Test: `test_dispatch.py` — `test_timeout_returns_exit2` and `test_timeout_on_one_file_does_not_stop_others`.
+
+## 2026-06-30 — New scanner modules need a home in `dispatch.py`, not ad-hoc scripts
+
+- **Observation:** `script_lint.py` was motivated by CVE-2026-6859 (trust_remote_code hardcoded in training scripts). The natural place to integrate it is as an additional dispatch step, not a standalone scanner, so its findings roll into the existing aggregate exit and bundle report.
+- **Lesson:** When adding a new static signal, check whether it belongs in `configlint.py` (config-file heuristics), `dispatch.py` (subprocess or module calls), or a new peer module called from `dispatch.py`. Keep the call graph flat; do not create new entry-point scripts unless the check genuinely needs a separate process boundary.
+
+## 2026-06-30 — AST scanning is safer than regex for Python source
+
+- **Observation:** Scanning Python files with regex for `trust_remote_code=True` produces false positives (comments, docstrings, string bodies) and false negatives (multi-line calls, mixed quoting).
+- **Fix:** `script_lint.py` uses `ast.parse` + `ast.walk` to find `keyword` nodes with `arg == "trust_remote_code"` and a `Constant` value of `True` (bool). This correctly ignores `# trust_remote_code=True`, `trust_remote_code=False`, and variable references while flagging the exact literal-true pattern. Parse errors (non-UTF-8 or invalid syntax) are caught and returned as a warning finding rather than crashing the scan.
+
+## 2026-06-30 — Gap tracking belongs in a structured register, not just session notes
+
+- **Observation:** Identified gaps (GGUF SSTI, picklescan version enforcement, expanded script patterns) were scattered across chat context. When a new agent session starts, it cannot reconstruct which gaps are open, which are closed, or what CVE/research backs each one.
+- **Fix:** Maintain `docs/GAP_TRACKER.md` as a structured register: gap ID, title, status (open/fixed), CVE/research reference, effort estimate, and suggested next step. Update it each session alongside the session log.
+
 ## Template (copy below)
 
 ```

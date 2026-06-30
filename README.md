@@ -31,7 +31,7 @@ Program overview: [docs/PROGRAM_STATUS_SNAPSHOT.md](docs/PROGRAM_STATUS_SNAPSHOT
 
 **Who this is for:** engineering leads, security / risk partners, and executives who need a **yes/no/hold** story without reading JSON or spreadsheets first.
 
-**What we actually do:** we take a **folder of model-related files** (weights, configs, and similar artifacts) and run **automated, offline-friendly checks** on them. Think “a release gate for the **files you are about to trust**,” not “we proved your chatbot will behave.”
+**What we actually do:** Argus is a **static admission and bundle-scanning system for Hugging Face–style model artifacts**. You point it at a directory of model files (weights, tokenizer configs, and related artifacts), and it runs automated, offline-friendly checks: policy gates (size limits, extension allowlists, SHA-256 allowlists), static config-risk analysis on JSON files (11 rule IDs covering trust escalation, remote fetching, and supply-chain signals), optional driver-based deep inspection via ModelScan and ModelAudit, and an AST-based `script_lint.py` module that detects `trust_remote_code=True` in bundled `.py` files without executing them. Results are aggregated into a single bundle JSON report with a stable exit code (`0` = clean, `1` = policy or findings, `2` = tooling error, `4` = usage error) that CI gates can act on directly. Think of it as a **release gate for the files you are about to trust**, not proof that a model will behave at inference time.
 
 **What you get out of it:**
 
@@ -322,6 +322,98 @@ The [![LLM Scanner CI](https://github.com/beejak/Argus/actions/workflows/llm-sca
 | **“Is CI green?”** | Open the latest **GitHub Actions** run for **`llm-scanner`** on [Argus](https://github.com/beejak/Argus/actions). |
 
 Deeper narrative: [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md). Agent entry: [AGENTS.md](AGENTS.md).
+
+---
+
+## Quick install
+
+Both packages require **Python 3.11 or 3.12**.
+
+```bash
+# From the repo root — creates .venv/ and installs both packages in editable mode
+make install
+
+# Or manually:
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e "model-admission/[dev]"
+pip install -e "hf_bundle_scanner/[dev,mcp,http]"
+```
+
+`make install` creates **`.venv/`** (PEP 668–friendly) and installs both Python packages in editable mode.
+
+---
+
+## Key commands with examples
+
+**Scan a whole bundle directory:**
+
+```bash
+export HF_BUNDLE_PYTHON="$(pwd)/.venv/bin/python"
+scan-bundle scan \
+  --root /path/to/snapshot \
+  --policy /path/to/policy.json \
+  --out /tmp/bundle-report.json \
+  --drivers "" \
+  --print-summary
+```
+
+**Scan a single model artifact:**
+
+```bash
+admit-model scan \
+  --artifact /path/to/model.safetensors \
+  --policy policy.json \
+  --report /tmp/admit.json \
+  --drivers "" \
+  --timeout 600 \
+  --fail-on MEDIUM
+```
+
+**Exit codes:**
+
+| Code | Meaning |
+| ---- | ------- |
+| **0** | Clean — no policy violations or findings at/above the severity floor |
+| **1** | Policy or findings — at least one finding at/above `--fail-on` severity, or a configlint CONFIG_RISK rule fired |
+| **2** | Tooling error — a driver subprocess failed or timed out |
+| **4** | Usage error — bad arguments or unrecognised driver name |
+
+---
+
+## configlint rule IDs
+
+`scan-bundle scan` runs static JSON config analysis on every `*.json` file in the snapshot tree. The 11 stable rule IDs emitted by `hf_bundle_scanner.configlint` are:
+
+| Rule ID | What it flags |
+| ------- | ------------- |
+| `trust_remote_code_enabled` | `trust_remote_code` is truthy — loading will execute Hub Python |
+| `use_auth_token_present` | `use_auth_token` is set — verify no tokens are embedded in public repos |
+| `use_fast_tokenizer_truthy` | `use_fast_tokenizer` is truthy — legacy tokenizer paths can complicate audits |
+| `auto_map_custom_classes` | `auto_map` references custom class names — verify code provenance |
+| `use_safetensors_disabled` | `use_safetensors` is explicitly false — loaders may prefer pickle-era weight paths |
+| `local_files_only_false` | `local_files_only` is explicitly false — loaders may fetch remote Hub files at load time |
+| `remote_pretrained_identifier_url` | A pretrained pointer (`pretrained_model_name_or_path`, etc.) is an `http(s)://` URL |
+| `tokenizer_subfolder_path_traversal` | `subfolder` contains `..` or an absolute prefix — potential path confusion |
+| `http_proxies_configured` | Top-level `proxies` is non-empty — verify no corporate credentials embedded |
+| `torchscript_truthy` | `torchscript` is truthy — TorchScript/tracing paths can complicate supply-chain review |
+| `config_json_invalid` | The JSON file could not be parsed |
+
+Rules `trust_remote_code_enabled`, `auto_map_custom_classes`, and `config_json_invalid` are in `CONFIG_RISK_RULE_IDS` — they escalate the bundle aggregate exit code to `1` even when all per-file scans are clean. The remaining 8 rules appear in `config_findings` but do not force that escalation by default. See [`docs/policy/configlint_rule_defaults.json`](docs/policy/configlint_rule_defaults.json) for the machine-readable form.
+
+---
+
+## script_lint.py — AST-based Python file detection
+
+`hf_bundle_scanner` includes a `script_lint.py` module that uses Python's `ast` module to detect `trust_remote_code=True` patterns in bundled `.py` files **without executing them**. This catches trust escalation that is encoded in Python rather than in JSON configs. Findings are surfaced in the bundle report's `config_findings` list alongside JSON configlint results.
+
+---
+
+## How to run tests
+
+```bash
+make test          # hf_bundle_scanner pytest (excludes integration / network tests)
+make agent-verify  # Both packages: model-admission + hf_bundle_scanner, plus ruff, orchestrator validate, dynamic-probe stub. Writes .agent/pytest-last.log
+```
 
 ---
 

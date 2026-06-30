@@ -23,6 +23,18 @@
       "notes": "Unexpected class wiring / provenance story; blocking in default CI today."
     },
     {
+      "rule_id": "trust_remote_code_in_script",
+      "default_aggregate_escalates": true,
+      "signal_class": "loader_remote_code",
+      "notes": "trust_remote_code=True found in a bundled .py file via AST scan (CVE-2026-6859); supply-chain RCE risk."
+    },
+    {
+      "rule_id": "script_parse_error",
+      "default_aggregate_escalates": false,
+      "signal_class": "integrity_parse",
+      "notes": "Bundled .py file could not be parsed; informational, review manually."
+    },
+    {
       "rule_id": "use_auth_token_present",
       "default_aggregate_escalates": false,
       "signal_class": "secrets_hygiene",
