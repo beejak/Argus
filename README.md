@@ -3,7 +3,7 @@
 # LLM Scanner
 
 <!-- SLOGAN_START -->
-<p align="center"><i>The mirror is public; your policy is yours.</i></p>
+<p align="center"><i>Ships happen; surprises should not.</i></p>
 <!-- SLOGAN_END -->
 
 <sub>Rotating tagline pool: <code>docs/slogans.json</code> · <a href="docs/SLOGANS.md">how it rotates</a> · <a href=".github/workflows/rotate-slogan.yml">workflow</a></sub>
