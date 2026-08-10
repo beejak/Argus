@@ -3,7 +3,7 @@
 # LLM Scanner
 
 <!-- SLOGAN_START -->
-<p align="center"><i>OSS scanners first; commercial adapters only when you opt in and write it down.</i></p>
+<p align="center"><i>The Hub gives you bytes; we give you receipts.</i></p>
 <!-- SLOGAN_END -->
 
 <sub>Rotating tagline pool: <code>docs/slogans.json</code> · <a href="docs/SLOGANS.md">how it rotates</a> · <a href=".github/workflows/rotate-slogan.yml">workflow</a></sub>
