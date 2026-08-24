@@ -3,7 +3,7 @@
 # LLM Scanner
 
 <!-- SLOGAN_START -->
-<p align="center"><i>Weights are data. Config is intent. Intent gets audited.</i></p>
+<p align="center"><i>Provenance is gossip that brought a checksum to a gunfight.</i></p>
 <!-- SLOGAN_END -->
 
 <sub>Rotating tagline pool: <code>docs/slogans.json</code> · <a href="docs/SLOGANS.md">how it rotates</a> · <a href=".github/workflows/rotate-slogan.yml">workflow</a></sub>
