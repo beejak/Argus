@@ -3,7 +3,7 @@
 # LLM Scanner
 
 <!-- SLOGAN_START -->
-<p align="center"><i>We lint your billion-parameter anxiety before it becomes a calendar invite.</i></p>
+<p align="center"><i>Your snapshot didn’t ask for a lawyer — we brought the linter.</i></p>
 <!-- SLOGAN_END -->
 
 <sub>Rotating tagline pool: <code>docs/slogans.json</code> · <a href="docs/SLOGANS.md">how it rotates</a> · <a href=".github/workflows/rotate-slogan.yml">workflow</a></sub>
